@@ -358,7 +358,7 @@ def get_all_series_info(all_series_ids_list):
         continue
   return temp_df_to_concat
 
-def get_years_from_series(year):
+def get_series_from_year(year):
    year_to_series_id_mapping = {
       2008 : 313494,
       2009 : 374163,

@@ -1,6 +1,5 @@
 import pandas as pd, requests, traceback, warnings
 from datetime import datetime
-from IPython.display import display, HTML
 import asyncio
 
 # Settings the warnings to be ignored
@@ -14,15 +13,13 @@ innings_taken = 2
 
 """# Get matches data"""
 
-def get_matches(series_id, stage="FINISHED"):
+def get_matches_returns_dict(series_id, stage="FINISHED"):
     try:
         url = f"https://hs-consumer-api.espncricinfo.com/v1/pages/series/schedule?lang=en&seriesId={series_id}"
         output = requests.get(url)
         print(url)
         matches = output.json()['content']["matches"]
-        # print(matches[0])
         df = pd.json_normalize(data=matches)
-        #print(df['teams'].head())
         if stage:
             df = df[df['stage']==stage]
         df.rename(columns={"objectId": "match_id", "slug": "match_name"}, inplace=True)
@@ -304,7 +301,7 @@ def get_one_innings_from_extracted_data(series_id, match_id, innings_id):
   final_df = final_df[::-1]
   return final_df
 
-def get_matches(series_id, stage="FINISHED"):
+def get_matches_returns_list(series_id, stage="FINISHED"):
     try:
         url = f"https://hs-consumer-api.espncricinfo.com/v1/pages/series/schedule?lang=en&seriesId={series_id}"
         output = requests.get(url)
@@ -330,7 +327,7 @@ def get_series_info(series_id):
   # LSG vs CSK 2nd Innings washed out due to rain.
   # match_ids_list.remove(1359519)
 
-  all_match_ids_list = get_matches(series_id)
+  all_match_ids_list = get_matches_returns_list(series_id)
   for match_id_iter in all_match_ids_list:
     try:
       for innings_iter in [1,2]:
@@ -350,7 +347,7 @@ def get_all_series_info(all_series_ids_list):
   # LSG vs CSK 2nd Innings washed out due to rain.
 
   for series_iter in all_series_ids_list:
-    all_match_ids_list = get_matches(series_iter)
+    all_match_ids_list = get_matches_returns_list(series_iter)
     for match_id_iter in all_match_ids_list:
       try:
         for innings_iter in [1,2]:
@@ -360,3 +357,47 @@ def get_all_series_info(all_series_ids_list):
         print(f'The series {series_iter} - match {match_id_iter} - innings {innings_iter} did not take place')
         continue
   return temp_df_to_concat
+
+def get_years_from_series(year):
+   year_to_series_id_mapping = {
+      2008 : 313494,
+      2009 : 374163,
+      2010 : 418064,
+      2011 : 466304,
+      2012 : 520932,
+      2013 : 586733,
+      2014 : 695871,
+      2015 : 791129,
+      2016 : 968923,
+      2017 : 1078425,
+      2018 : 1131611,
+      2019 : 1165643,
+      2020 : 1210595,
+      2021 : 1249214,
+      2022 : 1298423,
+      2023 : 1345038
+    }
+   return year_to_series_id_mapping[year]
+
+def get_match_ids_from_series(series_id):
+  try:
+      url = f"https://hs-consumer-api.espncricinfo.com/v1/pages/series/schedule?lang=en&seriesId={series_id}"
+      output = requests.get(url)
+      matches = output.json()['content']["matches"]
+      df = pd.json_normalize(data=matches)
+      df.rename(columns={"objectId": "match_id", "slug": "match_name"}, inplace=True)
+      matches_id_list=df['match_id'].to_list()
+      matches_names_list=[]
+      for match_id in matches_id_list:
+        url_info = f"https://hs-consumer-api.espncricinfo.com/v1/pages/match/home?lang=en&seriesId={series_id}&matchId={match_id}"
+        output_1 = requests.get(url_info)
+        team1_sn = output_1.json()['match']['teams'][0]['team']['abbreviation']
+        team2_sn = output_1.json()['match']['teams'][1]['team']['abbreviation']
+        match_num = output_1.json()['match']['title']
+        title = team1_sn + " vs " + team2_sn + " " + match_num
+        matches_names_list.append(title)
+      match_dict=dict(zip(matches_names_list,matches_id_list))
+      return match_dict
+        
+  except Exception as e:
+      traceback.print_exc()

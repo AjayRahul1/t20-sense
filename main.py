@@ -22,8 +22,4 @@ def process( request: Request, series_id: int = Form(...), match_id: int = Form(
     bowling1 = bowling1.to_dict(orient='records')
     batting2 = batting2.to_dict(orient='records')
     bowling2 = bowling2.to_dict(orient='records')
-    # batting1 = pd.read_csv('ser418064_mat419165_inn1_batting.csv').to_dict(orient='records')
-    # bowling1 = pd.read_csv('ser418064_mat419165_inn1_bowling.csv').to_dict(orient='records')
-    # batting2 = pd.read_csv('ser418064_mat419165_inn2_batting.csv').to_dict(orient='records')
-    # bowling2 = pd.read_csv('ser418064_mat419165_inn2_bowling.csv').to_dict(orient='records')
     return templates.TemplateResponse("results.html", {"request": request, "batting1": batting1, "bowling1": bowling1, "batting2": batting2, "bowling2": bowling2})

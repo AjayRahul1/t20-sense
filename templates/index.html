@@ -13,14 +13,14 @@
 <body>
     <h1 style="color: White">IPL Sense</h1>
     <form method="post" action="/process">
-        <label for="series_id" style="color: White">Series ID:</label>
-        <select id="series_id" name="series_id">
+        <label for="year" style="color: White">Year :</label>
+        <select id="year" name="year">
             {% for id in years %}
             <option value="{{ id }}">{{ id }}</option>
             {% endfor %}
         </select>
         <br><br>
-        <label for="match_id" style="color: White">Match ID:</label>
+        <label for="match_id" style="color: White">Match ID :</label>
         <select id="match_id" name="match_id">
             {% for id in match_ids %}
             <option value="{{ id }}">{{ id }}</option>

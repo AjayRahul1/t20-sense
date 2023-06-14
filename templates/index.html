@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>IPL Sense</title>
+    <style>
+      body {
+      background-image: url('https://hindi.sportzwiki.com/wp-content/uploads/2022/03/IPL-2022-1-1536x864.jpg');
+      background-repeat: no-repeat;
+      background-size: cover;
+    }
+    </style>
+</head>
+<body>
+    <h1 style="color: White">IPL Sense</h1>
+    <form method="post" action="/process">
+        <label for="series_id" style="color: White">Series ID:</label>
+        <select id="series_id" name="series_id">
+            {% for id in years %}
+            <option value="{{ id }}">{{ id }}</option>
+            {% endfor %}
+        </select>
+        <br><br>
+        <label for="match_id" style="color: White">Match ID:</label>
+        <select id="match_id" name="match_id">
+            {% for id in match_ids %}
+            <option value="{{ id }}">{{ id }}</option>
+            {% endfor %}
+        </select>
+        <br><br>
+        <input type="submit" value="Submit">
+    </form>
+</body>
+</html>

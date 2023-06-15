@@ -4,10 +4,13 @@
     <title>IPL Sense</title>
     <style>
         body {
-
+            /*  BG1 : https://hindi.sportzwiki.com/wp-content/uploads/2022/03/IPL-2022-1-1536x864.jpg
+                BG2 : https://wallpapercave.com/wp/wp2686809.jpg    */
             background-image: url('https://hindi.sportzwiki.com/wp-content/uploads/2022/03/IPL-2022-1-1536x864.jpg');
-            background-repeat: no-repeat;
             background-size: cover;
+            background-repeat: no-repeat;
+            background-attachment: fixed;
+            background-position: center;
         }
     </style>
 </head>
@@ -20,14 +23,13 @@
             <option value="{{ id }}">{{ id }}</option>
             {% endfor %}
         </select>
-        <br><br>
         <label for="match_id" style="color: White">Match ID :</label>
         <select id="match_id" name="match_id">
             {% for id in match_ids %}
             <option value="{{ id }}">{{ id }}</option>
             {% endfor %}
         </select>
-        <br><br>
+
         <input type="submit" value="Submit">
     </form>
 </body>

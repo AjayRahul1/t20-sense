@@ -41,9 +41,16 @@ async def process(
     series_id = get_series_from_year(year)
     print("Series ID: ", series_id)
     match_id = int(matches_dict[match_id])
+
     batting1, bowling1, batting2, bowling2 = get_particular_match_whole_score(series_id, match_id)
     batting1 = batting1.to_dict(orient='records')
     bowling1 = bowling1.to_dict(orient='records')
     batting2 = batting2.to_dict(orient='records')
     bowling2 = bowling2.to_dict(orient='records')
-    return templates.TemplateResponse("results.html", {"request": request, "batting1": batting1, "bowling1": bowling1, "batting2": batting2, "bowling2": bowling2})
+
+    team1_name, team2_name, match_date, result, match_title = get_match_info(series_id, match_id)
+    return templates.TemplateResponse("results.html", {"request": request, 
+                                                        "batting1": batting1, "bowling1": bowling1,
+                                                        "batting2": batting2, "bowling2": bowling2,
+                                                        "team1_name": team1_name, "team2_name": team2_name,
+                                                        "match_date": match_date, "result": result, "match_title":match_title })

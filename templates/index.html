@@ -12,26 +12,56 @@
             background-attachment: fixed;
             background-position: center;
         }
+        .dropdowns-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            position: relative;
+            overflow: hidden;
+        }
+        .dropdowns-content {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+            background-image: transparent; /* Replace with your desired background image */
+            background-size: cover;
+            backdrop-filter: blur(8px); /* Adjust the blur radius as needed */
+            z-index: 0;
+            /* Additional styling for the box */
+            width: fit-content;
+            padding: 20px;
+            color: white;
+        }
     </style>
 </head>
 <body>
-    <h1 style="color: White">IPL Sense</h1>
-    <form method="post" action="/process">
-        <label for="year" style="color: White">Year :</label>
-        <select id="year" name="year" onclick="updateMatchOptions()">
-            {% for id in years %}
-            <option value="{{ id }}">{{ id }}</option>
-            {% endfor %}
-        </select>
-        <label for="match_id" style="color: White">Match ID :</label>
-        <select id="match_id" name="match_id">
-            {% for id in match_ids %}
-            <option value="{{ id }}">{{ id }}</option>
-            {% endfor %}
-        </select>
-
-        <input type="submit" value="Submit">
-    </form>
+    <div class="dropdowns-container">
+        <div class="dropdowns-content">
+            <h1 style="color: White; padding: 0px 20px 0px 0px; font-size: 50px;">IPL Sense</h1>
+            <br><br>
+            <form method="post" action="/process">
+                <label for="year" style="color: White">Year :</label>
+                <br>
+                <select id="year" name="year" onclick="updateMatchOptions()">
+                    {% for id in years %}
+                    <option value="{{ id }}">{{ id }}</option>
+                    {% endfor %}
+                </select>
+                <br><br>
+                <label for="match_id" style="color: White">Match ID :</label>
+                <br>
+                <select id="match_id" name="match_id">
+                    {% for id in match_ids %}
+                    <option value="{{ id }}">{{ id }}</option>
+                    {% endfor %}
+                </select>
+                <br><br>
+                <input type="submit" value="Submit">
+            </form>
+        </div>
+    </div>
 </body>
 </html>
 

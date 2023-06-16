@@ -3,7 +3,7 @@ from fastapi.responses import HTMLResponse, JSONResponse
 from fastapi.templating import Jinja2Templates
 from typing import List
 from fastapi.staticfiles import StaticFiles
-from ipl_func import get_particular_match_whole_score, get_series_from_year, get_match_ids_from_series
+from ipl_func import get_particular_match_whole_score, get_series_from_year, get_match_ids_from_series_fast
 import pandas as pd
 
 app = FastAPI()
@@ -25,7 +25,7 @@ async def get_match_ids(year: int):
     global matches_dict, match_ids_list
     series_id = get_series_from_year(year)
     print(series_id)
-    matches_dict = get_match_ids_from_series(series_id)  # Your function to retrieve match_ids based on series_id
+    matches_dict = get_match_ids_from_series_fast(series_id)  # Your function to retrieve match_ids based on series_id
     match_ids_list = list(matches_dict.keys())
     return JSONResponse(content=match_ids_list)
 

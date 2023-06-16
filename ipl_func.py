@@ -79,7 +79,7 @@ def preprocessing_innings_df(req_response):
 #@title Preprocessing
 def bowlers_df_preprocessing(bowlers_df):
   # Batsman scoring 0 is a dot.
-  bowlers_df["isDot"] = (bowlers_df["batsmanRuns"] == 0)
+  bowlers_df["isDot"] = (bowlers_df["batsmanRuns"] == 0) & (bowlers_df["wides"] == 0) & (bowlers_df["noballs"] == 0)
 
   bowlers_df = bowlers_df[["bowler", "isWicket", "totalRuns", "isDot","isFour", "isSix", "noballs", "legbyes", "byes", "wides", "dismissalType"]]
 
@@ -142,7 +142,7 @@ def bowlers_df_ops(main_bowling_df):
 def batting_df_pre_operations(batsman_df):
 
   # Calculating Dot Balls assigning T or F
-  batsman_df["isDot"] = batsman_df["batsmanRuns"] == 0
+  batsman_df["isDot"] = (batsman_df["batsmanRuns"] == 0) & (batsman_df["wides"] == 0) & (batsman_df["noballs"] == 0)
 
   batsman_df = batsman_df[["batsman", "batsmanRuns", "isDot","isFour", "isSix", "wides", "noballs", "legbyes"]]
 

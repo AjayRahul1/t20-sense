@@ -3,7 +3,7 @@ from fastapi.responses import HTMLResponse, JSONResponse
 from fastapi.templating import Jinja2Templates
 from typing import List
 from fastapi.staticfiles import StaticFiles
-from ipl_func import get_particular_match_whole_score, get_series_from_year, get_match_ids_from_series_fast
+from ipl_func import get_particular_match_whole_score, get_series_from_year, get_match_ids_from_series_fast, get_match_info
 import pandas as pd
 
 app = FastAPI()

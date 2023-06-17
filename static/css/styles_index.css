@@ -1,0 +1,29 @@
+body {
+    /*  BG1 : https://hindi.sportzwiki.com/wp-content/uploads/2022/03/IPL-2022-1-1536x864.jpg
+        BG2 : https://wallpapercave.com/wp/wp2686809.jpg    */
+    background-image: url('https://hindi.sportzwiki.com/wp-content/uploads/2022/03/IPL-2022-1-1536x864.jpg');
+    background-size: cover;
+    background-repeat: no-repeat;
+    background-attachment: fixed;
+    background-position: center;
+}
+.dropdowns-container {
+    position: relative;
+    overflow: hidden;
+}
+.dropdowns-content {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: relative;
+    border: 2px solid black;
+    border-radius: 10px;
+    background-image: transparent; /* Replace with your desired background image */
+    background-size: cover;
+    backdrop-filter: blur(8px); /* Adjust the blur radius as needed */
+    z-index: 0;
+    /* Additional styling for the box */
+    width: fit-content;
+    padding: 20px;
+    color: white;
+}

@@ -1,90 +1,104 @@
 <!DOCTYPE html>
-<html>
-<head>
-    <title>IPL Sense</title>
-    <style>
-        body {
-            /*  BG1 : https://hindi.sportzwiki.com/wp-content/uploads/2022/03/IPL-2022-1-1536x864.jpg
-                BG2 : https://wallpapercave.com/wp/wp2686809.jpg    */
-            background-image: url('https://hindi.sportzwiki.com/wp-content/uploads/2022/03/IPL-2022-1-1536x864.jpg');
-            background-size: cover;
-            background-repeat: no-repeat;
-            background-attachment: fixed;
-            background-position: center;
-        }
-        .dropdowns-container {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            position: relative;
-            overflow: hidden;
-        }
-        .dropdowns-content {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            position: relative;
-            border: 2px solid black;
-            border-radius: 10px;
-            background-image: transparent; /* Replace with your desired background image */
-            background-size: cover;
-            backdrop-filter: blur(8px); /* Adjust the blur radius as needed */
-            z-index: 0;
-            /* Additional styling for the box */
-            width: fit-content;
-            padding: 20px;
-            color: white;
-        }
-    </style>
-</head>
-<body>
-    <div class="dropdowns-container">
-        <div class="dropdowns-content">
-            <h1 style="color: White; padding: 0px 20px 0px 0px; font-size: 50px;">IPL Sense</h1>
-            <br><br>
-            <form method="post" action="/process">
-                <label for="year" style="color: White">Year :</label>
-                <br>
-                <select id="year" name="year" onclick="updateMatchOptions()">
-                    {% for id in years %}
-                    <option value="{{ id }}">{{ id }}</option>
-                    {% endfor %}
-                </select>
-                <br><br>
-                <label for="match_id" style="color: White">Match ID :</label>
-                <br>
-                <select id="match_id" name="match_id">
-                    {% for id in match_ids %}
-                    <option value="{{ id }}">{{ id }}</option>
-                    {% endfor %}
-                </select>
-                <br><br>
-                <input type="submit" value="Submit">
-            </form>
+    <html>
+    <head>
+        <title>IPL Sense</title>
+        <link rel="stylesheet" href="/static/styles_index.css">
+        <script type="text/javascript" src="static/script.js"></script>
+    </head>
+    <body>
+        <div class="home-three-elem-container">
+            <div class="dropdowns-container">
+                <div class="dropdowns-content">
+                    <form method="post" action="/process">
+                        <label for="year" style="color: White">Year :</label>
+                        <select id="year" name="year" onclick="updateMatchOptions()">
+                            {% for id in years %}
+                            <option value="{{ id }}">{{ id }}</option>
+                            {% endfor %}
+                        </select>
+                        <br><br>
+                        <label for="match_id" style="color: White">Match ID :</label>
+                        <select id="match_id" name="match_id">
+                            {% for id in match_ids %}
+                            <option value="{{ id }}">{{ id }}</option>
+                            {% endfor %}
+                        </select>
+                        <br><br>
+                        <input type="submit" value="Submit">
+                    </form>
+                </div>
+            </div>
+            
+            <!-- 2nd Frame -->
+            {% if batting1 %}
+            <div class="scorecards-data">
+                <!-- Data displayed in center -->
+                <div>
+                    <div class="middle-content-container">
+                        <h1 style="text-align: center;"> {{match_title}} | {{match_date}} </h1>
+                        <h1 style="text-align: center;">{{result}}</h1>
+                        <h2 style="color: white;">1st Innings - Batting</h2>
+                        <table style="border-collapse: collapse;">
+                        <thead>
+                            <tr>
+                                <th>Batsman</th> <th>Runs</th> <th>Balls</th> <th>Dots</th> <th>Fours</th> <th>Sixes</th> <th>SR</th> <th>NDSR</th> <th>DB%</th> <th>4s_SR</th> <th>6s_SR</th> <th>4&6_SR</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for record in batting1 %}
+                            <tr>
+                                <td>{{ record['Batsman'] }}</td> <td>{{ record['Runs'] }}</td> <td>{{ record['Balls'] }}</td> <td>{{ record['Dots'] }}</td> <td>{{ record['Fours'] }}</td> <td>{{ record['Sixes'] }}</td> <td>{{ record['SR'] }}</td> <td>{{ record['NDSR'] }}</td> <td>{{ record['DB%'] }}</td> <td>{{ record['4s_SR'] }}</td> <td>{{ record['6s_SR'] }}</td> <td>{{ record['4&6_SR'] }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                        </table>
+                        <h2 style="color: white;">1st innings - Bowling</h2>
+                        <table>
+                            <tr>
+                                <th>Bowler</th> <th>Overs</th> <th>Balls</th> <th>Runs</th> <th>Wickets</th> <th>Dots</th> <th>Fours</th> <th>Sixers</th> <th>WD</th> <th>NB</th> <th>Byes</th> <th>LB</th> <th>Econ</th> <th>DB%</th> 
+                            </tr>
+                            {% for bowler in bowling1 %}
+                            <tr>
+                                <td>{{ bowler.Bowler }}</td><td>{{ bowler.Overs }}</td><td>{{ bowler.Balls }}</td><td>{{ bowler.Runs }}</td><td>{{ bowler.Wickets }}</td><td>{{ bowler.Dots }}</td><td>{{ bowler.Fours }}</td><td>{{ bowler.Sixers }}</td><td>{{ bowler.WD }}</td><td>{{ bowler.NB }}</td><td>{{ bowler.Byes }}</td><td>{{ bowler.LB }}</td><td>{{ bowler.Econ }}</td><td>{{ bowler["DB%"] }}</td>
+                            </tr>
+                            {% endfor %}
+                        </table>
+                        
+                        <h2 style="color: white;">2nd Innings - Batting</h2>
+                            <table style="border-collapse: collapse;">
+                            <thead>
+                                <tr>
+                                    <th>Batsman</th> <th>Runs</th> <th>Balls</th> <th>Dots</th> <th>Fours</th> <th>Sixes</th> <th>SR</th> <th>NDSR</th> <th>DB%</th> <th>4s_SR</th> <th>6s_SR</th> <th>4&6_SR</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for record in batting2 %}
+                                <tr>
+                                    <td>{{ record['Batsman'] }}</td> <td>{{ record['Runs'] }}</td> <td>{{ record['Balls'] }}</td> <td>{{ record['Dots'] }}</td> <td>{{ record['Fours'] }}</td> <td>{{ record['Sixes'] }}</td> <td>{{ record['SR'] }}</td> <td>{{ record['NDSR'] }}</td> <td>{{ record['DB%'] }}</td> <td>{{ record['4s_SR'] }}</td> <td>{{ record['6s_SR'] }}</td> <td>{{ record['4&6_SR'] }}</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    
+                        <h2 style="color: white;">2nd innings - Bowling</h2>
+                        <table>
+                            <tr>
+                                <th>Bowler</th> <th>Overs</th> <th>Balls</th> <th>Runs</th> <th>Wickets</th> <th>Dots</th> <th>Fours</th> <th>Sixers</th> <th>WD</th> <th>NB</th> <th>Byes</th> <th>LB</th> <th>Econ</th> <th>DB%</th>
+                            </tr>
+                            {% for bowler in bowling2 %}
+                            <tr>
+                                <td>{{ bowler.Bowler }}</td> <td>{{ bowler.Overs }}</td> <td>{{ bowler.Balls }}</td> <td>{{ bowler.Runs }}</td> <td>{{ bowler.Wickets }}</td> <td>{{ bowler.Dots }}</td> <td>{{ bowler.Fours }}</td> <td>{{ bowler.Sixers }}</td> <td>{{ bowler.WD }}</td> <td>{{ bowler.NB }}</td> <td>{{ bowler.Byes }}</td> <td>{{ bowler.LB }}</td> <td>{{ bowler.Econ }}</td> <td>{{ bowler["DB%"] }}</td>
+                            </tr>
+                            {% endfor %}
+                        </table>
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+            <!-- Ads Frames -->
+            <div class="ads-container-div" style="background-color: aliceblue; margin:40px;">
+                <h1>Hi</h1>
+            </div>
         </div>
-    </div>
-</body>
-</html>
-
-<script>
-    function updateMatchOptions() {
-        var yearDropdown = document.getElementById("year");
-        var year = yearDropdown.value;
-
-        fetch('/get_match_ids?year=' + year)
-            .then(response => response.json())
-            .then(data => {
-                var matchIdDropdown = document.getElementById("match_id");
-                matchIdDropdown.innerHTML = "";
-
-                data.forEach(matchId => {
-                    var option = document.createElement("option");
-                    option.text = matchId;
-                    option.value = matchId;
-                    matchIdDropdown.appendChild(option);
-                });
-        });
-    }
-</script>
-<!-- <link rel="script" href="/static/script.js">  -->
+    </body>
+</html> 

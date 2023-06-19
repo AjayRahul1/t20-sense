@@ -1,21 +1,18 @@
 function updateMatchOptions() {
-    var seriesId = document.getElementById("series_id").value;
+    var yearDropdown = document.getElementById("year");
+    var year = yearDropdown.value;
 
-    // Make an AJAX request to retrieve the match_ids based on the selected series_id
-    fetch(`/get_match_ids?series_id=${seriesId}`)
+    fetch('/get_match_ids?year=' + year)
         .then(response => response.json())
-        .then(matchIds => {
+        .then(data => {
             var matchIdDropdown = document.getElementById("match_id");
             matchIdDropdown.innerHTML = "";
 
-            for (var i = 0; i < matchIds.length; i++) {
+            data.forEach(matchId => {
                 var option = document.createElement("option");
-                option.text = matchIds[i];
-                option.value = matchIds[i];
+                option.text = matchId;
+                option.value = matchId;
                 matchIdDropdown.appendChild(option);
-            }
-        })
-        .catch(error => {
-            console.error('Error:', error);
+            });0
         });
 }

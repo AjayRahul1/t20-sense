@@ -35,7 +35,6 @@ async def process(
         year: int = Form(...),
         match_id: str = Form(...)
     ):
-    # Call the data processing function with the selected year and match ID
     print("Year: ", year)
     print("Match Name: ", match_id)
     series_id = get_series_from_year(year)
@@ -49,7 +48,7 @@ async def process(
     bowling2 = bowling2.to_dict(orient='records')
 
     team1_name, team2_name, match_date, result, match_title = get_match_info(series_id, match_id)
-    return templates.TemplateResponse("results.html", {"request": request, 
+    return templates.TemplateResponse("index.html", {   "request": request, "year":year, "match_id" : match_id,
                                                         "batting1": batting1, "bowling1": bowling1,
                                                         "batting2": batting2, "bowling2": bowling2,
                                                         "team1_name": team1_name, "team2_name": team2_name,

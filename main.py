@@ -13,11 +13,12 @@ app.mount("/static", StaticFiles(directory="static"), name="static")
 matches_dict = {}
 matches_ids_list = []
 
+years = list(range(2008, 2024))  # Generate a list of years from 2008 to 2023
+match_ids = ["Select the Match"]  # Example match IDs
+
 @app.get("/", response_class=HTMLResponse)
 def index(request: Request):
-    years = list(range(2008, 2024))  # Generate a list of years from 2008 to 2023
     # years = [313494, 374163, 418064, 466304, 520932, 586733, 695871, 791129, 968923, 1078425, 1131611, 1165643, 1210595, 1249214, 1298423, 1345038]
-    match_ids = ["Select the Match"]  # Example match IDs
     return templates.TemplateResponse("index.html", {"request": request, "years": years, "match_ids": match_ids})
 
 @app.get("/get_match_ids")
@@ -48,7 +49,7 @@ async def process(
     bowling2 = bowling2.to_dict(orient='records')
 
     team1_name, team2_name, match_date, result, match_title = get_match_info(series_id, match_id)
-    return templates.TemplateResponse("index.html", {   "request": request, "year":year, "match_id" : match_id,
+    return templates.TemplateResponse("index.html", {   "request": request, "years" : years, "match_ids" : match_ids,
                                                         "batting1": batting1, "bowling1": bowling1,
                                                         "batting2": batting2, "bowling2": bowling2,
                                                         "team1_name": team1_name, "team2_name": team2_name,

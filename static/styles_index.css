@@ -8,17 +8,17 @@ body {
     background-position: center;
 }
 table {
-    width: 100%;
+    width: 25px;
 }
 th, td {
-    border: 1px solid black;
     padding: 8px;
+    border: 1px solid black;
 }
 th {
     background-color: bisque;
 }
 td {
-    background-color: #CBCBD4;
+    background-color: white;
 }
 .home-three-elem-container {
     display: flex;
@@ -49,4 +49,26 @@ td {
     border-radius: 5px;
     backdrop-filter: blur(5px);
     z-index: 1;
+}
+.highlight {
+    background-color: #CED2CC; /* Set the desired highlight color */
+    padding: 5px;
+    color: black;
+}    
+.table-container-mid-frame {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+}
+
+.table-container {
+    flex-grow: 1;
+    overflow: auto;
+    padding: 8px;
+}
+
+.table-container table {
+    width: 100%;
+    table-layout: auto;
+    font-size: 10px;
 }

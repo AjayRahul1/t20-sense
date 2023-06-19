@@ -25,7 +25,7 @@
                             {% endfor %}
                         </select>
                         <br><br>
-                        <label for="match_id" style="color: White">Match ID :</label>
+                        <label for="match_id" style="color: White">Match Name :</label>
                         <select id="match_id" name="match_id">
                             {% for id in match_ids %}
                             <option value="{{ id }}">{{ id }}</option>
@@ -56,8 +56,8 @@
                 <!-- Data displayed in center -->
                 <div>
                     <div class="middle-content-container">
-                        <h1 style="text-align: center;"> {{match_title}} | {{match_date}} </h1>
-                        <h1 style="text-align: center;">{{result}}</h1>
+                        <h2 style="text-align: center;"> {{match_title}} | {{match_date}} </h2>
+                        <h2 style="text-align: center;">{{result}}</h2>
                         <div class="table-container-mid-frame">
                             <div class='table-container'>
                                 <h2 style="color: white;"><span class="highlight">1st Innings - Batting</span></h2>

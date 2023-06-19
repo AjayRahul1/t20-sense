@@ -8,15 +8,15 @@ body{
   table {
     width: 100%;
   }
-  th, td{
+  th, td {
     border: 1px solid black;
     padding: 8px;
   }
-  th{
+  th {
     background-color: darkblue;
     color: white;
   }
-  td{
+  td {
     background-color: #CBCBD4;
   }
   .container-result_match{

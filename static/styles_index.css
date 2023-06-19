@@ -7,23 +7,46 @@ body {
     background-attachment: fixed;
     background-position: center;
 }
+table {
+    width: 100%;
+}
+th, td {
+    border: 1px solid black;
+    padding: 8px;
+}
+th {
+    background-color: bisque;
+}
+td {
+    background-color: #CBCBD4;
+}
+.home-three-elem-container {
+    display: flex;
+    justify-content: space-evenly;
+}
 .dropdowns-container {
     position: relative;
     overflow: hidden;
 }
 .dropdowns-content {
     display: flex;
+    width: auto;
+    padding: 16px;
     justify-content: center;
     align-items: center;
     position: relative;
     border: 2px solid black;
     border-radius: 10px;
-    background-image: transparent; /* Replace with your desired background image */
+    background-image: transparent;
     background-size: cover;
     backdrop-filter: blur(8px); /* Adjust the blur radius as needed */
-    z-index: 0;
     /* Additional styling for the box */
-    width: fit-content;
-    padding: 20px;
     color: white;
+}
+.middle-content-container{
+    border: 2px solid black;
+    padding: 16px;
+    border-radius: 5px;
+    backdrop-filter: blur(5px);
+    z-index: 1;
 }

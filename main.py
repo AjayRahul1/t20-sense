@@ -44,8 +44,13 @@ async def process(
     match_id = int(matches_dict[match_id])
 
     toss_row_df = get_team_name_score_ground(series_id=series_id, match_id=match_id)
-    toss_row_ground = toss_row_df['ground'][0]
 
+    ground_info = toss_row_df['ground'][0]
+    toss_info = toss_row_df['tossWinnerTeamId'][0] + " " + toss_row_df['tossWinnerChoice'][0]
+    team1_name = toss_row_df['team_bat_first'][0]
+    team2_name = toss_row_df['team_bat_second'][0]
+    team1_score = toss_row_df['team1_score'][0]
+    team2_score = toss_row_df['team2_score'][0]
 
     batting1, bowling1, batting2, bowling2 = get_particular_match_whole_score(series_id, match_id)
     batting1 = batting1.to_dict(orient='records')
@@ -53,12 +58,12 @@ async def process(
     batting2 = batting2.to_dict(orient='records')
     bowling2 = bowling2.to_dict(orient='records')
 
-
-
     team1_name, team2_name, match_date, result, match_title = get_match_info(series_id, match_id)
     return templates.TemplateResponse("index.html", {   "request": request, "years" : years, "match_ids" : match_ids,
                                                         "batting1": batting1, "bowling1": bowling1,
                                                         "batting2": batting2, "bowling2": bowling2,
                                                         "team1_name": team1_name, "team2_name": team2_name,
                                                         "match_date": match_date, "result": result, "match_title":match_title,
-                                                        "ground_info": toss_row_ground })
+                                                        "ground_info": ground_info, "toss_info": toss_info,
+                                                        "team1_name": team1_name, "team2_name":team2_name,
+                                                        "team1_score":team1_score, "team2_score":team2_score })

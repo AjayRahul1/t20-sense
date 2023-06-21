@@ -51,7 +51,7 @@ td {
     z-index: 1;
 }
 .highlight {
-    background-color: #CED2CC; /* Set the desired highlight color */
+    background-color: #00ccff; /* Set the desired highlight color */
     padding: 5px;
     color: black;
 }    

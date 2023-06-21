@@ -2,6 +2,10 @@ import pandas as pd, requests, traceback, warnings
 from datetime import datetime
 import asyncio
 
+# Google Cloud Storage Imports
+from google.cloud import storage
+import pandas as pd, os, io
+
 # Settings the warnings to be ignored
 warnings.filterwarnings('ignore')
 
@@ -12,6 +16,38 @@ match_id_taken = 419165
 innings_taken = 2
 
 """# Get matches data"""
+
+def set_cloud_bucket_env():
+  # Set the path to your service account key file
+  os.environ['GOOGLE_APPLICATION_CREDENTIALS'] = 't20-sense-8f218a81848c.json'
+
+  # Create a client using the credentials
+  client = storage.Client()
+
+  # Specify the bucket name and CSV file path
+  bucket_name = 'match_data'
+
+  # Access the bucket
+  bucket = client.get_bucket(bucket_name)
+  return client, bucket
+
+def get_all_csv_files_from_cloud():
+  client, bucket = set_cloud_bucket_env()
+  file_path = 'whole_ipl_series_info.csv'
+
+  # Get the blob (file) from the bucket
+  blob = bucket.blob(file_path)
+
+  # Read the file contents into memory
+  file_content = blob.download_as_text()
+
+  # Create a StringIO object to treat the file content as a file-like object
+  csv_file = io.StringIO(file_content)
+
+  # Read the CSV file using pandas
+  all_ipl_series_info = pd.read_csv(csv_file)
+
+  return all_ipl_series_info
 
 def get_matches_returns_dict(series_id, stage="FINISHED"):
     try:
@@ -454,3 +490,24 @@ def get_match_ids_from_series_fast(series_id):
     else:
       return get_match_ids_from_series(series_id)
   
+def get_all_toss_info():
+  client, bucket = set_cloud_bucket_env()
+  files_path = {}
+  for series_id in all_series_ids:
+    # Get the blob (file) from the bucket
+    blob1 = bucket.blob(f"all_series_toss_info/{series_id}_toss_info.csv")
+
+    # Read the file contents into memory
+    file_content1 = blob1.download_as_text()
+
+    # Create a StringIO object to treat the file content as a file-like object
+    csv_io = io.StringIO(file_content1)
+
+    files_path[series_id] = pd.read_csv(csv_io)
+  return files_path
+
+def get_team_name_score_ground(series_id, match_id):
+  all_toss_infos = get_all_toss_info()
+  particular_match_toss_info = all_toss_infos[series_id]
+  particular_match_toss_info = particular_match_toss_info[particular_match_toss_info['match_id'] == match_id]
+  return particular_match_toss_info

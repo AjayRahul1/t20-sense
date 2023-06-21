@@ -50,6 +50,7 @@
                 </div>
             </div>
             {% if not batting1 %}
+                {% if finals_and_champs_df %}
                 <div style="width: 90%; margin-left: 10px;">
                     <div style="padding: 8px; backdrop-filter: blur(8px); border-radius: 16px; border: 2px solid black;">
                         <h2 style="text-align: center;"><span class="highlight">Finals & Champions</span></h2>
@@ -79,6 +80,7 @@
                         </table>
                     </div>
                 </div>
+                {% endif %}
             {% endif %}
             
             <!-- 2nd Frame -->

@@ -56,11 +56,13 @@
                 <!-- Data displayed in center -->
                 <div>
                     <div class="middle-content-container">
-                        <h2 style="text-align: center;"> {{match_title}} | {{match_date}} | {{ground_info}}</h2>
+                        <h2 style="text-align: center;">{{match_title}} | {{match_date}} | {{ground_info}}</h2>
                         <h2 style="text-align: center;">{{result}}</h2>
+                        <h2 style="text-align: center;">{{toss_info}}</h2>
+                        <h2 style="text-align: center;">{{team1_name}} - {{team1_score}} | {{team2_name}} - {{team2_score}}</h2>
                         <div class="table-container-mid-frame">
                             <div class='table-container'>
-                                <h2 style="color: white;"><span class="highlight">1st Innings - Batting</span></h2>
+                                <h2 style="color: white;"><span class="highlight">{{team1_name}} - Batting</span></h2>
                                 <table style="border-collapse: collapse;">
                                     <thead>
                                         <tr>
@@ -77,7 +79,7 @@
                                 </table>
                             </div>
                             <div class="table-container">
-                                <h2 style="color: white;"><span class="highlight">1st innings - Bowling</span></h2>
+                                <h2 style="color: white;"><span class="highlight">{{team2_name}} - Bowling</span></h2>
                                 <table>
                                     <tr>
                                         <th>Bowler</th> <th>Overs</th> <th>Balls</th> <th>Runs</th> <th>Wickets</th> <th>Dots</th> <th>Fours</th> <th>Sixers</th> <th>WD</th> <th>NB</th> <th>Byes</th> <th>LB</th> <th>Econ</th> <th>DB%</th> 
@@ -93,7 +95,7 @@
                         
                         <div class="table-container-mid-frame">
                             <div class="table-container">
-                                <h2 style="color: white;"><span class="highlight">2nd Innings - Batting</span></h2>
+                                <h2 style="color: white;"><span class="highlight">{{team2_name}} - Batting</span></h2>
                                 <table style="border-collapse: collapse;">
                                     <thead>
                                         <tr>
@@ -110,7 +112,7 @@
                                 </table>
                             </div>
                             <div class="table-container">
-                                <h2 style="color: white;"><span class="highlight">2nd innings - Bowling</span></h2>
+                                <h2 style="color: white;"><span class="highlight">{{team1_name}} - Bowling</span></h2>
                                 <table>
                                     <tr>
                                         <th>Bowler</th> <th>Overs</th> <th>Balls</th> <th>Runs</th> <th>Wickets</th> <th>Dots</th> <th>Fours</th> <th>Sixers</th> <th>WD</th> <th>NB</th> <th>Byes</th> <th>LB</th> <th>Econ</th> <th>DB%</th>

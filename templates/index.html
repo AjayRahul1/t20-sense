@@ -49,9 +49,40 @@
                     </div>
                 </div>
             </div>
+            {% if not batting1 %}
+                <div style="width: 90%; margin-left: 10px;">
+                    <div style="padding: 8px; backdrop-filter: blur(8px); border-radius: 16px; border: 2px solid black;">
+                        <h2 style="text-align: center;"><span class="highlight">Finals & Champions</span></h2>
+                        <table style="width: 100%;">
+                            <thead>
+                                <tr>
+                                    <th>Year</th>
+                                    <th>Final</th>
+                                    <th>Champion</th>
+                                    <th>Runner Up</th>
+                                    <th>Orange Cap</th>
+                                    <th>Purple Cap</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for data in finals_and_champs_df %}
+                                    <tr>
+                                        <td>{{data.Year}}</td>
+                                        <td>{{data.Final}}</td>
+                                        <td>{{data['Champions']}}</td>
+                                        <td>{{data['Runner up']}}</td>
+                                        <td>{{data['Orange Cap']}}</td>
+                                        <td>{{data['Purple Cap']}}</td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            {% endif %}
             
             <!-- 2nd Frame -->
-            {% if batting1 %}
+            {% if batting1 and batting2 and bowling1 and bowling2 %}
             <div class="scorecards-data">
                 <!-- Data displayed in center -->
                 <div>

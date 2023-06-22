@@ -76,10 +76,13 @@
             <div class="scorecards-data">
                 <!-- Data displayed in center -->
                 <div class="middle-content-container">
-                    <h2>{{match_title}}</h3>
+                    <div style="display: flex; justify-content: space-around; padding: 0 4px 0 4px;
+                                border: 2px solid darkblue; border-radius: 10px;">
+                        <h2>{{match_title}}</h2>
+                        <h2>{{match_date}} | {{ground_info}}</h2>
+                    </div>
                     <h3>{{toss_info}}</h3>
                     <h3>Result - {{result}}</h3>
-                    <h3>{{match_date}} | {{ground_info}}</h3>
                     
                     <div style="display: flex; margin-bottom: 0; justify-content: space-between;">
                         <h3 style="color: white;"><span class="highlight">{{team1_name}} - Batting</span></h3>

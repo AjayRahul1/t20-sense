@@ -510,7 +510,6 @@ def get_team_name_score_ground(series_id, match_id):
   all_toss_infos = get_all_toss_info()
   particular_match_toss_info = all_toss_infos[series_id]
   particular_match_toss_info = pd.DataFrame(particular_match_toss_info)
-  print(particular_match_toss_info)
   particular_match_toss_info = particular_match_toss_info[particular_match_toss_info['match_id'] == match_id]
   particular_match_toss_info.reset_index(drop=True, inplace=True)
   return particular_match_toss_info

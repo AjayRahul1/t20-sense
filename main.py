@@ -56,7 +56,7 @@ async def process(
 
     batting1, bowling1, batting2, bowling2 = get_particular_match_whole_score(series_id, match_id)
 
-    innings1_overs = str(bowling1['Balls'].sum()//6) + "." + str(bowling1['Balls'].sum()%6) + "ov"
+    innings1_overs = str(bowling1['Balls'].sum()//6) + "." + str(bowling1['Balls'].sum()%6) + " ov"
     innings2_overs, team2_target =  toss_row_df['team2_score_info'][0].split(', T:')
 
     batting1 = batting1.to_dict(orient='records')

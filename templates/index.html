@@ -35,18 +35,18 @@
                         <input type="submit" value="Submit">
                     </form>
                 </div>
-                <div>
+                <div style="width: 100%;">
                     <!-- Ads Frames -->
                     <div>
-                        <div style="padding: 8px; width: 175px; height: 125px; 
+                        <div style="padding: 8px; width: 100%; height: 125px; 
                             background-color: white; border-radius: 10px; margin-top: 10px; margin-bottom: 5px; ">
                             <p style="font-size: small;">Advertisement is going to displayed here</p>
                         </div>
-                        <div style="padding: 8px; width: 175px; height: 125px; 
+                        <div style="padding: 8px; width: 100%; height: 125px; 
                             background-color: white; border-radius: 10px; margin-bottom: 5px; ">
                             <p style="font-size: small;">Advertisement is going to displayed here</p>
                         </div>
-                        <div style="padding: 8px; width: 175px; height: 125px; 
+                        <div style="padding: 8px; width: 100%; height: 125px; 
                             background-color: white; border-radius: 10px; margin-bottom: 5px; ">
                             <p style="font-size: small;">Advertisement is going to displayed here</p>
                         </div>
@@ -98,10 +98,10 @@
                     <h3>{{toss_info}}</h3>
                     <h3>Result - {{result}}</h3>
                     
-                    <div style="display: flex; margin-bottom: 0; justify-content: space-between;">
-                        <h3 style="color: white;"><span class="highlight">{{team1_name}} - Batting</span></h3>
-                        <h3><span class="highlight">Total - {{team1_score}} / {{innings1_overs}}</span></h3>
-                        <h3><span class="highlight">Target - {{target}}</span></h3>
+                    <div style="display: flex; justify-content: space-between; margin-bottom: 5px;">
+                        <h3 style="color: white; margin-block-end: 0;"><span class="highlight">{{team1_name}} - Batting</span></h3>
+                        <h3 style="margin-block-end: 0;"><span class="highlight">Total - {{team1_score}} / {{innings1_overs}}</span></h3>
+                        <h3 style="margin-block-end: 0;"><span class="highlight">Target - {{target}}</span></h3>
                     </div>
                     <table style="border-collapse: collapse;">
                         <thead>
@@ -128,9 +128,9 @@
                         </tr>
                         {% endfor %}
                     </table>
-                    <div style="display: flex; margin-bottom: 0; justify-content: space-between;">
-                        <h3 style="color: white;"><span class="highlight">{{team2_name}} - Batting</span></h3>
-                        <h3><span class="highlight">Total - {{team2_score}} / {{innings2_overs}}</span></h3>
+                    <div style="display: flex; justify-content: space-between; margin-bottom: 5px;">
+                        <h3 style="color: white; margin-block-end: 0;"><span class="highlight">{{team2_name}} - Batting</span></h3>
+                        <h3 style="margin-block-end: 0;"><span class="highlight">Total - {{team2_score}} / {{innings2_overs}}</span></h3>
                     </div>
                     <table style="border-collapse: collapse;">
                         <thead>

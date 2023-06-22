@@ -7,68 +7,58 @@ body {
     background-attachment: fixed;
     background-position: center;
 }
-table {
-    width: 25px;
+table{
+    border-collapse: collapse;
+    width: 100%;
+    font-size: 14px;
 }
 th, td {
     padding: 8px;
     border: 1px solid black;
 }
 th {
-    background-color: bisque;
+    background-color: lightblue;
 }
 td {
-    background-color: white;
+    background-color: #D3D3D3;
 }
 .home-three-elem-container {
     display: flex;
-    justify-content: space-evenly;
+    justify-content: space-between;
 }
-.dropdowns-container {
+.dropdowns-containter{
     position: relative;
     overflow: hidden;
+    width: 60%;
 }
 .dropdowns-content {
     display: flex;
-    width: auto;
-    padding: 16px;
     justify-content: center;
     align-items: center;
     position: relative;
+    min-width: min-content;
+    height: fit-content;
+    padding: 16px;
     border: 2px solid black;
     border-radius: 10px;
     background-image: transparent;
-    background-size: cover;
     backdrop-filter: blur(8px); /* Adjust the blur radius as needed */
     /* Additional styling for the box */
     color: white;
 }
-.middle-content-container{
+.scorecards-data {
+    width: 60%;
+    margin: 0px 10px 0px 10px;
     border: 2px solid black;
     padding: 16px;
-    border-radius: 5px;
+    border-radius: 10px;
     backdrop-filter: blur(5px);
-    z-index: 1;
 }
+/* .middle-content-container{
+    
+} */
 .highlight {
-    background-color: #00ccff; /* Set the desired highlight color */
+    background-color: darkblue; /* Set the desired highlight color */
     padding: 5px;
-    color: black;
-}    
-.table-container-mid-frame {
-    display: flex;
-    flex-direction: row;
-    justify-content: space-between;
-}
-
-.table-container {
-    flex-grow: 1;
-    overflow: auto;
-    padding: 8px;
-}
-
-.table-container table {
-    width: 100%;
-    table-layout: auto;
-    font-size: 10px;
+    color: white;
 }

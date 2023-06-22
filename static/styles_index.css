@@ -36,7 +36,7 @@ td {
     justify-content: center;
     align-items: center;
     position: relative;
-    min-width: min-content;
+    min-width: max-content;
     height: fit-content;
     padding: 16px;
     border: 2px solid black;

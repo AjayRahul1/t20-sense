@@ -48,13 +48,17 @@ async def process(
     toss_row_df = get_team_name_score_ground(series_id=series_id, match_id=match_id)
 
     ground_info = toss_row_df['ground'][0]
-    toss_info = toss_row_df['tossWinnerTeamId'][0] + " " + toss_row_df['tossWinnerChoice'][0]
+    toss_info = toss_row_df['tossWinnerTeamId'][0] + " won the toss and " + toss_row_df['tossWinnerChoice'][0]
     team1_name = toss_row_df['team_bat_first'][0]
     team2_name = toss_row_df['team_bat_second'][0]
     team1_score = toss_row_df['team1_score'][0]
     team2_score = toss_row_df['team2_score'][0]
 
     batting1, bowling1, batting2, bowling2 = get_particular_match_whole_score(series_id, match_id)
+
+    innings1_overs = str(bowling1['Balls'].sum()//6) + "." + str(bowling1['Balls'].sum()%6) + "ov"
+    innings2_overs, team2_target =  toss_row_df['team2_score_info'][0].split(', T:')
+
     batting1 = batting1.to_dict(orient='records')
     bowling1 = bowling1.to_dict(orient='records')
     batting2 = batting2.to_dict(orient='records')
@@ -68,4 +72,6 @@ async def process(
                                                         "match_date": match_date, "result": result, "match_title":match_title,
                                                         "ground_info": ground_info, "toss_info": toss_info,
                                                         "team1_name": team1_name, "team2_name":team2_name,
-                                                        "team1_score":team1_score, "team2_score":team2_score })
+                                                        "team1_score":team1_score, "team2_score":team2_score,
+                                                        "innings1_overs": innings1_overs, "innings2_overs": innings2_overs,
+                                                        "target" : team2_target })

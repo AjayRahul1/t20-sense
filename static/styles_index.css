@@ -11,7 +11,7 @@ th {
     background-color: #f6f7f8;
 }
 td {
-    background-color: rgba(255, 255, 255, 0.7);
+    background-color: #ffffff;
     color: #4b494a;
 }
 .home-three-elem-container {
@@ -25,7 +25,6 @@ td {
     position: relative;
     overflow: hidden;
     width: 60%;
-    color: black;
 }
 .dropdowns-content {
     display: flex;
@@ -35,7 +34,7 @@ td {
     min-width: max-content;
     height: fit-content;
     padding: 16px;
-    border: 1px solid grey;
+    border: 1px solid #edeef0;
     color: black;
     border-radius: 8px;
     background-color: #ffffff;
@@ -43,7 +42,7 @@ td {
 .scorecards-data {
     width: 60%;
     margin: 0px 10px 0px 10px;
-    border: 1px solid grey;
+    border: 1px solid #edeef0;
     border-radius: 8px;
     backdrop-filter: blur(5px);
 }

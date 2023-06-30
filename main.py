@@ -27,17 +27,20 @@ def index(request: Request):
 @app.get("/get_match_ids")
 async def get_match_ids(year: int):
     global matches_dict, match_ids_list
+    print(year)
+    if year == -2:
+        return JSONResponse(content=['Select a Match'])
     series_id = get_series_from_year(year)
     print(series_id)
     matches_dict = get_match_ids_from_series_fast(series_id)  # Your function to retrieve match_ids based on series_id
     match_ids_list = list(matches_dict.keys())
     return JSONResponse(content=match_ids_list)
 
-@app.post("/process", response_class=HTMLResponse)
+@app.get("/process", response_class=HTMLResponse)
 async def process(
         request: Request,
-        year: int = Form(...),
-        match_id: str = Form(...)
+        year: int,
+        match_id: str
     ):
     print("Year: ", year)
     print("Match Name: ", match_id)

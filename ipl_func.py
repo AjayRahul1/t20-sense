@@ -395,25 +395,39 @@ def get_all_series_info(all_series_ids_list):
   return temp_df_to_concat
 
 def get_series_from_year(year):
-   year_to_series_id_mapping = {
-      2008 : 313494,
-      2009 : 374163,
-      2010 : 418064,
-      2011 : 466304,
-      2012 : 520932,
-      2013 : 586733,
-      2014 : 695871,
-      2015 : 791129,
-      2016 : 968923,
-      2017 : 1078425,
-      2018 : 1131611,
-      2019 : 1165643,
-      2020 : 1210595,
-      2021 : 1249214,
-      2022 : 1298423,
-      2023 : 1345038
-    }
-   return year_to_series_id_mapping[year]
+  match year:
+    case 2008:
+       return 313494
+    case 2009:
+       return 374163
+    case 2010:
+       return 418064
+    case 2011:
+       return 466304
+    case 2012:
+       return 520932
+    case 2013:
+       return 586733
+    case 2014:
+       return 695871
+    case 2015:
+       return 791129
+    case 2016:
+       return 968923
+    case 2017:
+       return 1078425
+    case 2018:
+       return 1131611
+    case 2019:
+       return 1165643
+    case 2020:
+       return 1210595
+    case 2021:
+       return 1249214
+    case 2022:
+       return 1298423
+    case 2023:
+       return 1345038
 
 def get_match_ids_from_series(series_id):
   try:

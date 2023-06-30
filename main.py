@@ -65,7 +65,8 @@ async def process(
     bowling2 = bowling2.to_dict(orient='records')
 
     team1_name, team2_name, match_date, result, match_title = get_match_info(series_id, match_id)
-    return templates.TemplateResponse("index.html", {   "request": request, "years" : years, "match_ids" : match_ids,
+    return templates.TemplateResponse("index.html", {   "year": year, "match_id": match_id,
+                                                        "request": request, "years" : years, "match_ids" : match_ids,
                                                         "batting1": batting1, "bowling1": bowling1,
                                                         "batting2": batting2, "bowling2": bowling2,
                                                         "team1_name": team1_name, "team2_name": team2_name,

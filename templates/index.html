@@ -4,7 +4,9 @@
         <title>T20 Sense</title>
         <link rel="stylesheet" href="/static/styles_index.css">
         <script type="text/javascript" src="static/script.js"></script>
-        
+
+        <!-- Bootstrap CSS Link -->
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.3.1/dist/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
         <!-- <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
         <script>
             (adsbygoogle = window.adsbygoogle || []).push({
@@ -14,18 +16,42 @@
         </script> -->
     </head>
     <body>
+        <nav class="navbar navbar-expand-lg navbar-light shadow-sm" style="background-color: #e3f2fd;">
+            <!-- Just an image -->
+            <a class="navbar-brand" href="#">
+            <img src="/static/t20-sense-logo.svg" width="112.8px" height="30px" alt="">
+            </a>
+            <div class="collapse navbar-collapse" id="navbarSupportedContent">
+              <ul class="navbar-nav mr-auto">
+                <li class="nav-item active">
+                  <a class="nav-link" href="/">IPL <span class="sr-only">(current)</span></a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="#">T20 WC</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="#">ODI WC</a>
+                </li>
+              </ul>
+              <form class="form-inline my-2 my-lg-0">
+                <input class="form-control mr-sm-2" type="search" placeholder="Search" aria-label="Search">
+                <button class="btn btn-outline-info my-2 my-sm-0" type="submit">Search a Match</button>
+              </form>
+            </div>
+          </nav>
+                
         <div class="home-three-elem-container">
             <div class="dropdowns-container">
                 <div class="dropdowns-content">
                     <form method="post" action="/process">
-                        <label for="year" style="color: White">Year :</label>
+                        <label for="year" style="color: black;">Year :</label>
                         <select id="year" name="year" onclick="updateMatchOptions()">
                             {% for id in years %}
                             <option value="{{ id }}">{{ id }}</option>
                             {% endfor %}
                         </select>
                         <br><br>
-                        <label for="match_id" style="color: White">Match Name :</label>
+                        <label for="match_id" style="color: black;">Match Name :</label>
                         <select id="match_id" name="match_id">
                             {% for id in match_ids %}
                             <option value="{{ id }}">{{ id }}</option>
@@ -38,50 +64,48 @@
                 <div style="width: 100%;">
                     <!-- Ads Frames -->
                     <div>
-                        <div style="padding: 8px; width: 100%; height: 125px; 
-                            background-color: white; border-radius: 10px; margin-top: 10px; margin-bottom: 5px; ">
+                        <div style="padding: 8px; width: 100%; height: 125px; border: 1px solid grey;
+                            background-color: #ffffff; border-radius: 10px; margin-top: 10px; margin-bottom: 5px; ">
                             <p style="font-size: small;">Advertisement is going to displayed here</p>
                         </div>
-                        <div style="padding: 8px; width: 100%; height: 125px; 
-                            background-color: white; border-radius: 10px; margin-bottom: 5px; ">
+                        <div style="padding: 8px; width: 100%; height: 125px; border: 1px solid grey;
+                            background-color: #ffffff; border-radius: 10px; margin-bottom: 5px; ">
                             <p style="font-size: small;">Advertisement is going to displayed here</p>
                         </div>
-                        <div style="padding: 8px; width: 100%; height: 125px; 
-                            background-color: white; border-radius: 10px; margin-bottom: 5px; ">
+                        <div style="padding: 8px; width: 100%; height: 125px; border: 1px solid grey;
+                            background-color: #ffffff; border-radius: 10px; margin-bottom: 5px; ">
                             <p style="font-size: small;">Advertisement is going to displayed here</p>
                         </div>
                     </div>
                 </div>
             </div>
             {% if not batting1 and finals_and_champs_df %}
-                <div>
-                    <div style="padding: 8px; backdrop-filter: blur(8px); border-radius: 16px; border: 2px solid black;">
-                        <p style="text-align: center;margin-bottom: 5px;"><span class="highlight">Finals & Champions</span></p>
-                        <table style="width: 100%; border-collapse: collapse;">
-                            <thead>
+                <div style="border-radius: 8px; border: 1px solid grey;">
+                    <p class="font-weight-bold" style="margin-bottom: 5px; padding: 5px; background-color: #e3f2fd; border-radius: 8px 8px 0px 0px;">Finals & Champions</p>
+                    <table style="width: 100%; border-collapse: collapse;">
+                        <thead>
+                            <tr>
+                                <th>Year</th>
+                                <th>Final</th>
+                                <th>Champion</th>
+                                <th>Runner Up</th>
+                                <th>Orange Cap</th>
+                                <th>Purple Cap</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for data in finals_and_champs_df %}
                                 <tr>
-                                    <th style="color: white; background-color: indigo;">Year</th>
-                                    <th style="color: white; background-color: green;">Final</th>
-                                    <th style="color: white; background-color: goldenrod;">Champion</th>
-                                    <th style="color: white; background-color: brown;">Runner Up</th>
-                                    <th style="color: white; background-color: orangered;">Orange Cap</th>
-                                    <th style="color: white; background-color: purple;">Purple Cap</th>
+                                    <td>{{data.Year}}</td>
+                                    <td>{{data.Final}}</td>
+                                    <td>{{data['Champions']}}</td>
+                                    <td>{{data['Runner up']}}</td>
+                                    <td>{{data['Orange Cap']}}</td>
+                                    <td>{{data['Purple Cap']}}</td>
                                 </tr>
-                            </thead>
-                            <tbody>
-                                {% for data in finals_and_champs_df %}
-                                    <tr>
-                                        <td>{{data.Year}}</td>
-                                        <td>{{data.Final}}</td>
-                                        <td>{{data['Champions']}}</td>
-                                        <td>{{data['Runner up']}}</td>
-                                        <td>{{data['Orange Cap']}}</td>
-                                        <td>{{data['Purple Cap']}}</td>
-                                    </tr>
-                                {% endfor %}
-                            </tbody>
-                        </table>
-                    </div>
+                            {% endfor %}
+                        </tbody>
+                    </table>
                 </div>
             {% endif %}
             
@@ -90,18 +114,18 @@
             <div class="scorecards-data">
                 <!-- Data displayed in center -->
                 <div class="middle-content-container">
-                    <div style="display: flex; background-color: darkblue; color: white; justify-content: space-around; padding: 0 4px 0 4px;
+                    <div style="display: flex; background-color: darkblue; color: white; justify-content: space-between;
                                 border: 2px solid darkblue; border-radius: 10px;">
-                        <h3>{{match_title}}</h3>
-                        <h3>{{match_date}} | {{ground_info}}</h3>
+                        <p class="text-left">{{match_title}}</p>
+                        <p class="text-left">{{match_date}} | {{ground_info}}</p>
                     </div>
-                    <h3>{{toss_info}}</h3>
-                    <h3>Result - {{result}}</h3>
+                    <p class="text-left">{{toss_info}}</p>
+                    <p class="text-left">Result - {{result}}</p>
                     
-                    <div style="display: flex; justify-content: space-between; margin-bottom: 5px;">
-                        <h3 style="color: white; margin-block-end: 0;"><span class="highlight">{{team1_name}} - Batting</span></h3>
-                        <h3 style="margin-block-end: 0;"><span class="highlight">Total - {{team1_score}} / {{innings1_overs}}</span></h3>
-                        <h3 style="margin-block-end: 0;"><span class="highlight">Target - {{target}}</span></h3>
+                    <div style="display: flex; justify-content: space-between;">
+                        <p class="text-sm-left" style="margin-block-end: 0;">{{team1_name}} - Batting</p>
+                        <p class="text-sm-left" style="margin-block-end: 0;">Total - {{team1_score}} / {{innings1_overs}}</p>
+                        <p class="text-sm-left" style="margin-block-end: 0;">Target - {{target}}</p>
                     </div>
                     <table style="border-collapse: collapse;">
                         <thead>
@@ -117,7 +141,7 @@
                             {% endfor %}
                         </tbody>
                     </table>
-                    <h3 style="color: white; margin-bottom: 5px;"><span class="highlight">{{team2_name}} - Bowling</span></h3>
+                    <p class="text-sm-left" style="margin-bottom: 5px;">{{team2_name}} - Bowling</p>
                     <table style="border-collapse: collapse;">
                         <tr>
                             <th>Bowler</th> <th>Overs</th> <th>Balls</th> <th>Runs</th> <th>Wickets</th> <th>Dots</th> <th>Fours</th> <th>Sixers</th> <th>WD</th> <th>NB</th> <th>Byes</th> <th>LB</th> <th>Econ</th> <th>DB%</th> 
@@ -128,9 +152,9 @@
                         </tr>
                         {% endfor %}
                     </table>
-                    <div style="display: flex; justify-content: space-between; margin-bottom: 5px;">
-                        <h3 style="color: white; margin-block-end: 0;"><span class="highlight">{{team2_name}} - Batting</span></h3>
-                        <h3 style="margin-block-end: 0;"><span class="highlight">Total - {{team2_score}} / {{innings2_overs}}</span></h3>
+                    <div style="display: flex; justify-content: space-between;">
+                        <p class="text-sm-left" style="margin-block-end: 0;">{{team2_name}} - Batting</p>
+                        <p class="text-sm-left" style="margin-block-end: 0;">Total - {{team2_score}} / {{innings2_overs}}</p>
                     </div>
                     <table style="border-collapse: collapse;">
                         <thead>
@@ -146,7 +170,7 @@
                             {% endfor %}
                         </tbody>
                     </table>
-                    <h3 style="color: white;margin-bottom: 5px;"><span class="highlight">{{team1_name}} - Bowling</span></h3>
+                    <p class="text-sm-left" style="margin-bottom: 5px;">{{team1_name}} - Bowling</p>
                     <table style="border-collapse: collapse;">
                         <tr>
                             <th>Bowler</th> <th>Overs</th> <th>Balls</th> <th>Runs</th> <th>Wickets</th> <th>Dots</th> <th>Fours</th> <th>Sixers</th> <th>WD</th> <th>NB</th> <th>Byes</th> <th>LB</th> <th>Econ</th> <th>DB%</th>
@@ -184,3 +208,8 @@
 <!-- <script>
     (adsbygoogle = window.adsbygoogle || []).push({});
 </script> -->
+
+<!-- Bootstrap JS -->
+<script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/popper.js@1.14.7/dist/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@4.3.1/dist/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>

@@ -5,7 +5,7 @@ function updateMatchOptions() {
     fetch('/get_match_ids?year=' + year)
         .then(response => response.json())
         .then(data => {
-            var matchIdDropdown = document.getElementById("match_id");
+            var matchIdDropdown = document.getElementById("match_name");
             matchIdDropdown.innerHTML = "";
 
             data.forEach(matchId => {

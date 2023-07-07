@@ -16,6 +16,7 @@
         </script> -->
     </head>
     <body>
+        <!-- Navigation Bar -->
         <nav class="navbar navbar-expand-lg navbar-light shadow-sm" style="background-color: #e3f2fd;">
             <!-- Just an image -->
             <a class="navbar-brand" href="/">
@@ -52,8 +53,8 @@
                             {% endfor %}
                         </select>
                         <br><br>
-                        <label for="match_id">Match Name :</label>
-                        <select id="match_id" name="match_id">
+                        <label for="match_name">Match Name :</label>
+                        <select id="match_name" name="match_name">
                             {% for id in match_ids %}
                             <option value="{{ id }}">{{ id }}</option>
                             {% endfor %}
@@ -114,38 +115,73 @@
             {% if batting1 and batting2 and bowling1 and bowling2 %}
             <div class="scorecards-data">
                 <!-- Data displayed in center -->
-                <div class="middle-content-container">
-                    <div style="display: flex; background-color: darkblue; color: white; justify-content: space-between;
-                                border: 2px solid darkblue; border-radius: 10px;">
-                        <p class="text-left">{{match_title}}</p>
-                        <p class="text-left">{{match_date}} | {{ground_info}}</p>
-                    </div>
-                    <p class="text-left">{{toss_info}}</p>
-                    <p class="text-left">Result - {{result}}</p>
-                    
-                    <div style="display: flex; justify-content: space-between;">
-                        <p class="text-sm-left" style="margin-block-end: 0;">{{team1_name}} - Batting</p>
-                        <p class="text-sm-left" style="margin-block-end: 0;">Total - {{team1_score}} / {{innings1_overs}}</p>
-                        <p class="text-sm-left" style="margin-block-end: 0;">Target - {{target}}</p>
+                <div class="border rounded" style="padding: 8px; background-color: #ffffff;">
+                    <p style="margin-block-end: 0;">{{match_title}}, {{match_date}}, {{ground_info}}</p>
+                    <p style="margin-block-end: 0;">{{toss_info}}</p>
+                    <p style="margin-block-end: 0;">Result - {{result}}</p>
+                </div>
+                
+                <!-- 1st Innings -->
+                <div class="border rounded mt-2 mb-2" style="background-color: #ffffff;">
+                    <div style="background-color: #e3f2fd; margin: 0;">
+                        <p class="font-weight-bold p-1" style="margin-block: 0;">{{team1_name}}</p>
                     </div>
                     <table style="border-collapse: collapse;">
                         <thead>
                             <tr>
-                                <th>Batsman</th> <th>Runs</th> <th>Balls</th> <th>Dots</th> <th>Fours</th> <th>Sixes</th> <th>SR</th> <th>NDSR</th> <th>DB%</th> <th>4s_SR</th> <th>6s_SR</th> <th>4&6_SR</th>
+                                <th>Batsman</th>
+                                <th>Runs</th>
+                                <th>Balls</th>
+                                <th>Dots</th>
+                                <th>4s</th>
+                                <th>6s</th>
+                                <th>SR</th>
+                                <th>NDSR</th>
+                                <th>DB%</th>
+                                <th>4s_SR</th>
+                                <th>6s_SR</th>
+                                <th>4&6_SR</th>
                             </tr>
                         </thead>
                         <tbody>
                             {% for record in batting1 %}
                             <tr>
-                                <td>{{ record['Batsman'] }}</td> <td>{{ record['Runs'] }}</td> <td>{{ record['Balls'] }}</td> <td>{{ record['Dots'] }}</td> <td>{{ record['Fours'] }}</td> <td>{{ record['Sixes'] }}</td> <td>{{ record['SR'] }}</td> <td>{{ record['NDSR'] }}</td> <td>{{ record['DB%'] }}</td> <td>{{ record['4s_SR'] }}</td> <td>{{ record['6s_SR'] }}</td> <td>{{ record['4&6_SR'] }}</td>
+                                <td>{{ record['Batsman'] }}</td>
+                                <td class="font-weight-bold">{{ record['Runs'] }}</td>
+                                <td>{{ record['Balls'] }}</td>
+                                <td>{{ record['Dots'] }}</td>
+                                <td>{{ record['Fours'] }}</td>
+                                <td>{{ record['Sixes'] }}</td>
+                                <td>{{ record['SR'] }}</td>
+                                <td>{{ record['NDSR'] }}</td>
+                                <td>{{ record['DB%'] }}</td>
+                                <td>{{ record['4s_SR'] }}</td>
+                                <td>{{ record['6s_SR'] }}</td>
+                                <td>{{ record['4&6_SR'] }}</td>
                             </tr>
                             {% endfor %}
                         </tbody>
                     </table>
-                    <p class="text-sm-left" style="margin-bottom: 5px;">{{team2_name}} - Bowling</p>
+                    <div class="border-top" style="display: flex; justify-content: space-around;">
+                        <p style="margin-block: 0;">Total - {{team1_score}} ({{innings1_overs}})</p>
+                        <p style="margin-block: 0;">Target - {{target}}</p>
+                    </div>
                     <table style="border-collapse: collapse;">
                         <tr>
-                            <th>Bowler</th> <th>Overs</th> <th>Balls</th> <th>Runs</th> <th>Wickets</th> <th>Dots</th> <th>Fours</th> <th>Sixers</th> <th>WD</th> <th>NB</th> <th>Byes</th> <th>LB</th> <th>Econ</th> <th>DB%</th> 
+                            <th>Bowler</th>
+                            <th>Overs</th>
+                            <th>Balls</th>
+                            <th>Runs</th>
+                            <th>Wickets</th>
+                            <th>Dots</th>
+                            <th>Fours</th>
+                            <th>Sixers</th>
+                            <th>WD</th>
+                            <th>NB</th>
+                            <th>Byes</th>
+                            <th>LB</th>
+                            <th>Econ</th>
+                            <th>DB%</th> 
                         </tr>
                         {% for bowler in bowling1 %}
                         <tr>
@@ -153,25 +189,54 @@
                         </tr>
                         {% endfor %}
                     </table>
-                    <div style="display: flex; justify-content: space-between;">
-                        <p class="text-sm-left" style="margin-block-end: 0;">{{team2_name}} - Batting</p>
-                        <p class="text-sm-left" style="margin-block-end: 0;">Total - {{team2_score}} / {{innings2_overs}}</p>
+                    <br>
+                </div>
+
+                <!-- 2nd Innings -->
+                <div class="border rounded mt-2 mb-2" style="background-color: #ffffff;">
+                    <div style="background-color: #e3f2fd; margin: 0;">
+                        <p class="font-weight-bold p-1" style="margin-block: 0;">{{team2_name}}</p>
                     </div>
                     <table style="border-collapse: collapse;">
                         <thead>
                             <tr>
-                                <th>Batsman</th> <th>Runs</th> <th>Balls</th> <th>Dots</th> <th>Fours</th> <th>Sixes</th> <th>SR</th> <th>NDSR</th> <th>DB%</th> <th>4s_SR</th> <th>6s_SR</th> <th>4&6_SR</th>
+                                <th>Batsman</th>
+                                <th>Runs</th>
+                                <th>Balls</th>
+                                <th>Dots</th>
+                                <th>4s</th>
+                                <th>6s</th>
+                                <th>SR</th>
+                                <th>NDSR</th>
+                                <th>DB%</th>
+                                <th>4s_SR</th>
+                                <th>6s_SR</th>
+                                <th>4&6_SR</th>
                             </tr>
                         </thead>
                         <tbody>
                             {% for record in batting2 %}
                             <tr>
-                                <td>{{ record['Batsman'] }}</td> <td>{{ record['Runs'] }}</td> <td>{{ record['Balls'] }}</td> <td>{{ record['Dots'] }}</td> <td>{{ record['Fours'] }}</td> <td>{{ record['Sixes'] }}</td> <td>{{ record['SR'] }}</td> <td>{{ record['NDSR'] }}</td> <td>{{ record['DB%'] }}</td> <td>{{ record['4s_SR'] }}</td> <td>{{ record['6s_SR'] }}</td> <td>{{ record['4&6_SR'] }}</td>
+                                <td class="text-dark">{{ record['Batsman'] }}</td>
+                                <td class="font-weight-bold">{{ record['Runs'] }}</td>
+                                <td>{{ record['Balls'] }}</td>
+                                <td>{{ record['Dots'] }}</td>
+                                <td>{{ record['Fours'] }}</td>
+                                <td>{{ record['Sixes'] }}</td>
+                                <td>{{ record['SR'] }}</td>
+                                <td>{{ record['NDSR'] }}</td>
+                                <td>{{ record['DB%'] }}</td>
+                                <td>{{ record['4s_SR'] }}</td>
+                                <td>{{ record['6s_SR'] }}</td>
+                                <td>{{ record['4&6_SR'] }}</td>
                             </tr>
                             {% endfor %}
                         </tbody>
                     </table>
-                    <p class="text-sm-left" style="margin-bottom: 5px;">{{team1_name}} - Bowling</p>
+                    <div class="border-top" style="display: flex; justify-content: space-around;">
+                        <p style="margin-block: 0;">Total - {{team2_score}} ({{innings2_overs}})</p>
+                    </div>
+
                     <table style="border-collapse: collapse;">
                         <tr>
                             <th>Bowler</th> <th>Overs</th> <th>Balls</th> <th>Runs</th> <th>Wickets</th> <th>Dots</th> <th>Fours</th> <th>Sixers</th> <th>WD</th> <th>NB</th> <th>Byes</th> <th>LB</th> <th>Econ</th> <th>DB%</th>
@@ -186,7 +251,7 @@
             </div>
             {% endif %}
             <div>
-                <div style="height: 600px;">
+                <!-- <div style="height: 600px;">
                     <div style="position:relative; display:block;">
                         <img src="https://pagead2.googlesyndication.com/pagead/gen_204?id=dv3-render&amp;msg=fetch&amp;cor=14988633729678733623&amp;x=1&amp;ct=77" border="0" width="1" height="1" alt="" style="display:none">
                         <script>(
@@ -225,11 +290,11 @@
                             </div>
                         </div>
                     </div>
-                </div>
-                <!-- <div style="padding: 8px; width: 175px; height: 500px; border: 1px #edeef0;
+                </div> -->
+                <div style="padding: 8px; width: 175px; height: 500px; border: 1px #edeef0;
                             background-color: white; border-radius: 10px; margin-bottom: 5px; ">
                     <p style="font-size: small;">Advertisement is going to displayed here</p>
-                </div> -->
+                </div>
             </div>
         </div>
     </body>

@@ -239,14 +239,41 @@
 
                     <table style="border-collapse: collapse;">
                         <tr>
-                            <th>Bowler</th> <th>Overs</th> <th>Balls</th> <th>Runs</th> <th>Wickets</th> <th>Dots</th> <th>Fours</th> <th>Sixers</th> <th>WD</th> <th>NB</th> <th>Byes</th> <th>LB</th> <th>Econ</th> <th>DB%</th>
+                            <th>Bowler</th>
+                            <th>Overs</th>
+                            <th>Balls</th>
+                            <th>Runs</th>
+                            <th>Wickets</th>
+                            <th>Dots</th>
+                            <th>Fours</th>
+                            <th>Sixers</th>
+                            <th>WD</th>
+                            <th>NB</th>
+                            <th>Byes</th>
+                            <th>LB</th>
+                            <th>Econ</th>
+                            <th>DB%</th>
                         </tr>
                         {% for bowler in bowling2 %}
                         <tr>
-                            <td>{{ bowler.Bowler }}</td> <td>{{ bowler.Overs }}</td> <td>{{ bowler.Balls }}</td> <td>{{ bowler.Runs }}</td> <td>{{ bowler.Wickets }}</td> <td>{{ bowler.Dots }}</td> <td>{{ bowler.Fours }}</td> <td>{{ bowler.Sixers }}</td> <td>{{ bowler.WD }}</td> <td>{{ bowler.NB }}</td> <td>{{ bowler.Byes }}</td> <td>{{ bowler.LB }}</td> <td>{{ bowler.Econ }}</td> <td>{{ bowler["DB%"] }}</td>
+                            <td>{{ bowler.Bowler }}</td>
+                            <td>{{ bowler.Overs }}</td>
+                            <td>{{ bowler.Balls }}</td>
+                            <td>{{ bowler.Runs }}</td>
+                            <td>{{ bowler.Wickets }}</td>
+                            <td>{{ bowler.Dots }}</td>
+                            <td>{{ bowler.Fours }}</td>
+                            <td>{{ bowler.Sixers }}</td>
+                            <td>{{ bowler.WD }}</td>
+                            <td>{{ bowler.NB }}</td>
+                            <td>{{ bowler.Byes }}</td>
+                            <td>{{ bowler.LB }}</td>
+                            <td>{{ bowler.Econ }}</td>
+                            <td>{{ bowler["DB%"] }}</td>
                         </tr>
                         {% endfor %}
                     </table>
+                    <br>
                 </div>
             </div>
             {% endif %}

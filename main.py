@@ -40,13 +40,13 @@ async def get_match_ids(year: int):
 async def process(
         request: Request,
         year: int,
-        match_id: str
+        match_name: str
     ):
     print("Year: ", year)
-    print("Match Name: ", match_id)
+    print("Match Name: ", match_name)
     series_id = get_series_from_year(year)
     print("Series ID: ", series_id)
-    match_id = int(matches_dict[match_id])
+    match_id = int(matches_dict[match_name])
 
     toss_row_df = get_team_name_score_ground(series_id=series_id, match_id=match_id)
 

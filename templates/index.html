@@ -47,7 +47,8 @@
           <form method="get" action="/get_scorecard">
             <div class="form-group">
               <label for="year">Year </label>
-              <select class="form-select" aria-label="Default select example" id="year" name="year" hx-trigger="change, load" hx-get="/return_matches_names" hx-target="#match_name">
+              <br>
+              <select class="custom-select" style="width: 100%;" aria-label="Default select example" id="year" name="year" hx-trigger="change, load" hx-get="/return_matches_names" hx-target="#match_name">
                 <!-- <option selected disabled>Select an year</option> -->
                 {% for year in years %}
                   <option value="{{ year }}">{{ year }}</option>
@@ -56,7 +57,8 @@
             </div>
             <div class="form-group">
               <label for="match_name">Match Name </label>
-              <select class="form-select" id="match_name" name="match_name">
+              <br>
+              <select class="custom-select" style="width: 100%;" id="match_name" name="match_name">
                 {% for id in match_ids %}
                 <option value="{{ id }}">{{ id }}</option>
                 {% endfor %}

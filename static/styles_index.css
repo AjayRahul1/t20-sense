@@ -24,8 +24,6 @@ td {
 .dropdowns-containter{
     background-color: #ffffff;
     position: relative;
-    overflow: hidden;
-    width: 60%;
 }
 .dropdowns-content {
     display: flex;
@@ -41,7 +39,7 @@ td {
     background-color: #ffffff;
 }
 .scorecards-data {
-    width: 60%;
+    width: 100%;
     margin: 0px 10px 0px 10px;
     backdrop-filter: blur(5px);
 }

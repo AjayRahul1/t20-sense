@@ -45,26 +45,28 @@
             <div class="dropdowns-container">
                 <div class="dropdowns-content">
                     <form method="get" action="/process">
-                        <label for="year">Year :</label>
-                        <select id="year" name="year" onchange="updateMatchOptions()">
-                            <option value="-2" selected disabled>Select an year</option>
-                            {% for id in years %}
-                            <option value="{{ id }}">{{ id }}</option>
-                            {% endfor %}
-                        </select>
-                        <br><br>
-                        <label for="match_name">Match Name :</label>
-                        <select id="match_name" name="match_name">
-                            {% for id in match_ids %}
-                            <option value="{{ id }}">{{ id }}</option>
-                            {% endfor %}
-                        </select>
-                        <br><br>
-                        <input type="submit" value="Submit">
+                        <div class="form-group">
+                            <label for="year">Year </label>
+                            <select class="form-select" id="year" name="year" onchange="updateMatchOptions()">
+                                <option selected disabled>Select an year</option>
+                                {% for id in years %}
+                                <option value="{{ id }}">{{ id }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="match_name">Match Name </label>
+                            <select class="form-select" id="match_name" name="match_name">
+                                {% for id in match_ids %}
+                                <option value="{{ id }}">{{ id }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <input type="submit" class="btn btn-outline-dark btn-sm btn-block" value="Submit">
                     </form>
                 </div>
+                <!-- Ads Frames -->
                 <div style="width: 100%;">
-                    <!-- Ads Frames -->
                     <div>
                         <div style="padding: 8px; width: 100%; height: 125px; border: 1px solid #edeef0;
                             background-color: #ffffff; border-radius: 10px; margin-top: 10px; margin-bottom: 5px; ">
@@ -81,10 +83,16 @@
                     </div>
                 </div>
             </div>
+
+            <!-- Finals and Champions Table Division -->
             {% if not batting1 and finals_and_champs_df %}
-            <div style="border-radius: 8px; border: 1px solid grey;">
-                <p class="font-weight-bold" style="margin-bottom: 5px; padding: 5px; background-color: #e3f2fd; border-radius: 8px 8px 0px 0px;">Finals & Champions</p>
-                <table style="width: 100%; border-collapse: collapse;">
+            <div style="border-radius: 8px;">
+                <p class="font-weight-bold" style="margin-bottom: 0; padding: 8px;
+                    background-color: #e3f2fd;
+                    border-radius: 8px 8px 0px 0px;">
+                    Finals & Champions
+                </p>
+                <table style="width: 100%; border-collapse: collapse; border: 1px solid #edeef0;">
                     <thead>
                         <tr>
                             <th>Year</th>
@@ -100,12 +108,13 @@
                             <tr>
                                 <td>{{data.Year}}</td>
                                 <td>{{data.Final}}</td>
-                                <td>{{data['Champions']}}</td>
+                                <td class="font-weight-bold">{{data['Champions']}}</td>
                                 <td>{{data['Runner up']}}</td>
                                 <td>{{data['Orange Cap']}}</td>
                                 <td>{{data['Purple Cap']}}</td>
                             </tr>
                         {% endfor %}
+                            <tr></tr>
                     </tbody>
                 </table>
             </div>
@@ -116,7 +125,7 @@
             <div class="scorecards-data">
                 <!-- Data displayed in center -->
                 <div class="border rounded" style="padding: 8px; background-color: #ffffff;">
-                    <p style="margin-block-end: 0;">{{match_title}}, {{match_date}}, {{ground_info}}</p>
+                    <p class="font-weight-bold" style="margin-block-end: 0;">{{match_title}}, {{match_date}}, {{ground_info}}</p>
                     <p style="margin-block-end: 0;">{{toss_info}}</p>
                     <p style="margin-block-end: 0;">Result - {{result}}</p>
                 </div>
@@ -318,7 +327,7 @@
                         </div>
                     </div>
                 </div> -->
-                <div style="padding: 8px; width: 175px; height: 500px; border: 1px #edeef0;
+                <div style="padding: 8px; width: 175px; height: 500px; border: 1px solid #edeef0;
                             background-color: white; border-radius: 10px; margin-bottom: 5px; ">
                     <p style="font-size: small;">Advertisement is going to displayed here</p>
                 </div>

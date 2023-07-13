@@ -1,6 +1,7 @@
 table{
     border-collapse: collapse;
     width: 100%;
+    background-color: #ffffff;
 }
 th, td {
     padding: 2px 8px; /* Top/Bottom: 2px , Left/Right: 8px*/

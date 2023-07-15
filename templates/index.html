@@ -17,7 +17,7 @@
   </head>
   <body style="background-color: #f9f9fb;">
     <!-- Navigation Bar -->
-    <nav class="navbar navbar-expand-lg navbar-light shadow-sm" style="background-color: #e3f2fd;">
+    <nav class="navbar navbar-expand-lg navbar-light shadow-sm" style="background-color: #ffdea6;"> <!-- Yellow : ffdea6 -->
       <!-- Just an image -->
       <a class="navbar-brand" href="/">
       <img src="/static/t20-sense-logo.svg" width="112.8px" height="30px" alt="">
@@ -39,7 +39,7 @@
         </ul>
         <form class="form-inline my-2 my-lg-0">
           <input class="form-control mr-sm-2 rounded-pill" type="search" placeholder="Search any match" aria-label="Search">
-          <button class="btn btn-outline-info my-2 my-sm-0 rounded-pill" type="submit">Search</button>
+          <button class="btn btn-outline-dark my-2 my-sm-0 rounded-pill" type="submit">Search</button>
         </form>
       </div>
       </nav>
@@ -91,37 +91,39 @@
 
       <!-- Finals and Champions Table Division -->
       {% if not batting1 and finals_and_champs_df %}
-      <div style="border-radius: 8px;">
-        <p class="font-weight-bold" style="margin-bottom: 0; padding: 8px;
-          background-color: #e3f2fd;
-          border-radius: 8px 8px 0px 0px;">
-          Finals & Champions
-        </p>
-        <table style="width: 100%; border-collapse: collapse; border: 1px solid #edeef0;">
-          <thead>
-            <tr>
-              <th>Year</th>
-              <th>Final</th>
-              <th>Champion</th>
-              <th>Runner Up</th>
-              <th>Orange Cap</th>
-              <th>Purple Cap</th>
-            </tr>
-          </thead>
-          <tbody>
-            {% for data in finals_and_champs_df %}
+      <div>
+        <div style="border-radius: 8px; border: 1px solid #edeef0;">
+          <p class="font-weight-bold p-1" style="margin-bottom: 0;
+            background-color: #bbe6f0;
+            border-radius: 8px 8px 0px 0px;">
+            Finals & Champions
+          </p>
+          <table style="width: 100%; border-collapse: collapse;">
+            <thead>
               <tr>
-                <td>{{data.Year}}</td>
-                <td>{{data.Final}}</td>
-                <td class="font-weight-bold">{{data['Champions']}}</td>
-                <td>{{data['Runner up']}}</td>
-                <td>{{data['Orange Cap']}}</td>
-                <td>{{data['Purple Cap']}}</td>
+                <th>Year</th>
+                <th>Final</th>
+                <th>Champion</th>
+                <th>Runner Up</th>
+                <th>Orange Cap</th>
+                <th>Purple Cap</th>
               </tr>
-            {% endfor %}
-              <tr></tr>
-          </tbody>
-        </table>
+            </thead>
+            <tbody>
+              {% for data in finals_and_champs_df %}
+                <tr>
+                  <td>{{data.Year}}</td>
+                  <td>{{data.Final}}</td>
+                  <td class="font-weight-bold">{{data['Champions']}}</td>
+                  <td>{{data['Runner up']}}</td>
+                  <td>{{data['Orange Cap']}}</td>
+                  <td>{{data['Purple Cap']}}</td>
+                </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+          <br>
+        </div>
       </div>
       {% endif %}
       

@@ -24,24 +24,16 @@ def index(request: Request):
   finals_and_champs_df = finals_and_champs_df.to_dict(orient='records')
   return templates.TemplateResponse("index.html", {"request": request, "years": years, "match_ids": match_ids, "finals_and_champs_df":finals_and_champs_df})
 
-@app.get("/get_match_ids")
-async def get_match_ids(year: int):
-  global matches_dict, match_names_list
-  print(year)
-  if year == -2:
-    return JSONResponse(content=['Select a Match'])
-  series_id = get_series_from_year(year)
-  print(series_id)
-  matches_dict = get_match_ids_from_series_fast(series_id)  # Your function to retrieve match_ids based on series_id
-  match_names_list = list(matches_dict.keys())
-  return JSONResponse(content=match_names_list)
-
-@app.get("/return_matches_names")
-async def ret_match_ids(year : int, request : Request):
+def updating_match_details_for_refresh(year):
   global matches_dict, match_ids_list
   series_id = get_series_from_year(year)
   matches_dict = get_match_ids_from_series_fast(series_id)  # Your function to retrieve match_ids based on series_id
   matches_names_list = list(matches_dict.keys())
+  return matches_names_list
+
+@app.get("/return_matches_names")
+async def ret_match_ids(year : int, request : Request):
+  matches_names_list = updating_match_details_for_refresh(year)
   return templates.TemplateResponse('content_loading_htmx/ipl_match_options.html', {"request" : request, "matches_names_list" : matches_names_list})
       
 @app.get("/get_scorecard", response_class=HTMLResponse)
@@ -51,6 +43,7 @@ async def process(
     match_name: str
   ):
   try:
+    updating_match_details_for_refresh(year=year)
     print("Year: ", year)
     print("Match Name: ", match_name)
     series_id = get_series_from_year(year)

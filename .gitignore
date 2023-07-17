@@ -1,3 +1,4 @@
 **/**.json
 venv-linux-ts/
 venv-windows-ts/
+__pycache__/

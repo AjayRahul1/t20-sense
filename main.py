@@ -43,7 +43,7 @@ async def process(
     match_name: str
   ):
   try:
-    updating_match_details_for_refresh(year=year)
+    matches_names_list = updating_match_details_for_refresh(year=year)
     print("Year: ", year)
     print("Match Name: ", match_name)
     series_id = get_series_from_year(year)

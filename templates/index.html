@@ -64,9 +64,6 @@
               <label for="match_name">Match Name </label>
               <br>
               <select class="custom-select" style="width: 100%;" id="match_name" name="match_name">
-                {% for id in match_ids %}
-                <option value="{{ id }}">{{ id }}</option>
-                {% endfor %}
               </select>
             </div>
             <input type="submit" class="btn btn-outline-dark btn-sm btn-block" value="Go to the match">

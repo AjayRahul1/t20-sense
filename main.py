@@ -1,5 +1,5 @@
 from fastapi import FastAPI, Request, Form
-from fastapi.responses import HTMLResponse, JSONResponse
+from fastapi.responses import HTMLResponse
 from fastapi.templating import Jinja2Templates
 from typing import List
 from fastapi.staticfiles import StaticFiles

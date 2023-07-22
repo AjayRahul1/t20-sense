@@ -11,8 +11,7 @@ templates = Jinja2Templates(directory="templates")
 app.mount("/static", StaticFiles(directory="static"), name="static")
 
 all_ipl_series_info = get_all_csv_files_from_cloud()
-matches_dict = {}
-matches_names_list = []
+matches_names_and_ids_dict = {}
 
 years = list(range(2008, 2024))  # Generate a list of years from 2008 to 2023
 match_ids = ["Select the Match"]  # Example match IDs
@@ -25,30 +24,29 @@ def index(request: Request):
   return templates.TemplateResponse("index.html", {"request": request, "years": years, "match_ids": match_ids, "finals_and_champs_df":finals_and_champs_df})
 
 def updating_match_details_for_refresh(year):
-  global matches_dict, match_ids_list
+  global matches_names_and_ids_dict
   series_id = get_series_from_year(year)
-  matches_dict = get_match_ids_from_series_fast(series_id)  # Your function to retrieve match_ids based on series_id
-  matches_names_list = list(matches_dict.keys())
-  return matches_names_list
+  matches_names_and_ids_dict = get_match_ids_from_series_fast(series_id)  # Your function to retrieve match_ids based on series_id
+  return matches_names_and_ids_dict
 
 @app.get("/return_matches_names")
 async def ret_match_ids(year : int, request : Request):
-  matches_names_list = updating_match_details_for_refresh(year)
-  return templates.TemplateResponse('content_loading_htmx/ipl_match_options.html', {"request" : request, "matches_names_list" : matches_names_list})
-      
+  matches_names_and_ids_dict = updating_match_details_for_refresh(year)
+  return templates.TemplateResponse('content_loading_htmx/ipl_match_options.html', {"request" : request, "matches_names_and_ids_dict" : matches_names_and_ids_dict})
+
 @app.get("/get_scorecard", response_class=HTMLResponse)
 async def process(
     request: Request,
     year: int,
-    match_name: str
+    match_id: int
   ):
   try:
-    matches_names_list = updating_match_details_for_refresh(year=year)
+    matches_names_and_ids_dict = updating_match_details_for_refresh(year=year)
     print("Year: ", year)
-    print("Match Name: ", match_name)
+    print("Match ID: ", match_id)
     series_id = get_series_from_year(year)
     print("Series ID: ", series_id)
-    match_id = int(matches_dict[match_name])
+    # match_id = int(matches_names_and_ids_dict[match_name])
 
     toss_row_df = get_team_name_score_ground(series_id=series_id, match_id=match_id)
 

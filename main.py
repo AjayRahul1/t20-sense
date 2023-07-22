@@ -31,6 +31,7 @@ def updating_match_details_for_refresh(year):
 
 @app.get("/return_matches_names")
 async def ret_match_ids(year : int, request : Request):
+  global matches_names_and_ids_dict
   matches_names_and_ids_dict = updating_match_details_for_refresh(year)
   return templates.TemplateResponse('content_loading_htmx/ipl_match_options.html', {"request" : request, "matches_names_and_ids_dict" : matches_names_and_ids_dict})
 
@@ -68,7 +69,7 @@ async def process(
     bowling2 = bowling2.to_dict(orient='records')
 
     team1_name, team2_name, match_date, result, match_title = get_match_info(series_id, match_id)
-    return templates.TemplateResponse("index.html", {   "year": year, "match_id": match_id,
+    return templates.TemplateResponse("index.html", {   "selected_year": year, "selected_match_id": match_id,
                               "request": request, "years" : years, "match_ids" : match_ids,
                               "batting1": batting1, "bowling1": bowling1,
                               "batting2": batting2, "bowling2": bowling2,

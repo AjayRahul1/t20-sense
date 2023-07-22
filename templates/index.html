@@ -56,14 +56,14 @@
               <select class="custom-select" style="width: 100%;" aria-label="Default select example" id="year" name="year" hx-trigger="change, load" hx-get="/return_matches_names" hx-target="#match_id">
                 <!-- <option selected disabled>Select an year</option> -->
                 {% for year in years %}
-                  <option value="{{ year }}">{{ year }}</option>
-                {% endfor %}
-              </select>
-            </div>
-            <div class="form-group">
-              <label for="match_name">Match Name </label>
-              <br>
-              <select class="custom-select" style="width: 100%;" id="match_id" name="match_id">
+                  <option value="{{ year }}" {% if selected_year and selected_year == year %}selected{% endif %}>{{ year }}</option>
+                  {% endfor %}
+                </select>
+              </div>
+              <div class="form-group">
+                <label for="match_name">Match Name </label>
+                <br>
+                <select class="custom-select" style="width: 100%;" id="match_id" name="match_id">
               </select>
             </div>
             <input type="submit" class="btn btn-outline-dark btn-sm btn-block" value="Go to the match">

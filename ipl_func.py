@@ -1,13 +1,20 @@
 import pandas as pd, requests, traceback, warnings
 from datetime import datetime
-import asyncio
+import asyncio, os, io
+from dotenv import load_dotenv
 
 # Google Cloud Storage Imports
 from google.cloud import storage
-import pandas as pd, os, io
 
 # Settings the warnings to be ignored
 warnings.filterwarnings('ignore')
+
+# Load .env variables into the environment
+load_dotenv()
+
+# Access environment variables
+ENVIRONMENT = os.getenv("ENVIRONMENT")
+API_KEY = os.getenv("API_KEY")
 
 all_series_ids = [313494, 374163, 418064, 466304, 520932, 586733, 695871, 791129, 968923, 1078425, 1131611, 1165643, 1210595, 1249214, 1298423, 1345038]
 

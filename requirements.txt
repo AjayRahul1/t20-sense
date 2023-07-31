@@ -3,3 +3,4 @@ pandas
 requests
 ipython
 google.cloud.storage
+python-dotenv

@@ -17,7 +17,7 @@
   </head>
   <body style="background-color: #f9f9fb;">
     <!-- Navigation Bar -->
-    <nav class="navbar navbar-expand-sm navbar-light shadow-sm" style="background-color: #ffdea6;"> <!-- Yellow : ffdea6 -->
+    <nav class="navbar navbar-expand-lg navbar-light shadow-sm" style="background-color: #ffdea6;"> <!-- Yellow : ffdea6 -->
       <!-- Just an image -->
       <a class="navbar-brand" href="/">
       <img src="/static/t20-sense-logo.svg" width="112.8px" height="30px" alt="">
@@ -44,10 +44,10 @@
           <button class="btn btn-outline-dark my-2 my-sm-0 rounded-pill" type="submit">Search</button>
         </form> -->
       </div>
-      </nav>
+    </nav>
         
     <div class="home-three-elem-container">
-      <div class="dropdowns-container">
+      <div class="first-frame-container">
         <div class="dropdowns-content">
           <form method="get" action="/get_scorecard">
             <div class="form-group">
@@ -76,22 +76,15 @@
               background-color: #ffffff; border-radius: 10px; margin-top: 10px; margin-bottom: 5px; ">
               <p style="font-size: small;">Advertisement is going to displayed here</p>
             </div>
-            <div style="padding: 8px; width: 100%; height: 125px; border: 1px solid #edeef0;
-              background-color: #ffffff; border-radius: 10px; margin-bottom: 5px; ">
-              <p style="font-size: small;">Advertisement is going to displayed here</p>
-            </div>
-            <div style="padding: 8px; width: 100%; height: 125px; border: 1px solid #edeef0;
-              background-color: #ffffff; border-radius: 10px; margin-bottom: 5px; ">
-              <p style="font-size: small;">Advertisement is going to displayed here</p>
-            </div>
           </div>
         </div>
       </div>
 
-      <!-- Finals and Champions Table Division -->
-      {% if not batting1 and finals_and_champs_df %}
-      <div>
-        <div style="border-radius: 8px; border: 1px solid #edeef0; background-color: #ffffff;">
+      <!-- 2nd Frame --> <!-- Data displayed in center -->
+      <div class="scorecards-data">
+        <!-- Finals and Champions Table Division -->
+        {% if not batting1 and finals_and_champs_df %}
+        <div class="border rounded" style="background-color: #ffffff;">
           <p class="font-weight-bold p-1" style="margin-bottom: 0;
             background-color: #bbe6f0;
             border-radius: 8px 8px 0px 0px;">
@@ -123,13 +116,9 @@
           </table>
           <br>
         </div>
-      </div>
-      {% endif %}
-      
-      <!-- 2nd Frame -->
-      {% if batting1 and batting2 and bowling1 and bowling2 %}
-      <div class="scorecards-data">
-        <!-- Data displayed in center -->
+        {% endif %}
+
+        {% if batting1 and batting2 and bowling1 and bowling2 %}
         <div class="border rounded" style="padding: 8px; background-color: #ffffff;">
           <p class="font-weight-bold" style="margin-block-end: 0;">{{match_title}}, {{match_date}}, {{ground_info}}</p>
           <p style="margin-block-end: 0;">{{toss_info}}</p>
@@ -290,8 +279,9 @@
           </table>
           <br>
         </div>
+        {% endif %}
       </div>
-      {% endif %}
+      
       <div>
         <!-- <div style="height: 600px;">
           <div style="position:relative; display:block;">

@@ -1,9 +1,9 @@
-from fastapi import FastAPI, Request, Form
+from fastapi import FastAPI, Request
 from fastapi.responses import HTMLResponse
 from fastapi.templating import Jinja2Templates
 from typing import List
 from fastapi.staticfiles import StaticFiles
-from ipl_func import get_particular_match_whole_score, get_series_from_year, get_match_ids_from_series_fast, get_match_info, get_all_csv_files_from_cloud, get_team_name_score_ground
+from ipl_func import get_particular_match_whole_score, get_series_from_year, get_match_ids_from_series_fast, get_match_info, get_all_csv_files_from_cloud, get_team_name_score_ground, get_graphical_stats_from_each_ball_data
 import pandas as pd
 
 app = FastAPI()
@@ -69,6 +69,8 @@ async def process(
     bowling2 = bowling2.to_dict(orient='records')
 
     team1_name, team2_name, match_date, result, match_title = get_match_info(series_id, match_id)
+
+    line_plot_cumulative_team_score_graph_base64 = get_graphical_stats_from_each_ball_data(series_id=series_id, match_id=match_id)
     return templates.TemplateResponse("index.html", {   "selected_year": year, "selected_match_id": match_id,
                               "request": request, "years" : years, "match_ids" : match_ids,
                               "batting1": batting1, "bowling1": bowling1,
@@ -78,7 +80,7 @@ async def process(
                               "ground_info": ground_info, "toss_info": toss_info,
                               "team1_name": team1_name, "team2_name":team2_name,
                               "team1_score":team1_score, "team2_score":team2_score,
-                              "innings1_overs": innings1_overs, "innings2_overs": innings2_overs,
-                              "target" : team2_target })
+                              "innings1_overs": innings1_overs, "innings2_overs": innings2_overs, "target" : team2_target,
+                              "each_team_cumulative_score_per_over" : line_plot_cumulative_team_score_graph_base64 })
   except:
     return templates.TemplateResponse('error_pages/no_scorecard.html', {"request": request})

@@ -43,11 +43,17 @@ td {
     margin: 0px 10px 0px 10px;
     backdrop-filter: blur(5px);
 }
+.third-frame-stats-ads{
+    width: 20%;
+}
 
 /* Styles for mobile */
 @media (max-width: 767px) {
     .home-three-elem-container {
         display: flex;
         flex-direction: column;
+    }
+    .third-frame-stats-ads {
+        width: 100%;
     }
 }

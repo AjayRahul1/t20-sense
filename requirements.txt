@@ -1,5 +1,7 @@
 fastapi[all]
+numpy
 pandas
+matplotlib
 requests
 ipython
 google.cloud.storage

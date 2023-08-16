@@ -1,8 +1,18 @@
 <!DOCTYPE html>
 <html>
+
   <head>
     <title>T20 Sense</title>
     <link rel="stylesheet" href="/static/styles_index.css">
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-LWDCC125HK"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+
+      gtag('config', 'G-LWDCC125HK');
+    </script>
     <script type="text/javascript" src="static/script.js"></script>
 
     <!-- Bootstrap CSS Link -->
@@ -282,8 +292,8 @@
         {% endif %}
       </div>
       
-      <!-- Ads Frames -->
-      <div>
+      <!-- Third Frame -->
+      <div class="third-frame-stats-ads">
         <!-- <div style="height: 600px;">
           <div style="position:relative; display:block;">
             <img src="https://pagead2.googlesyndication.com/pagead/gen_204?id=dv3-render&amp;msg=fetch&amp;cor=14988633729678733623&amp;x=1&amp;ct=77" border="0" width="1" height="1" alt="" style="display:none">
@@ -324,9 +334,14 @@
             </div>
           </div>
         </div> -->
-        <div style="padding: 8px; width: 175px; height: 500px; border: 1px solid #edeef0;
+        {% if each_team_cumulative_score_per_over %}
+        <div style="margin-bottom: 10px;">
+          <img src="data:image/png;base64,{{ each_team_cumulative_score_per_over }}" alt="Cumulative Runs Graph" style="width: 100%; max-height: min-content;">
+        </div>
+        {% endif %}
+        <div style="margin: 8px; padding: 8px; width: 100%; height: 300px; border: 1px solid #edeef0;
               background-color: white; border-radius: 10px; margin-bottom: 5px; ">
-          <p style="font-size: small;">Advertisement is going to displayed here</p>
+          <p class="text-center" style="font-size: small;">Advertisement is going to displayed here</p>
         </div>
       </div>
     </div>

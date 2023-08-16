@@ -1,4 +1,5 @@
-import pandas as pd, requests, traceback, warnings
+import pandas as pd, requests, traceback, warnings, numpy as np, base64
+from matplotlib.figure import Figure
 from datetime import datetime
 import asyncio, os, io
 from dotenv import load_dotenv
@@ -343,6 +344,35 @@ def get_one_innings_from_extracted_data(series_id, match_id, innings_id):
   # Reversing the dataframe from 20th to 1st over into 1st to 20th over
   final_df = final_df[::-1]
   return final_df
+
+def get_graphical_stats_from_each_ball_data(series_id, match_id):
+  # Ball By Ball for 1st innings
+  req_response = get_request_response_API(series_id, match_id, 1)
+  ball_by_ball_json = pd.json_normalize(data=req_response.json()['comments'])
+  
+  nparr_each_ball_score_inn1 = np.array(ball_by_ball_json['totalInningRuns'])
+  nparr_over_no_where_team_score_at_inn1 = np.array(ball_by_ball_json['oversActual'])
+  
+  # Ball By Ball for 2nd innings
+  req_response = get_request_response_API(series_id, match_id, 2)
+  ball_by_ball_json = pd.json_normalize(data=req_response.json()['comments'])
+  
+  nparr_each_ball_score_inn2 = np.array(ball_by_ball_json['totalInningRuns'])
+  nparr_over_no_where_team_score_at_inn2 = np.array(ball_by_ball_json['oversActual'])
+
+  fig = Figure()
+  ax = fig.add_subplot(1, 1, 1)
+  ax.plot(nparr_over_no_where_team_score_at_inn1, nparr_each_ball_score_inn1)
+  ax.plot(nparr_over_no_where_team_score_at_inn2, nparr_each_ball_score_inn2)
+  ax.set_xlabel("Overs")
+  ax.set_ylabel("Runs")
+
+  img_stream = io.BytesIO()
+  fig.savefig(img_stream, format="png")
+  img_stream.seek(0)
+  line_plot_cumulative_team_score_graph_base64 = base64.b64encode(img_stream.read()).decode("utf-8")
+
+  return line_plot_cumulative_team_score_graph_base64
 
 def get_matches_returns_list(series_id, stage="FINISHED"):
     try:

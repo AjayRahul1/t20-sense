@@ -47,6 +47,7 @@ td {
 /* Styles for mobile */
 @media (max-width: 767px) {
     .home-three-elem-container {
+        display: flex;
         flex-direction: column;
     }
 }

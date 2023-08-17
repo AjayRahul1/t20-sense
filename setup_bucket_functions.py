@@ -53,3 +53,6 @@ def create_series_info_bucket():
 
           # Upload the pickled data to the bucket
           blob.upload_from_string(series_json_data, content_type='application/octet-stream')
+
+if __name__ == '__main__':
+  create_series_info_bucket()

@@ -128,11 +128,18 @@
         </div>
         {% endif %}
 
-        {% if batting1 and batting2 and bowling1 and bowling2 %}
+        {% if batting1 and bowling1 %}
         <div class="border rounded" style="padding: 8px; background-color: #ffffff;">
           <p class="font-weight-bold" style="margin-block-end: 0;">{{match_title}}, {{match_date}}, {{ground_info}}</p>
           <p style="margin-block-end: 0;">{{toss_info}}</p>
+          <p style="margin-block-end: 0;">Man of the Match - {{man_of_the_match}}</p>  <!-- Man of the match -->
           <p style="margin-block-end: 0;">Result - {{result}}</p>
+        </div>
+
+        <div class="border rounded mt-2" style="padding: 8px; background-color: #ffffff;">
+          <p class="font-weight-bold" style="margin-block-end: 0;">Best Performers in Batsman</p>
+          <p style="margin-block-end: 0;">{{best_performance_batsmen_inn1}}</p>
+          <p style="margin-block-end: 0;">{{best_performance_batsmen_inn2}}</p>
         </div>
         
         <!-- 1st Innings -->

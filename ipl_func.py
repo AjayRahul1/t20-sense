@@ -564,3 +564,17 @@ def get_team_name_score_ground(series_id, match_id):
   particular_match_toss_info = particular_match_toss_info[particular_match_toss_info['match_id'] == match_id]
   particular_match_toss_info.reset_index(drop=True, inplace=True)
   return particular_match_toss_info
+
+def get_man_of_the_match(series_id, match_id):
+  url = f"https://hs-consumer-api.espncricinfo.com/v1/pages/match/home?lang=en&seriesId={series_id}&matchId={match_id}"
+  response = requests.get(url)
+  mom = response.json()['content']['matchPlayerAwards'][0]['player']['longName']
+  return mom
+
+def get_best_shots(series_id, match_id):
+  url = f"https://hs-consumer-api.espncricinfo.com/v1/pages/match/home?lang=en&seriesId={series_id}&matchId={match_id}"
+  response = requests.get(url)
+  best_performance_batsmen = response.json()['content']['bestPerformance']['batsmen']
+  best_performance_batsmen_inn1 = f"{best_performance_batsmen[0]['teamAbbreviation']} - {best_performance_batsmen[0]['player']['longName']} with {best_performance_batsmen[0]['shot']} shot scoring {best_performance_batsmen[0]['shotRuns']} out of {best_performance_batsmen[0]['runs']} runs"
+  best_performance_batsmen_inn2 = f"{best_performance_batsmen[1]['teamAbbreviation']} - {best_performance_batsmen[1]['player']['longName']} with {best_performance_batsmen[1]['shot']} shot scoring {best_performance_batsmen[1]['shotRuns']} out of {best_performance_batsmen[1]['runs']} runs"
+  return best_performance_batsmen_inn1, best_performance_batsmen_inn2

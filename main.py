@@ -1,9 +1,9 @@
-from fastapi import FastAPI, Request
+from fastapi import FastAPI, Request, Form
 from fastapi.responses import HTMLResponse
 from fastapi.templating import Jinja2Templates
-from typing import List
+from starlette.responses import RedirectResponse
 from fastapi.staticfiles import StaticFiles
-from ipl_func import get_particular_match_whole_score, get_series_from_year, get_match_ids_from_series_fast, get_match_info, get_all_csv_files_from_cloud, get_team_name_score_ground, get_graphical_stats_from_each_ball_data
+from ipl_func import get_particular_match_whole_score, get_match_ids_from_series_fast, get_match_info, get_all_csv_files_from_cloud, get_team_name_score_ground, get_graphical_stats_from_each_ball_data
 from ipl_func import get_man_of_the_match, get_best_shots
 import pandas as pd
 
@@ -14,7 +14,7 @@ app.mount("/static", StaticFiles(directory="static"), name="static")
 all_ipl_series_info = get_all_csv_files_from_cloud()
 matches_names_and_ids_dict = {}
 
-years = list(range(2008, 2024))  # Generate a list of years from 2008 to 2023
+all_ipl_series_ids = {1345038: 2023, 1298423: 2022, 1249214: 2021, 1210595: 2020, 1165643: 2019, 1131611: 2018, 1078425: 2017, 968923: 2016, 791129: 2015, 695871: 2014, 586733: 2013, 520932: 2012, 466304: 2011, 418064: 2010, 374163: 2009, 313494: 2008} # Generate a list of years from 2008 to 2023
 match_ids = ["Select the Match"]  # Example match IDs
 
 @app.get("/", response_class=HTMLResponse)
@@ -22,36 +22,41 @@ def index(request: Request):
   # years = [313494, 374163, 418064, 466304, 520932, 586733, 695871, 791129, 968923, 1078425, 1131611, 1165643, 1210595, 1249214, 1298423, 1345038]
   finals_and_champs_df = pd.read_csv('Finals.csv')
   finals_and_champs_df = finals_and_champs_df.to_dict(orient='records')
-  return templates.TemplateResponse("index.html", {"request": request, "years": years, "match_ids": match_ids, "finals_and_champs_df":finals_and_champs_df})
+  return templates.TemplateResponse("index.html", {"request": request, "years": all_ipl_series_ids, "match_ids": match_ids, "finals_and_champs_df":finals_and_champs_df})
+
+@app.post("/redirect_to_scorecard")
+def submit_form(series_id: int = Form(...), match_id: int = Form(...)):
+    redirect_url = f"/get_scorecard/{series_id}/{match_id}"
+    return RedirectResponse(url=redirect_url, status_code=303)
 
 # @app.get('/get_mom')
 # async def get_mom():
 #   man_of_the_match = get_man_of_the_match(series_id, match_id)
 #   return f"{man_of_the_match}"
 
-def updating_match_details_for_refresh(year):
+def updating_match_details_for_refresh(series_id):
   global matches_names_and_ids_dict
-  series_id = get_series_from_year(year)
+  # series_id = get_series_from_year(year)
   matches_names_and_ids_dict = get_match_ids_from_series_fast(series_id)  # Your function to retrieve match_ids based on series_id
   return matches_names_and_ids_dict
 
 @app.get("/return_matches_names")
-async def ret_match_ids(year : int, request : Request):
+async def ret_match_ids(series_id : int, request : Request):
   global matches_names_and_ids_dict
-  matches_names_and_ids_dict = updating_match_details_for_refresh(year)
+  matches_names_and_ids_dict = updating_match_details_for_refresh(series_id)
   return templates.TemplateResponse('content_loading_htmx/ipl_match_options.html', {"request" : request, "matches_names_and_ids_dict" : matches_names_and_ids_dict})
 
-@app.get("/get_scorecard", response_class=HTMLResponse)
+@app.get("/get_scorecard/{series_id}/{match_id}", response_class=HTMLResponse)
 async def process(
     request: Request,
-    year: int,
+    series_id: int,
     match_id: int
   ):
   try:
-    matches_names_and_ids_dict = updating_match_details_for_refresh(year=year)
-    print("Year: ", year)
+    matches_names_and_ids_dict = updating_match_details_for_refresh(series_id)
+    # print("Year: ", year)
     print("Match ID: ", match_id)
-    series_id = get_series_from_year(year)
+    # series_id = get_series_from_year(year)
     print("Series ID: ", series_id)
     # match_id = int(matches_names_and_ids_dict[match_name])
 
@@ -79,8 +84,8 @@ async def process(
     man_of_the_match = get_man_of_the_match(series_id, match_id)
     best_performance_batsmen_inn1, best_performance_batsmen_inn2 = get_best_shots(series_id, match_id)
     line_plot_cumulative_team_score_graph_base64 = get_graphical_stats_from_each_ball_data(series_id=series_id, match_id=match_id)
-    return templates.TemplateResponse("index.html", {   "selected_year": year, "selected_match_id": match_id,
-                              "request": request, "years" : years, "match_ids" : match_ids,
+    return templates.TemplateResponse("index.html", {   "selected_year": series_id, "selected_match_id": match_id,
+                              "request": request, "years" : all_ipl_series_ids, "match_ids" : match_ids,
                               "batting1": batting1, "bowling1": bowling1,
                               "batting2": batting2, "bowling2": bowling2,
                               "team1_name": team1_name, "team2_name": team2_name,

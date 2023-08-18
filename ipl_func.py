@@ -270,6 +270,11 @@ def get_request_response_API(series_id, match_id, innings_id):
   response = requests.get(url)
   return response
 
+def get_match_info_response_API(series_id, match_id):
+  url = f"https://hs-consumer-api.espncricinfo.com/v1/pages/match/home?lang=en&seriesId={series_id}&matchId={match_id}"
+  response = requests.get(url)
+  return response.json()
+
 """## Comments Extraction"""
 
 #@title Get Comments of a single innings in a match
@@ -350,6 +355,9 @@ def get_graphical_stats_from_each_ball_data(series_id, match_id):
   req_response = get_request_response_API(series_id, match_id, 1)
   ball_by_ball_json = pd.json_normalize(data=req_response.json()['comments'])
   
+  inn1_team_color = get_match_info_response_API(series_id, match_id)['content']['innings'][0]['team']['primaryColor']
+  inn2_team_color = get_match_info_response_API(series_id, match_id)['content']['innings'][1]['team']['primaryColor']
+
   nparr_each_ball_score_inn1 = np.array(ball_by_ball_json['totalInningRuns'])
   nparr_over_no_where_team_score_at_inn1 = np.array(ball_by_ball_json['oversActual'])
   
@@ -362,8 +370,8 @@ def get_graphical_stats_from_each_ball_data(series_id, match_id):
 
   fig = Figure()
   ax = fig.add_subplot(1, 1, 1)
-  ax.plot(nparr_over_no_where_team_score_at_inn1, nparr_each_ball_score_inn1)
-  ax.plot(nparr_over_no_where_team_score_at_inn2, nparr_each_ball_score_inn2)
+  ax.plot(nparr_over_no_where_team_score_at_inn1, nparr_each_ball_score_inn1, color=inn1_team_color)
+  ax.plot(nparr_over_no_where_team_score_at_inn2, nparr_each_ball_score_inn2, color=inn2_team_color)
   ax.set_xlabel("Overs")
   ax.set_ylabel("Runs")
 
@@ -430,41 +438,6 @@ def get_all_series_info(all_series_ids_list):
         print(f'The series {series_iter} - match {match_id_iter} - innings {innings_iter} did not take place')
         continue
   return temp_df_to_concat
-
-def get_series_from_year(year):
-  match year:
-    case 2008:
-       return 313494
-    case 2009:
-       return 374163
-    case 2010:
-       return 418064
-    case 2011:
-       return 466304
-    case 2012:
-       return 520932
-    case 2013:
-       return 586733
-    case 2014:
-       return 695871
-    case 2015:
-       return 791129
-    case 2016:
-       return 968923
-    case 2017:
-       return 1078425
-    case 2018:
-       return 1131611
-    case 2019:
-       return 1165643
-    case 2020:
-       return 1210595
-    case 2021:
-       return 1249214
-    case 2022:
-       return 1298423
-    case 2023:
-       return 1345038
 
 def get_match_ids_from_series(series_id):
   try:

@@ -4,6 +4,7 @@ from fastapi.templating import Jinja2Templates
 from typing import List
 from fastapi.staticfiles import StaticFiles
 from ipl_func import get_particular_match_whole_score, get_series_from_year, get_match_ids_from_series_fast, get_match_info, get_all_csv_files_from_cloud, get_team_name_score_ground, get_graphical_stats_from_each_ball_data
+from ipl_func import get_man_of_the_match, get_best_shots
 import pandas as pd
 
 app = FastAPI()
@@ -22,6 +23,11 @@ def index(request: Request):
   finals_and_champs_df = pd.read_csv('Finals.csv')
   finals_and_champs_df = finals_and_champs_df.to_dict(orient='records')
   return templates.TemplateResponse("index.html", {"request": request, "years": years, "match_ids": match_ids, "finals_and_champs_df":finals_and_champs_df})
+
+# @app.get('/get_mom')
+# async def get_mom():
+#   man_of_the_match = get_man_of_the_match(series_id, match_id)
+#   return f"{man_of_the_match}"
 
 def updating_match_details_for_refresh(year):
   global matches_names_and_ids_dict
@@ -69,7 +75,9 @@ async def process(
     bowling2 = bowling2.to_dict(orient='records')
 
     team1_name, team2_name, match_date, result, match_title = get_match_info(series_id, match_id)
-
+    
+    man_of_the_match = get_man_of_the_match(series_id, match_id)
+    best_performance_batsmen_inn1, best_performance_batsmen_inn2 = get_best_shots(series_id, match_id)
     line_plot_cumulative_team_score_graph_base64 = get_graphical_stats_from_each_ball_data(series_id=series_id, match_id=match_id)
     return templates.TemplateResponse("index.html", {   "selected_year": year, "selected_match_id": match_id,
                               "request": request, "years" : years, "match_ids" : match_ids,
@@ -77,10 +85,11 @@ async def process(
                               "batting2": batting2, "bowling2": bowling2,
                               "team1_name": team1_name, "team2_name": team2_name,
                               "match_date": match_date, "result": result, "match_title":match_title,
-                              "ground_info": ground_info, "toss_info": toss_info,
+                              "ground_info": ground_info, "toss_info": toss_info, "man_of_the_match":man_of_the_match,
                               "team1_name": team1_name, "team2_name":team2_name,
                               "team1_score":team1_score, "team2_score":team2_score,
                               "innings1_overs": innings1_overs, "innings2_overs": innings2_overs, "target" : team2_target,
+                              "best_performance_batsmen_inn1" : best_performance_batsmen_inn1,"best_performance_batsmen_inn2": best_performance_batsmen_inn2, 
                               "each_team_cumulative_score_per_over" : line_plot_cumulative_team_score_graph_base64 })
   except:
     return templates.TemplateResponse('error_pages/no_scorecard.html', {"request": request})

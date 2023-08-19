@@ -40,8 +40,6 @@ td {
 .scorecards-data {
     min-width: fit-content;
     width: 60%;
-    margin: 0px 10px 0px 10px;
-    backdrop-filter: blur(5px);
 }
 .third-frame-stats-ads{
     width: 20%;
@@ -54,6 +52,10 @@ td {
         flex-direction: column;
     }
     .third-frame-stats-ads {
+        width: 100%;
+    }
+    .scorecards-data {
+        min-width: fit-content;
         width: 100%;
     }
 }

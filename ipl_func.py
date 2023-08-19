@@ -144,7 +144,7 @@ def bowlers_df_preprocessing(bowlers_df):
 #@title Operations
 def bowlers_df_ops(main_bowling_df):
   # Adding Overs to the Bowler Scorecard
-  main_bowling_df["Overs"] = main_bowling_df["Balls"].apply(lambda x:  divmod(x, 6))
+  main_bowling_df["Overs"] = main_bowling_df["Balls"].apply(lambda x:  f"{x//6}.{x%6}")
 
   main_bowling_df["DB%"] = main_bowling_df["isDot"] * 100 / main_bowling_df["Balls"]  # Dot Ball Rate
 

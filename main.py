@@ -4,7 +4,7 @@ from fastapi.templating import Jinja2Templates
 from starlette.responses import RedirectResponse
 from fastapi.staticfiles import StaticFiles
 from ipl_func import get_particular_match_whole_score, get_match_ids_from_series_fast, get_match_info, get_all_csv_files_from_cloud, get_team_name_score_ground, get_graphical_stats_from_each_ball_data
-from ipl_func import get_man_of_the_match, get_best_shots
+from stats import get_man_of_the_match, get_best_shots, fun_best_bowl_peformance
 import pandas as pd
 
 app = FastAPI()
@@ -82,7 +82,8 @@ async def process(
     team1_name, team2_name, match_date, result, match_title = get_match_info(series_id, match_id)
     
     man_of_the_match = get_man_of_the_match(series_id, match_id)
-    best_performance_batsmen_inn1, best_performance_batsmen_inn2 = get_best_shots(series_id, match_id)
+    bst_perf_bat_inn1, bst_perf_bat_inn2 = get_best_shots(series_id, match_id)
+    bst_perf_bowl_inn1, bst_perf_bowl_inn2 = fun_best_bowl_peformance(series_id, match_id)
     line_plot_cumulative_team_score_graph_base64 = get_graphical_stats_from_each_ball_data(series_id=series_id, match_id=match_id)
     return templates.TemplateResponse("index.html", {   "selected_year": series_id, "selected_match_id": match_id,
                               "request": request, "years" : all_ipl_series_ids, "match_ids" : match_ids,
@@ -94,7 +95,8 @@ async def process(
                               "team1_name": team1_name, "team2_name":team2_name,
                               "team1_score":team1_score, "team2_score":team2_score,
                               "innings1_overs": innings1_overs, "innings2_overs": innings2_overs, "target" : team2_target,
-                              "best_performance_batsmen_inn1" : best_performance_batsmen_inn1,"best_performance_batsmen_inn2": best_performance_batsmen_inn2, 
+                              "bst_perf_bat_inn1": bst_perf_bat_inn1, "bst_perf_bat_inn2": bst_perf_bat_inn2, 
+                              "bst_perf_bowl_inn1": bst_perf_bowl_inn1, "bst_perf_bowl_inn2": bst_perf_bowl_inn2, 
                               "each_team_cumulative_score_per_over" : line_plot_cumulative_team_score_graph_base64 })
   except:
     return templates.TemplateResponse('error_pages/no_scorecard.html', {"request": request})

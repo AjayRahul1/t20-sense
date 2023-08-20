@@ -1,8 +1,9 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
   <head>
     <title>T20 Sense</title>
     <link rel="stylesheet" href="/static/styles_index.css">
+    
     <!-- Google tag (gtag.js) -->
     <script async src="https://www.googletagmanager.com/gtag/js?id=G-LWDCC125HK"></script>
     <script>
@@ -14,19 +15,16 @@
     </script>
 
     <script type="text/javascript" src="static/script.js"></script>
-    <!-- HTMX related script import -->
+    
+    <!-- HTMX Import -->
     <script src="https://unpkg.com/htmx.org@1.9.2"></script>
 
-    <!-- Bootstrap CSS Link -->
-    <!-- <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.3.1/dist/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
-    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
-    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.14.7/dist/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.3.1/dist/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script> -->
-
+    <!-- Bootstrap Import -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-4bw+/aepP/YC94hEpVNVgiZdgIC5+VKNBQNGCHeKRQN+PtmoHDEXuppvnDJzQIu9" crossorigin="anonymous">
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/js/bootstrap.bundle.min.js" integrity="sha384-HwwvtgBNo3bZJJLYd8oVXjrBZt8cqVSpeBNS5n7C8IVInixGAoxmnlMuBnhbgrkm" crossorigin="anonymous"></script>
+
   </head>
-  <body style="background-color: #f9f9fb;">
+  <body class="bg-light">
     <!-- Navigation Bar -->
     <nav class="navbar navbar-expand-lg shadow-sm" style="background-color: #ffdea6;">
       <div class="container-fluid">
@@ -118,16 +116,22 @@
 
         {% if batting1 and bowling1 %}
         <div class="border rounded text-wrap p-2" style="background-color: #ffffff;">
-          <p class="fw-bold my-0">{{match_title}}, {{match_date}}, {{ground_info}}</p>
+          <p class="fw-bold my-1">{{match_title}}, {{match_date}}, {{ground_info}}</p>
           <p class="my-1">{{toss_info}}</p>
           <p class="my-1">Man of the Match - {{man_of_the_match}}</p>  <!-- Man of the match -->
           <p class="my-1">Result - {{result}}</p>
         </div>
 
         <div class="border rounded mt-2 p-2" style="background-color: #ffffff;">
-          <p class="fw-bold my-1" style="margin-block-end: 0;">Best Performers in Batsman</p>
-          <p class="my-1">{{best_performance_batsmen_inn1}}</p>
-          <p class="my-1">{{best_performance_batsmen_inn2}}</p>
+          <p class="fw-bold my-1" style="margin-block-end: 0;">Best Performances in Batting</p>
+          <p class="my-1">{{bst_perf_bat_inn1}}</p>
+          <p class="my-1">{{bst_perf_bat_inn2}}</p>
+        </div>
+        
+        <div class="border rounded mt-2 p-2" style="background-color: #ffffff;">
+          <p class="fw-bold my-1" style="margin-block-end: 0;">Best Performances in Bowling</p>
+          <p class="my-1">{{bst_perf_bowl_inn1}}</p>
+          <p class="my-1">{{bst_perf_bowl_inn2}}</p>
         </div>
         
         <!-- 1st Innings -->
@@ -313,9 +317,9 @@
             <img src="data:image/png;base64,{{ each_team_cumulative_score_per_over }}" alt="Cumulative Runs Graph" style="width: 100%; max-height: min-content;">
           </div>
         {% endif %}
-        <div class="border rounded p-2 mb-2" style="width: 100%; height: 300px; background-color: white;">
+        <!-- <div class="border rounded p-2 mb-2" style="width: 100%; height: 300px; background-color: white;">
           <p class="text-center" style="font-size: small;">Advertisement is going to displayed here</p>
-        </div>
+        </div> -->
       </div>
     </div>
   </body>

@@ -56,8 +56,8 @@
       </div>
     </nav>
         
-    <div class="home-three-elem-container">
-      <div class="first-frame-container">
+    <div class="row m-3">
+      <div class="col-md-2 col-12 mb-3">
         <div class="dropdowns-content">
           <form method="post" action="/redirect_to_scorecard">
             <div class="form-group mt-1">
@@ -80,7 +80,7 @@
       </div>
 
       <!-- 2nd Frame --> <!-- Data displayed in center -->
-      <div class="scorecards-data">
+      <div class="col-md-7 col-12 mb-3">
         <!-- Finals and Champions Table Division -->
         {% if not batting1 and finals_and_champs_df %}
         <div class="border rounded" style="background-color: #ffffff;">
@@ -311,7 +311,7 @@
       </div>
       
       <!-- Third Frame -->
-      <div class="third-frame-stats-ads">
+      <div class="col-md-3 col-12 mb-3">
         {% if each_team_cumulative_score_per_over %}
           <div class="border rounded mb-2 overflow-hidden">
             <img src="data:image/png;base64,{{ each_team_cumulative_score_per_over }}" alt="Cumulative Runs Graph" style="width: 100%; max-height: min-content;">

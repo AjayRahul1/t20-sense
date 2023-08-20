@@ -3,8 +3,9 @@ from fastapi.responses import HTMLResponse
 from fastapi.templating import Jinja2Templates
 from starlette.responses import RedirectResponse
 from fastapi.staticfiles import StaticFiles
-from ipl_func import get_particular_match_whole_score, get_match_ids_from_series_fast, get_match_info, get_all_csv_files_from_cloud, get_team_name_score_ground, get_graphical_stats_from_each_ball_data
-from stats import get_man_of_the_match, get_best_shots, fun_best_bowl_peformance
+from ipl_func import get_particular_match_whole_score, get_match_info, get_all_csv_files_from_cloud, get_team_name_score_ground, get_graphical_stats_from_each_ball_data
+from functionality import get_match_ids_from_series_fast
+from stats import get_man_of_the_match, get_best_shots, fun_best_bowl_peformance, batting_impact_points
 import pandas as pd
 
 app = FastAPI()
@@ -17,6 +18,9 @@ matches_names_and_ids_dict = {}
 all_ipl_series_ids = {1345038: 2023, 1298423: 2022, 1249214: 2021, 1210595: 2020, 1165643: 2019, 1131611: 2018, 1078425: 2017, 968923: 2016, 791129: 2015, 695871: 2014, 586733: 2013, 520932: 2012, 466304: 2011, 418064: 2010, 374163: 2009, 313494: 2008} # Generate a list of years from 2008 to 2023
 match_ids = ["Select the Match"]  # Example match IDs
 
+gbl_series_id=0
+gbl_match_id=0
+
 @app.get("/", response_class=HTMLResponse)
 def index(request: Request):
   # years = [313494, 374163, 418064, 466304, 520932, 586733, 695871, 791129, 968923, 1078425, 1131611, 1165643, 1210595, 1249214, 1298423, 1345038]
@@ -26,6 +30,9 @@ def index(request: Request):
 
 @app.post("/redirect_to_scorecard")
 def submit_form(series_id: int = Form(...), match_id: int = Form(...)):
+    global gbl_series_id, gbl_match_id
+    gbl_series_id = series_id
+    gbl_match_id = match_id
     redirect_url = f"/get_scorecard/{series_id}/{match_id}"
     return RedirectResponse(url=redirect_url, status_code=303)
 
@@ -44,7 +51,11 @@ def updating_match_details_for_refresh(series_id):
 async def ret_match_ids(series_id : int, request : Request):
   global matches_names_and_ids_dict
   matches_names_and_ids_dict = updating_match_details_for_refresh(series_id)
-  return templates.TemplateResponse('content_loading_htmx/ipl_match_options.html', {"request" : request, "matches_names_and_ids_dict" : matches_names_and_ids_dict})
+  return templates.TemplateResponse('content_templates/ipl_match_options.html', {"request" : request, "matches_names_and_ids_dict" : matches_names_and_ids_dict})
+
+# @app.get('/ld_imp_pts/{series_id}/{match_id}')
+# async def get_impact_points(request : Request, series_id: int, match_id: int):
+#   return templates.TemplateResponse('content_templates/imp_pts_tbl.html', {"request" : request, })
 
 @app.get("/get_scorecard/{series_id}/{match_id}", response_class=HTMLResponse)
 async def process(
@@ -84,6 +95,9 @@ async def process(
     man_of_the_match = get_man_of_the_match(series_id, match_id)
     bst_perf_bat_inn1, bst_perf_bat_inn2 = get_best_shots(series_id, match_id)
     bst_perf_bowl_inn1, bst_perf_bowl_inn2 = fun_best_bowl_peformance(series_id, match_id)
+
+    imp_pts, ptnrshp_df = batting_impact_points(series_id, match_id)  # Batting impact points
+    imp_pts = imp_pts.to_dict(orient='records')
     line_plot_cumulative_team_score_graph_base64 = get_graphical_stats_from_each_ball_data(series_id=series_id, match_id=match_id)
     return templates.TemplateResponse("index.html", {   "selected_year": series_id, "selected_match_id": match_id,
                               "request": request, "years" : all_ipl_series_ids, "match_ids" : match_ids,
@@ -97,6 +111,7 @@ async def process(
                               "innings1_overs": innings1_overs, "innings2_overs": innings2_overs, "target" : team2_target,
                               "bst_perf_bat_inn1": bst_perf_bat_inn1, "bst_perf_bat_inn2": bst_perf_bat_inn2, 
                               "bst_perf_bowl_inn1": bst_perf_bowl_inn1, "bst_perf_bowl_inn2": bst_perf_bowl_inn2, 
+                              "imp_pts": imp_pts,
                               "each_team_cumulative_score_per_over" : line_plot_cumulative_team_score_graph_base64 })
   except:
     return templates.TemplateResponse('error_pages/no_scorecard.html', {"request": request})

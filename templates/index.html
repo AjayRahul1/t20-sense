@@ -307,6 +307,35 @@
           </div>
           <br>
         </div>
+        
+        <div class="border rounded mt-2 mb-2" style="background-color: #ffffff;">
+          <button class="btn text-start" style="width: 100%; background-color: #e3f2fd; margin: 0;">
+            <p class="font-weight-bold p-1" style="margin-block: 0;">Impact points</p>
+          </button>
+          <div id="imp_pts">
+            <table class="table table-sm mb-0">
+              <thead>
+                <tr class="table-secondary">
+                  <th class="px-2">Name</th>
+                  <th>Runs</th>
+                  <th>SR</th>
+                  <th>Points</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for row in imp_pts %}
+                <tr>
+                  <td class="px-2">{{ row['player name'] }}</td>
+                  <td>{{ row.runs }}</td>
+                  <td>{{ row.SR }}</td>
+                  <td>{{ row.impact_points }}</td>
+                </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        </div>
+
         {% endif %}
       </div>
       

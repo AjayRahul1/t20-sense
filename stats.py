@@ -338,4 +338,5 @@ def batting_impact_points(series_id,match_id):
     # df1['RRR_when_came']=(df1['RRR_when_came']).apply(round_float)
     # df1['RRR_when_out']=(df1['RRR_when_out']).apply(round_float)
     # b_df1 = b_df[b_df['Performance_score'] != 0]
+    df1=df1.sort_values(by='impact_points', ascending=False)
   return df1,partnership_df

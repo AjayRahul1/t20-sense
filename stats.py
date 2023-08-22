@@ -346,3 +346,112 @@ def batting_impact_points(series_id,match_id):
     # b_df1 = b_df[b_df['Performance_score'] != 0]
     df1=df1.sort_values(by='impact_points', ascending=False)
   return df1,partnership_df
+
+def bowlers_impact_points(series_id,match_id):
+  player_dict={}
+  url1=f"https://hs-consumer-api.espncricinfo.com/v1/pages/match/home?lang=en&seriesId={series_id}&matchId={match_id}"
+  output1=requests.get(url1)
+  for i in range(0,2):
+    matches1 = output1.json()['content']['matchPlayers']['teamPlayers'][i]
+    if(i==0):
+      team1_name=matches1['team']['longName']
+    else:
+      team2_name=matches1['team']['longName']
+    players=matches1['players']
+    for j in range(0,len(players)):
+      player_id=players[j]['player']['id']
+      player_name=players[j]['player']['longName']
+      player_dict[player_id] = player_name
+  df = pd.DataFrame(list(player_dict.items()), columns=['player id', 'player name'])
+  b_df = pd.DataFrame(list(player_dict.items()), columns=['player id', 'player name'])
+  b_df['team']=None
+  b_df['innings']=0
+  b_df['impact_points']=0
+  b_df['balls']=0
+  b_df['wickets']=0
+  df['runs']=0
+  df['balls']=0
+  
+  # bat_runs=0
+  for innings in range(1,3):
+    try:
+      url =f'https://hs-consumer-api.espncricinfo.com/v1/pages/match/comments?lang=en&seriesId={series_id}&matchId={match_id}&inningNumber={innings}&commentType=ALL&sortDirection=DESC&fromInningOver=-1'
+      output=requests.get(url)
+      matches = output.json()['comments']
+      for i in range(0,len(matches)):
+        try:
+          over=matches[i]['overNumber']
+          oversActual=matches[i]['oversActual']
+          totalruns=matches[i]['totalRuns']
+          bowler_id=matches[i]['bowlerPlayerId']
+          batsman_id=matches[i]['batsmanPlayerId']
+          batsman_runs=matches[i]['batsmanRuns']
+          wides=matches[i]['wides']
+          noballs=matches[i]['noballs']
+          byes=matches[i]['byes']
+          legbyes=matches[i]['legbyes']
+          penalties=matches[i]['penalties']
+          wicket=matches[i]['isWicket']
+          impact_points=0
+          if(wides>0):
+            ball=0
+          else:
+            ball=1
+          if(batsman_runs==0 and wides==0):
+            dot=1
+          else:
+            dot=0
+          df.loc[df['player id'] == batsman_id, 'runs'] = df.loc[df['player id'] == batsman_id,'runs'] + batsman_runs
+          df.loc[df['player id'] == batsman_id, 'balls'] = df.loc[df['player id'] == batsman_id,'balls'] + ball
+
+          b_df.loc[b_df['player id'] == bowler_id, 'innings'] = innings
+          b_df.loc[b_df['player id'] == bowler_id, 'balls'] = b_df.loc[b_df['player id'] == bowler_id,'balls'] + ball
+
+          if(batsman_runs==0):
+            impact_points+=2
+          if(batsman_runs==4):
+            impact_points+=-2
+          if(batsman_runs==6):
+            impact_points+=-3
+          if(wides>0):
+            impact_points=-(wides)
+          if(noballs==1):
+            impact_points +=-2
+
+          if(wicket == True):
+            dismissal_type=matches[i]['dismissalType']
+            outplayer_id=matches[i]['outPlayerId']
+            if(dismissal_type!=4):
+              impact_points+=15
+              b_df.loc[b_df['player id'] == bowler_id, 'wickets'] += 1
+              dismissed_bat_runs = df.loc[df['player id'] == outplayer_id, 'runs'].sum()
+              impact_points += 15
+
+              if dismissed_bat_runs >= 30:
+                  impact_points += 5
+              elif dismissed_bat_runs > 50:
+                  impact_points += 8
+              elif dismissed_bat_runs > 100:
+                  impact_points += 15
+            if(over<7):
+              b_df.loc[b_df['player id'] == bowler_id , 'impact_points'] += 2
+            if(over>16):
+              b_df.loc[b_df['player id'] == bowler_id , 'impact_points'] += 5
+          b_df.loc[b_df['player id'] == bowler_id, 'impact_points'] += impact_points   
+        except:
+          print(id)
+          continue
+    except:
+      print(innings)
+      continue
+  for b in range(0, len(b_df)):
+    if b_df.loc[b, 'innings'] == 1:
+        b_df.loc[b, 'team'] = team2_name
+    else:
+        b_df.loc[b, 'team'] = team1_name
+  df['SR']=df['runs']*100/df['balls']
+  df = df[df['balls'] != 0]
+  b_df = b_df[b_df['balls'] != 0]
+  b_df['innings']=b_df['innings'].astype(int)
+  b_df=b_df.sort_values(by='impact_points', ascending=False)
+  return df,b_df

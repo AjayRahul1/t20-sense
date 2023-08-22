@@ -2,7 +2,7 @@ import pandas as pd, requests, os, pickle
 from google.cloud import storage  # Google Cloud Storage Imports
 
 # Set the path to your service account key file
-os.environ['GOOGLE_APPLICATION_CREDENTIALS'] = 't20-sense-main.json'
+os.environ['GOOGLE_APPLICATION_CREDENTIALS'] = os.getenv('API_KEY') # 't20-sense-main.json'
 
 # Create a client using the credentials
 storage_client = storage.Client()

@@ -2,20 +2,12 @@ import pandas as pd, requests, traceback, warnings, numpy as np, base64
 from matplotlib.figure import Figure
 from datetime import datetime
 import asyncio, os, io
-from dotenv import load_dotenv
 
 # Google Cloud Storage Imports
 from google.cloud import storage
 
 # Settings the warnings to be ignored
 warnings.filterwarnings('ignore')
-
-# Load .env variables into the environment
-load_dotenv()
-
-# Access environment variables
-ENVIRONMENT = os.getenv("ENVIRONMENT")
-API_KEY = os.getenv("API_KEY")
 
 all_series_ids = [313494, 374163, 418064, 466304, 520932, 586733, 695871, 791129, 968923, 1078425, 1131611, 1165643, 1210595, 1249214, 1298423, 1345038]
 
@@ -27,7 +19,7 @@ innings_taken = 2
 
 def set_cloud_bucket_env():
   # Set the path to your service account key file
-  os.environ['GOOGLE_APPLICATION_CREDENTIALS'] = 't20-sense-8f218a81848c.json'
+  os.environ['GOOGLE_APPLICATION_CREDENTIALS'] = 't20-sense-main.json'
 
   # Create a client using the credentials
   client = storage.Client()

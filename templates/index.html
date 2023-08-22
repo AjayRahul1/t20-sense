@@ -56,7 +56,7 @@
       </div>
     </nav>
         
-    <div class="row m-3">
+    <div class="row m-1">
       <div class="col-lg-2 col-12 mb-3">
         <div class="dropdowns-content">
           <form method="post" action="/redirect_to_scorecard">
@@ -90,7 +90,7 @@
           <table class="table table-sm table-striped" style="width: 100%; margin-bottom: 0;">
             <thead>
               <tr>
-                <th>Year</th>
+                <th class="px-1">Year</th>
                 <th>Final</th>
                 <th>Champion</th>
                 <th>Runner Up</th>
@@ -101,7 +101,7 @@
             <tbody>
               {% for data in finals_and_champs_df %}
                 <tr>
-                  <td>{{data.Year}}</td>
+                  <td class="px-1">{{data.Year}}</td>
                   <td>{{data.Final}}</td>
                   <td class="fw-bold">{{data['Champions']}}</td>
                   <td>{{data['Runner up']}}</td>
@@ -368,6 +368,15 @@
           </div>
         </div>
 
+        <!-- <div class="border rounded mt-2 mb-2" style="background-color: #ffffff;">
+          <button class="btn text-start" style="width: 100%; background-color: #e3f2fd; margin: 0;">
+            <p class="font-weight-bold p-1" style="margin-block: 0;">Partnerships</p>
+          </button>
+          <div id="ptnrsh_figs">
+            <img src="data:image/png;base64,{{ ptnr_f1 }}" alt="Innings 1 Partnerships Runs">
+          </div>
+        </div> -->
+
         {% endif %}
       </div>
       
@@ -376,6 +385,12 @@
         {% if each_team_cumulative_score_per_over %}
           <div class="border rounded mb-2 overflow-hidden">
             <img src="data:image/png;base64,{{ each_team_cumulative_score_per_over }}" alt="Cumulative Runs Graph" style="width: 100%; max-height: min-content;">
+          </div>
+          <div class="border rounded mb-2 overflow-hidden">
+            <img src="data:image/png;base64,{{ i1_ov_runs }}" alt="Innings 1 Overs-Runs" style="width: 100%; max-height: min-content;">
+          </div>
+          <div class="border rounded mb-2 overflow-hidden">
+            <img src="data:image/png;base64,{{ i2_ov_runs }}" alt="Innings 2 Overs-Runs" style="width: 100%; max-height: min-content;">
           </div>
         {% endif %}
         <!-- <div class="border rounded p-2 mb-2" style="width: 100%; height: 300px; background-color: white;">

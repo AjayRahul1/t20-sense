@@ -539,8 +539,8 @@ def get_ptnship(series_id,match_id):
 
   plt.tight_layout()
 
-  f1 = conv_to_base64(f1)
-  f2 = conv_to_base64(f2)
+  f1 = conv_to_base64(fig_1)
+  f2 = conv_to_base64(fig_2)
 
   # Return the DataFrames and the figures
   return inn_1_part, inn_2_part, f1, f2
@@ -571,10 +571,16 @@ def runs_in_ovs_fig(series_id, match_id):
   fig = Figure(figsize=(8, 6))
 
   ax = fig.add_subplot(1, 1, 1)
+  ax.set_ylabel('Runs')
+  ax.set_xlabel('Overs')
+  ax.set_title('Runs Per Over - Innings 1')
   ax.bar(ov_no_1, ov_runs_1)
   inn1_ovs_runs = conv_to_base64(fig)
   
   ax = fig.add_subplot(1, 1, 1)
+  ax.set_ylabel('Runs')
+  ax.set_xlabel('Overs')
+  ax.set_title('Runs Per Over - Innings 2')
   ax.bar(ov_no_2, ov_runs_2)
   inn2_ovs_runs = conv_to_base64(fig)
   

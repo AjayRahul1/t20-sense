@@ -104,9 +104,14 @@ async def process(
     bat_df,bow_imp_pts = bowlers_impact_points(series_id,match_id)  #Bowlers impact points
     imp_pts = imp_pts.to_dict(orient='records')
     bow_imp_pts = bow_imp_pts.to_dict(orient='records')
+
     line_plot_cumulative_team_score_graph_base64 = get_graphical_stats_from_each_ball_data(series_id=series_id, match_id=match_id)
-    # i1_ptnr_df, i2_ptnr_df, ptnr_f1, ptnr_f2 = get_ptnship(series_id, match_id)
+    
+    i1_ptnr_df, i2_ptnr_df, ptnr_f1, ptnr_f2 = get_ptnship(series_id, match_id)
+    i1_ptnr_df = i1_ptnr_df.to_dict(orient='records')
+    i2_ptnr_df = i2_ptnr_df.to_dict(orient='records')
     i1_ovs_runs, i2_ovs_runs = runs_in_ovs_fig(series_id, match_id)
+    
     return templates.TemplateResponse("index.html", {   "selected_year": series_id, "selected_match_id": match_id,
                               "request": request, "years" : all_ipl_series_ids, "match_ids" : match_ids,
                               "batting1": batting1, "bowling1": bowling1,
@@ -120,7 +125,7 @@ async def process(
                               "bst_perf_bat_inn1": bst_perf_bat_inn1, "bst_perf_bat_inn2": bst_perf_bat_inn2, 
                               "bst_perf_bowl_inn1": bst_perf_bowl_inn1, "bst_perf_bowl_inn2": bst_perf_bowl_inn2, 
                               "imp_pts": imp_pts, "bow_imp_pts": bow_imp_pts,
-                              # "ptnr_f1": ptnr_f1, "ptnr_f2": ptnr_f2,
+                              "ptnr_df1": i1_ptnr_df, "ptnr_df2": i2_ptnr_df,
                               "i1_ov_runs": i1_ovs_runs, "i2_ov_runs": i2_ovs_runs,
                               "each_team_cumulative_score_per_over" : line_plot_cumulative_team_score_graph_base64 })
   except Exception as e:

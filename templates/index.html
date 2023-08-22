@@ -368,6 +368,74 @@
           </div>
         </div>
 
+        <div class="border rounded mt-2 mb-2" style="background-color: #ffffff;">
+          <button class="btn text-start" style="width: 100%; background-color: #e3f2fd; margin: 0;">
+            <p class="font-weight-bold p-1" style="margin-block: 0;">Partnerships - Innings 1</p>
+          </button>
+          <div id="ptnr_df1">
+            <table class="table table-sm mb-0">
+              <thead>
+                <tr class="table-secondary">
+                  <th class="px-2">Player 1 Runs</th>
+                  <th>Player 1 Balls</th>
+                  <th>Player 1 Name</th>
+                  <th class="fw-bold text-center">Partnership Runs</th>
+                  <th>Player 2 Name</th>
+                  <th>Player 2 Balls</th>
+                  <th>Player 2 Runs</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for row in ptnr_df1 %}
+                <tr>
+                  <td class="px-2">{{ row.player1_runs }}</td>
+                  <td>{{ row.player1_balls }}</td>
+                  <td>{{ row.player1 }}</td>
+                  <td class="fw-bold text-center">{{ row.partnershipRuns }}</td>
+                  <td>{{ row.player2 }}</td>
+                  <td>{{ row.player2_balls }}</td>
+                  <td>{{ row.player2_runs }}</td>
+                </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <div class="border rounded mt-2 mb-2" style="background-color: #ffffff;">
+          <button class="btn text-start" style="width: 100%; background-color: #e3f2fd; margin: 0;">
+            <p class="font-weight-bold p-1" style="margin-block: 0;">Partnerships - Innings 2</p>
+          </button>
+          <div id="ptnr_df1">
+            <table class="table table-sm mb-0">
+              <thead>
+                <tr class="table-secondary">
+                  <th class="px-2">Player 1 Runs</th>
+                  <th>Player 1 Balls</th>
+                  <th>Player 1 Name</th>
+                  <th class="fw-bold text-center">Partnership Runs</th>
+                  <th>Player 2 Name</th>
+                  <th>Player 2 Balls</th>
+                  <th>Player 2 Runs</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for row in ptnr_df2 %}
+                <tr>
+                  <td class="px-2">{{ row.player1_runs }}</td>
+                  <td>{{ row.player1_balls }}</td>
+                  <td>{{ row.player1 }}</td>
+                  <td class="fw-bold text-center">{{ row.partnershipRuns }}</td>
+                  <td>{{ row.player2 }}</td>
+                  <td>{{ row.player2_balls }}</td>
+                  <td>{{ row.player2_runs }}</td>
+                </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        </div>
+
         <!-- <div class="border rounded mt-2 mb-2" style="background-color: #ffffff;">
           <button class="btn text-start" style="width: 100%; background-color: #e3f2fd; margin: 0;">
             <p class="font-weight-bold p-1" style="margin-block: 0;">Partnerships</p>

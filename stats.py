@@ -6,7 +6,7 @@ from matplotlib.figure import Figure
 import io, base64
 
 # Set the path to your service account key file
-os.environ['GOOGLE_APPLICATION_CREDENTIALS'] ='t20-sense-main.json'
+os.environ['GOOGLE_APPLICATION_CREDENTIALS'] = os.getenv('API_KEY') # 't20-sense-main.json'
 
 # Create a client using the credentials
 storage_client = storage.Client()
@@ -357,6 +357,7 @@ def batting_impact_points(series_id,match_id):
     # df1['RRR_when_out']=(df1['RRR_when_out']).apply(round_float)
     # b_df1 = b_df[b_df['Performance_score'] != 0]
     df1=df1.sort_values(by='impact_points', ascending=False)
+    df1['SR'] = df1['SR'].round(2)
   return df1,partnership_df
 
 def bowlers_impact_points(series_id,match_id):
@@ -576,8 +577,5 @@ def runs_in_ovs_fig(series_id, match_id):
   ax = fig.add_subplot(1, 1, 1)
   ax.bar(ov_no_2, ov_runs_2)
   inn2_ovs_runs = conv_to_base64(fig)
-
-  print(ov_no_1)
-  print(ov_runs_1)
   
   return inn1_ovs_runs, inn2_ovs_runs

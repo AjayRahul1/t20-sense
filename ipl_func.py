@@ -19,13 +19,13 @@ innings_taken = 2
 
 def set_cloud_bucket_env():
   # Set the path to your service account key file
-  os.environ['GOOGLE_APPLICATION_CREDENTIALS'] = 't20-sense-main.json'
+  os.environ['GOOGLE_APPLICATION_CREDENTIALS'] = os.getenv('API_KEY') #'t20-sense-main.json'
 
   # Create a client using the credentials
   client = storage.Client()
 
   # Specify the bucket name and CSV file path
-  bucket_name = 'match_data'
+  bucket_name = os.getenv("BUCKET_NAME")
 
   # Access the bucket
   bucket = client.get_bucket(bucket_name)

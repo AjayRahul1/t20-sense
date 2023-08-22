@@ -70,6 +70,10 @@ def batting_impact_points(series_id,match_id):
   partnership_df = pd.DataFrame(columns=['innings', 'player1ID', 'player1', 'player2ID', 'player2','player_out_id', 'player1_runs', 'player1_balls','player2_runs', 'player2_balls', 'partnershipRuns', 'partnershipBalls'])
   f = 0
   for k in range(0, 2):
+    if(k==0):
+      team1_name=content['matchPlayers']['teamPlayers'][k]['team']['longName']
+    else:
+      team2_name=content['matchPlayers']['teamPlayers'][k]['team']['longName']
     partnerships = content['innings'][k]['inningPartnerships']
     for p in range(0, len(partnerships)):
         partnership_df.loc[f, 'innings'] = k + 1
@@ -113,13 +117,14 @@ def batting_impact_points(series_id,match_id):
   df['runs_imp']=0
   df['fours_imp']=0
   df['sixes_imp']=0
+  df['team']=None
   team_1_total = 0
   team_2_total = 0
   team1_balls = 0
   team2_balls = 0
   wkts1=0
   wkts2=0
-  
+
   for innings in range(1,3):
     try:
       url =f'https://hs-consumer-api.espncricinfo.com/v1/pages/match/comments?lang=en&seriesId={series_id}&matchId={match_id}&inningNumber={innings}&commentType=ALL&sortDirection=DESC&fromInningOver=-1'
@@ -263,6 +268,10 @@ def batting_impact_points(series_id,match_id):
 
 
         df.loc[df['player id']==batsman_id,'innings']=innings
+        if(innings==1):
+          df.loc[df['player id']==batsman_id,'team']=team1_name
+        else:
+          df.loc[df['player id']==batsman_id,'team']=team2_name
         df.loc[df['player id'] == batsman_id, 'runs'] = df.loc[df['player id'] == batsman_id,'runs'] + batsman_runs
         df.loc[df['player id'] == batsman_id, 'balls'] = df.loc[df['player id'] == batsman_id,'balls'] + ball
         r=0
@@ -292,9 +301,6 @@ def batting_impact_points(series_id,match_id):
           df.loc[df['player id'] == batsman_id, 'sixes_imp']+= sixes_imp + r
         else:
           df.loc[df['player id'] == batsman_id, 'sixes_imp']+= sixes_imp
-        # b_df.loc[b_df['player id'] == bowler_id, 'runs'] = b_df.loc[b_df['player id'] == bowler_id,'runs'] + batsman_runs
-        # b_df.loc[b_df['player id'] == bowler_id, 'Performance_score']+= Performance_score
-
       df['impact_points']=df['runs_imp'] + df['fours_imp'] + df['sixes_imp']
       df['SR'] = (df['runs']*100/df['balls']).round(2)
 

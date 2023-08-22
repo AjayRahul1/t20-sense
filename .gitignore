@@ -2,3 +2,4 @@
 venv-linux-ts/
 venv-windows-ts/
 __pycache__/
+.env

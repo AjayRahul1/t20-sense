@@ -5,8 +5,12 @@ from starlette.responses import RedirectResponse
 from fastapi.staticfiles import StaticFiles
 from ipl_func import get_particular_match_whole_score, get_match_info, get_all_csv_files_from_cloud, get_team_name_score_ground, get_graphical_stats_from_each_ball_data
 from functionality import get_match_ids_from_series_fast
-from stats import get_man_of_the_match, get_best_shots, fun_best_bowl_peformance, batting_impact_points, bowlers_impact_points
+from stats import get_man_of_the_match, get_best_shots, fun_best_bowl_peformance, batting_impact_points, bowlers_impact_points, get_ptnship, runs_in_ovs_fig
 import pandas as pd
+
+# Load .env variables into the environment
+from dotenv import load_dotenv
+load_dotenv('.env')
 
 app = FastAPI()
 templates = Jinja2Templates(directory="templates")
@@ -101,6 +105,8 @@ async def process(
     imp_pts = imp_pts.to_dict(orient='records')
     bow_imp_pts = bow_imp_pts.to_dict(orient='records')
     line_plot_cumulative_team_score_graph_base64 = get_graphical_stats_from_each_ball_data(series_id=series_id, match_id=match_id)
+    # i1_ptnr_df, i2_ptnr_df, ptnr_f1, ptnr_f2 = get_ptnship(series_id, match_id)
+    i1_ovs_runs, i2_ovs_runs = runs_in_ovs_fig(series_id, match_id)
     return templates.TemplateResponse("index.html", {   "selected_year": series_id, "selected_match_id": match_id,
                               "request": request, "years" : all_ipl_series_ids, "match_ids" : match_ids,
                               "batting1": batting1, "bowling1": bowling1,
@@ -113,8 +119,10 @@ async def process(
                               "innings1_overs": innings1_overs, "innings2_overs": innings2_overs, "target" : team2_target,
                               "bst_perf_bat_inn1": bst_perf_bat_inn1, "bst_perf_bat_inn2": bst_perf_bat_inn2, 
                               "bst_perf_bowl_inn1": bst_perf_bowl_inn1, "bst_perf_bowl_inn2": bst_perf_bowl_inn2, 
-                              "imp_pts": imp_pts,
-                              "bow_imp_pts": bow_imp_pts,
+                              "imp_pts": imp_pts, "bow_imp_pts": bow_imp_pts,
+                              # "ptnr_f1": ptnr_f1, "ptnr_f2": ptnr_f2,
+                              "i1_ov_runs": i1_ovs_runs, "i2_ov_runs": i2_ovs_runs,
                               "each_team_cumulative_score_per_over" : line_plot_cumulative_team_score_graph_base64 })
-  except:
+  except Exception as e:
+    print(e)
     return templates.TemplateResponse('error_pages/no_scorecard.html', {"request": request})

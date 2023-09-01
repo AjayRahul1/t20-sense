@@ -35,7 +35,7 @@ def match_ids(series_id):
 def create_series_info_bucket():
   # Variables
   global ipl_all_series_ids
-  bucket_name = 't20_sense_series_info'
+  bucket_name = os.getenv('BUCKET_NAME')
   
   try:
     bucket = storage_client.get_bucket(bucket_name)
@@ -48,7 +48,7 @@ def create_series_info_bucket():
     bucket = storage_client.get_bucket(bucket_name)
     print('series_info bucket function running...')
     for series_id in ipl_all_series_ids:
-      file_name = f"s_{series_id}_data.pkl"
+      file_name = f"t20_sense_series_info/s_{series_id}_data.pkl"
       blob = bucket.blob(file_name)
       if blob.exists():
           # File Exists
@@ -60,10 +60,11 @@ def create_series_info_bucket():
 
           # Upload the pickled data to the bucket
           blob.upload_from_string(series_json_data, content_type='application/octet-stream')
+    print('series_info files uploaded successfully!')
 
 def create_match_info_bucket():
   global ipl_all_series_ids
-  bucket_name = 't20_sense_match_info'
+  bucket_name = os.getenv('BUCKET_NAME')
   
   try:
     bucket = storage_client.get_bucket(bucket_name)
@@ -76,10 +77,10 @@ def create_match_info_bucket():
     print('match_info bucket function running...')
     bucket = storage_client.get_bucket(bucket_name)
     for series_id in ipl_all_series_ids:
-      print('Creating match_info file for ', series_id)
+      print('Creating match_info files for series', series_id)
       matches_ids = match_ids(series_id)
       for match_id in matches_ids:
-        file_name = f"s_{series_id}_m_{match_id}_data.pkl"
+        file_name = f"t20_sense_match_info/s_{series_id}_m_{match_id}_data.pkl"
         blob = bucket.blob(file_name)
         if blob.exists():
             # File Exists

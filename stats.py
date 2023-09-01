@@ -15,8 +15,8 @@ ipl_player_dictionary = {80607: 'Tushar Deshpande', 58403: 'Devon Conway', 95094
 
 # Base Functions
 def get_series_data_from_bucket(series_id):
-  bucket_name = 't20_sense_series_info'
-  file_path = f's_{series_id}_data.pkl'
+  bucket_name = os.getenv('BUCKET_NAME')
+  file_path = f't20_sense_series_info/s_{series_id}_data.pkl'
   bucket = storage_client.get_bucket(bucket_name)
   # Get the blob (file) from the bucket
   blob = bucket.blob(file_path)
@@ -27,8 +27,8 @@ def get_series_data_from_bucket(series_id):
   return loaded_data
 
 def get_match_data_from_bucket(series_id, match_id):
-  bucket_name = 't20_sense_match_info'
-  file_path = f's_{series_id}_m_{match_id}_data.pkl'
+  bucket_name = os.getenv('BUCKET_NAME')
+  file_path = f't20_sense_match_info/s_{series_id}_m_{match_id}_data.pkl'
   bucket = storage_client.get_bucket(bucket_name)
   # Get the blob (file) from the bucket
   blob = bucket.blob(file_path)

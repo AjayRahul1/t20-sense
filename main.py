@@ -34,11 +34,11 @@ def index(request: Request):
 
 @app.post("/redirect_to_scorecard")
 def submit_form(series_id: int = Form(...), match_id: int = Form(...)):
-    global gbl_series_id, gbl_match_id
-    gbl_series_id = series_id
-    gbl_match_id = match_id
-    redirect_url = f"/get_scorecard/{series_id}/{match_id}"
-    return RedirectResponse(url=redirect_url, status_code=303)
+  global gbl_series_id, gbl_match_id
+  gbl_series_id = series_id
+  gbl_match_id = match_id
+  redirect_url = f"/get_scorecard/{series_id}/{match_id}"
+  return RedirectResponse(url=redirect_url, status_code=303)
 
 # @app.get('/get_mom')
 # async def get_mom():

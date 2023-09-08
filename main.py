@@ -3,14 +3,15 @@ from fastapi.responses import HTMLResponse
 from fastapi.templating import Jinja2Templates
 from starlette.responses import RedirectResponse
 from fastapi.staticfiles import StaticFiles
-from ipl_func import get_particular_match_whole_score, get_match_info, get_all_csv_files_from_cloud, get_team_name_score_ground, get_graphical_stats_from_each_ball_data
-from functionality import get_match_ids_from_series_fast
-from stats import get_man_of_the_match, get_best_shots, fun_best_bowl_peformance, batting_impact_points, bowlers_impact_points, get_ptnship, runs_in_ovs_fig
 import pandas as pd
 
 # Load .env variables into the environment
 from dotenv import load_dotenv
-load_dotenv('.env')
+load_dotenv()
+
+from ipl_func import get_particular_match_whole_score, get_match_info, get_all_csv_files_from_cloud, get_team_name_score_ground, get_graphical_stats_from_each_ball_data
+from functionality import get_match_ids_from_series_fast
+from stats import get_man_of_the_match, get_best_shots, fun_best_bowl_peformance, batting_impact_points, bowlers_impact_points, get_ptnship, runs_in_ovs_fig
 
 app = FastAPI()
 templates = Jinja2Templates(directory="templates")

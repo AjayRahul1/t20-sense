@@ -1,4 +1,7 @@
 fastapi[all]
+google
+google-cloud-storage
+google-cloud-bigquery
 numpy
 pandas
 matplotlib

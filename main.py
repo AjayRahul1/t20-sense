@@ -132,3 +132,25 @@ async def process(
   except Exception as e:
     print(e)
     return templates.TemplateResponse('error_pages/no_scorecard.html', {"request": request})
+PROJECT_ID = 't20-sense'
+DATASET_ID = 'seriesipl'
+TABLE_ID = 'data'
+@app.get("/action_page") 
+async def get_data(request: Request, choose_batsman: str,choose_series_id: str):
+    global PROJECT_ID
+    global DATASET_ID
+    global TABLE_ID
+
+  
+    query = f"""
+        SELECT batsman, SUM(batsmanruns) AS run
+        FROM `seriesipl.data`
+        WHERE series_id = '{choose_series_id}'
+        AND batsman = '{choose_batsman}'
+        GROUP BY batsman;"""
+
+     
+    return templates.TemplateResponse(
+        'index.html',
+        context={"request": request, "chosen_batsman": choose_batsman, "chosen_series_id": choose_series_id}
+)

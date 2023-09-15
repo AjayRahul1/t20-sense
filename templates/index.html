@@ -376,25 +376,21 @@
             <table class="table table-sm mb-0">
               <thead>
                 <tr class="table-secondary">
-                  <th class="px-2">Player 1 Runs</th>
-                  <th>Player 1 Balls</th>
-                  <th>Player 1 Name</th>
-                  <th class="fw-bold text-center">Partnership Runs</th>
-                  <th>Player 2 Name</th>
-                  <th>Player 2 Balls</th>
-                  <th>Player 2 Runs</th>
+                  <th class="px-2">Wicket No</th>
+                  <th>Player 1</th>
+                  <th>Player 2</th>
+                  <th class="fw-bold text-center">Partnership</th>
+                  <th>Player out</th>
                 </tr>
               </thead>
               <tbody>
                 {% for row in ptnr_df1 %}
                 <tr>
-                  <td class="px-2">{{ row.player1_runs }}</td>
-                  <td>{{ row.player1_balls }}</td>
-                  <td>{{ row.player1 }}</td>
-                  <td class="fw-bold text-center">{{ row.partnershipRuns }}</td>
-                  <td>{{ row.player2 }}</td>
-                  <td>{{ row.player2_balls }}</td>
-                  <td>{{ row.player2_runs }}</td>
+                  <td class="px-2">{{ row.Wicket }}</td>
+                  <td>{{ row.Player_1 }}</td>
+                  <td>{{ row.Player_2 }}</td>
+                  <td class="fw-bold text-center">{{ row.Partnership }}</td>
+                  <td>{{ row.player_out }}</td>
                 </tr>
                 {% endfor %}
               </tbody>
@@ -410,25 +406,21 @@
             <table class="table table-sm mb-0">
               <thead>
                 <tr class="table-secondary">
-                  <th class="px-2">Player 1 Runs</th>
-                  <th>Player 1 Balls</th>
-                  <th>Player 1 Name</th>
-                  <th class="fw-bold text-center">Partnership Runs</th>
-                  <th>Player 2 Name</th>
-                  <th>Player 2 Balls</th>
-                  <th>Player 2 Runs</th>
+                  <th class="px-2">Wicket No</th>
+                  <th>Player 1</th>
+                  <th>Player 2</th>
+                  <th class="fw-bold text-center">Partnership</th>
+                  <th>Player out</th>
                 </tr>
               </thead>
               <tbody>
                 {% for row in ptnr_df2 %}
                 <tr>
-                  <td class="px-2">{{ row.player1_runs }}</td>
-                  <td>{{ row.player1_balls }}</td>
-                  <td>{{ row.player1 }}</td>
-                  <td class="fw-bold text-center">{{ row.partnershipRuns }}</td>
-                  <td>{{ row.player2 }}</td>
-                  <td>{{ row.player2_balls }}</td>
-                  <td>{{ row.player2_runs }}</td>
+                  <td class="px-2">{{ row.Wicket }}</td>
+                  <td>{{ row.Player_1 }}</td>
+                  <td>{{ row.Player_2 }}</td>
+                  <td class="fw-bold text-center">{{ row.Partnership }}</td>
+                  <td>{{ row.player_out }}</td>
                 </tr>
                 {% endfor %}
               </tbody>

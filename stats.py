@@ -4,6 +4,11 @@ from google.cloud import storage  # Google Cloud Storage Imports
 import matplotlib.pyplot as plt
 from matplotlib.figure import Figure
 import io, base64
+import plotly.express as px
+import plotly.graph_objects as go
+import plotly.offline as pyo
+import plotly.io as pio
+
 
 # Set the path to your service account key file
 os.environ['GOOGLE_APPLICATION_CREDENTIALS'] = os.getenv('API_KEY') # 't20-sense-main.json'
@@ -58,6 +63,11 @@ def conv_to_base64(fig):
   img_stream.seek(0)
   img_data = base64.b64encode(img_stream.read()).decode("utf-8")
   return img_data
+
+def conv_to_html(fig):
+    # Convert the Plotly figure to HTML using plotly.io.to_html
+    fig_html = pio.to_html(fig, full_html=False)
+    return fig_html
 
 # Main Functions
 def fun_best_bowl_peformance(series_id, match_id):
@@ -574,8 +584,18 @@ def get_ptnship(series_id,match_id):
     # Add the formatted data to dff DataFrame
     i2_partnership.loc[index] = [wicket, player1, player2, partnership, player_out]
 
+  buf1 = io.BytesIO()
+  fig_1.savefig(buf1, format='png')
+  buf1.seek(0)
+  figdata1 = base64.b64encode(buf1.getvalue()).decode('utf-8')
+
+  buf2 = io.BytesIO()
+  fig_2.savefig(buf2, format='png')
+  buf2.seek(0)
+  figdata2 = base64.b64encode(buf2.getvalue()).decode('utf-8')
+
   # Return the DataFrames and the figures
-  return i1_partnership,i2_partnership, fig_1, fig_2
+  return i1_partnership,i2_partnership, figdata1, figdata2
 
 def runs_in_ovs_fig(series_id, match_id):
   url=f"https://hs-consumer-api.espncricinfo.com/v1/pages/match/home?lang=en&seriesId={series_id}&matchId={match_id}"
@@ -617,3 +637,54 @@ def runs_in_ovs_fig(series_id, match_id):
   inn2_ovs_runs = conv_to_base64(fig)
   
   return inn1_ovs_runs, inn2_ovs_runs
+
+
+def division_of_runs(series_id, match_id):
+    inn1_runs = [0, 0, 0, 0, 0, 0]
+    inn2_runs = [0, 0, 0, 0, 0, 0]
+
+    for innings in [1, 2]:
+        try:
+            url = f"https://hs-consumer-api.espncricinfo.com/v1/pages/match/comments?lang=en&seriesId={series_id}&matchId={match_id}&inningNumber={innings}&commentType=ALL&sortDirection=DESC&fromInningOver=-1"
+            output = requests.get(url)
+            comments = output.json()['comments']
+
+            for i in range(0, len(comments)):
+                runs = comments[i]['batsmanRuns']
+                wides = comments[i]['wides']
+                four = comments[i]['isFour']
+                six = comments[i]['isSix']
+
+                if runs == 1:
+                    inn_runs = inn1_runs if innings == 1 else inn2_runs
+                    inn_runs[1] += 1
+                elif runs == 2:
+                    inn_runs = inn1_runs if innings == 1 else inn2_runs
+                    inn_runs[2] += 1
+                elif runs == 3:
+                    inn_runs = inn1_runs if innings == 1 else inn2_runs
+                    inn_runs[3] += 1
+                if runs == 0 and wides == 0:
+                    inn_runs = inn1_runs if innings == 1 else inn2_runs
+                    inn_runs[0] += 1
+                if four:
+                    inn_runs = inn1_runs if innings == 1 else inn2_runs
+                    inn_runs[4] += 1
+                if six:
+                    inn_runs = inn1_runs if innings == 1 else inn2_runs
+                    inn_runs[5] += 1
+        except:
+            print(innings)
+            continue
+    lab=["dots","1s","2s","3s","4s","6s"]
+    fig1 = go.Figure(data=[go.Pie(labels=lab, values=inn1_runs, textinfo='value')])
+    fig2 = go.Figure(data=[go.Pie(labels=lab, values=inn2_runs, textinfo='value')])
+    # fig1.update_layout(title='Distribution of Runs')
+    # fig2.update_layout(title='Distribution of Runs')
+    # i1_runs = conv_to_base64(fig1)
+    # i2_runs = conv_to_base64(fig2)
+    i1_runs = conv_to_html(fig1)
+    i2_runs = conv_to_html(fig2)
+    # i1_runs = pyo.plot(fig1, output_type="div", include_plotlyjs=False)
+    # i2_runs = pyo.plot(fig2, output_type="div", include_plotlyjs=False)
+    return i1_runs, i2_runs

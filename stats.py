@@ -679,12 +679,36 @@ def division_of_runs(series_id, match_id):
     lab=["dots","1s","2s","3s","4s","6s"]
     fig1 = go.Figure(data=[go.Pie(labels=lab, values=inn1_runs, textinfo='value')])
     fig2 = go.Figure(data=[go.Pie(labels=lab, values=inn2_runs, textinfo='value')])
-    # fig1.update_layout(title='Distribution of Runs')
-    # fig2.update_layout(title='Distribution of Runs')
-    # i1_runs = conv_to_base64(fig1)
-    # i2_runs = conv_to_base64(fig2)
     i1_runs = conv_to_html(fig1)
     i2_runs = conv_to_html(fig2)
-    # i1_runs = pyo.plot(fig1, output_type="div", include_plotlyjs=False)
-    # i2_runs = pyo.plot(fig2, output_type="div", include_plotlyjs=False)
     return i1_runs, i2_runs
+
+
+def DNB(series_id,match_id):
+  url=f"https://hs-consumer-api.espncricinfo.com/v1/pages/match/home?lang=en&seriesId={series_id}&matchId={match_id}"
+  output=requests.get(url)
+  innings=output.json()['content']['innings']
+  DNB1=[]
+  DNB2=[]
+  for k in range(0,len(innings)):
+    if(k==0):
+      inningBatsmen=innings[k]['inningBatsmen']
+      for i in range(0,len(inningBatsmen)):
+        batsman_id=inningBatsmen[i]['player']['id']
+        batsman_name=inningBatsmen[i]['player']['longName']
+        battedtype=inningBatsmen[i]['battedType']
+        if(battedtype=="DNB"):
+          DNB1.append(batsman_name)
+        else:
+          continue
+    if(k==1):
+      inningBatsmen=innings[k]['inningBatsmen']
+      for i in range(0,len(inningBatsmen)):
+        batsman_id=inningBatsmen[i]['player']['id']
+        batsman_name=inningBatsmen[i]['player']['longName']
+        battedtype=inningBatsmen[i]['battedType']
+        if(battedtype=="DNB"):
+          DNB2.append(batsman_name)
+        else:
+          continue
+  return DNB1,DNB2

@@ -9,3 +9,4 @@ requests
 ipython
 google.cloud.storage
 python-dotenv
+plotly

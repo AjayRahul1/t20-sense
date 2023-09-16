@@ -176,9 +176,13 @@
                 {% endfor %}
               </tbody>
             </table>
+            <div>   
+              &nbsp; <strong> Did not bat</strong> : {{dnb1}} 
+            </div>
+            <br>
             <div style="display: flex; justify-content: space-around;">
-              <p style="margin-block: 0;">Total - {{team1_score}} ({{innings1_overs}})</p>
-              <p style="margin-block: 0;">Target - {{target}}</p>
+              <p style="margin-block: 0;"> <strong>Total</strong> - {{team1_score}} ({{innings1_overs}})</p>
+              <p style="margin-block: 0;"> <strong>Target</strong> - {{target}}</p>
             </div>
             <table class="table table-sm mb-0">
               <tr class="table-secondary">
@@ -264,8 +268,12 @@
                 {% endfor %}
               </tbody>
             </table>
+            <div>   
+              &nbsp; <strong> Did not bat</strong> : {{dnb2}} 
+            </div>
+            <br>
             <div class="mt-0" style="display: flex; justify-content: space-around;">
-              <p style="margin-block: 0;">Total - {{team2_score}} ({{innings2_overs}})</p>
+              <p style="margin-block: 0;"><strong>Total</strong> - {{team2_score}} ({{innings2_overs}})</p>
             </div>
   
             <table class="table table-sm mb-0">

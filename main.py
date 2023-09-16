@@ -11,7 +11,7 @@ load_dotenv()
 
 from ipl_func import get_particular_match_whole_score, get_match_info, get_all_csv_files_from_cloud, get_team_name_score_ground, get_graphical_stats_from_each_ball_data
 from functionality import get_match_ids_from_series_fast
-from stats import get_man_of_the_match, get_best_shots, fun_best_bowl_peformance, batting_impact_points, bowlers_impact_points, get_ptnship, runs_in_ovs_fig
+from stats import get_man_of_the_match, get_best_shots, fun_best_bowl_peformance, batting_impact_points, bowlers_impact_points, get_ptnship, runs_in_ovs_fig,division_of_runs,DNB
 
 app = FastAPI()
 templates = Jinja2Templates(directory="templates")
@@ -112,6 +112,10 @@ async def process(
     i1_ptnr_df = i1_ptnr_df.to_dict(orient='records')
     i2_ptnr_df = i2_ptnr_df.to_dict(orient='records')
     i1_ovs_runs, i2_ovs_runs = runs_in_ovs_fig(series_id, match_id)
+
+    i1_runs,i2_runs=division_of_runs(series_id,match_id)
+
+    dnb1,dnb2 = DNB(series_id,match_id)
     
     return templates.TemplateResponse("index.html", {   "selected_year": series_id, "selected_match_id": match_id,
                               "request": request, "years" : all_ipl_series_ids, "match_ids" : match_ids,
@@ -127,6 +131,9 @@ async def process(
                               "bst_perf_bowl_inn1": bst_perf_bowl_inn1, "bst_perf_bowl_inn2": bst_perf_bowl_inn2, 
                               "imp_pts": imp_pts, "bow_imp_pts": bow_imp_pts,
                               "ptnr_df1": i1_ptnr_df, "ptnr_df2": i2_ptnr_df,
+                              "ptnr_f1" : ptnr_f1, "ptnr_f2" : ptnr_f2,
+                              "i1_runs" : i1_runs, "i2_runs" : i2_runs,
+                              "dnb1" : dnb1, "dnb2" : dnb2,
                               "i1_ov_runs": i1_ovs_runs, "i2_ov_runs": i2_ovs_runs,
                               "each_team_cumulative_score_per_over" : line_plot_cumulative_team_score_graph_base64 })
   except Exception as e:

@@ -452,6 +452,18 @@
           <div class="border rounded mb-2 overflow-hidden">
             <img src="data:image/png;base64,{{ i2_ov_runs }}" alt="Innings 2 Overs-Runs" style="width: 100%; max-height: min-content;">
           </div>
+          <h5>Distribution of Runs - {{team1_name}}</h5>
+          <iframe srcdoc="{{ i1_runs }}" width="100%" height="375" frameborder="0" scrolling="no"></iframe>
+
+          <h5>Distribution of Runs - {{team2_name}}</h5>
+          <iframe srcdoc="{{ i2_runs }}" width="100%" height="375" frameborder="0" scrolling="no"></iframe>
+
+          <!-- <div class="border rounded mb-2 overflow-hidden">
+            <img src="data:image/png;base64,{{ i1_runs }}" alt="Innings 1 Runs distribution" style="width: 100%; max-height: min-content;">
+          </div>
+          <div class="border rounded mb-2 overflow-hidden">
+            <img src="data:image/png;base64,{{ i2_runs }}" alt="Innings 2 Runs distribution" style="width: 100%; max-height: min-content;">
+          </div> -->
         {% endif %}
         <!-- <div class="border rounded p-2 mb-2" style="width: 100%; height: 300px; background-color: white;">
           <p class="text-center" style="font-size: small;">Advertisement is going to displayed here</p>

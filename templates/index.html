@@ -176,9 +176,13 @@
                 {% endfor %}
               </tbody>
             </table>
+            <div>   
+              &nbsp; <strong> Did not bat</strong> : {{dnb1}} 
+            </div>
+            <br>
             <div style="display: flex; justify-content: space-around;">
-              <p style="margin-block: 0;">Total - {{team1_score}} ({{innings1_overs}})</p>
-              <p style="margin-block: 0;">Target - {{target}}</p>
+              <p style="margin-block: 0;"> <strong>Total</strong> - {{team1_score}} ({{innings1_overs}})</p>
+              <p style="margin-block: 0;"> <strong>Target</strong> - {{target}}</p>
             </div>
             <table class="table table-sm mb-0">
               <tr class="table-secondary">
@@ -264,8 +268,12 @@
                 {% endfor %}
               </tbody>
             </table>
+            <div>   
+              &nbsp; <strong> Did not bat</strong> : {{dnb2}} 
+            </div>
+            <br>
             <div class="mt-0" style="display: flex; justify-content: space-around;">
-              <p style="margin-block: 0;">Total - {{team2_score}} ({{innings2_overs}})</p>
+              <p style="margin-block: 0;"><strong>Total</strong> - {{team2_score}} ({{innings2_overs}})</p>
             </div>
   
             <table class="table table-sm mb-0">
@@ -376,25 +384,21 @@
             <table class="table table-sm mb-0">
               <thead>
                 <tr class="table-secondary">
-                  <th class="px-2">Player 1 Runs</th>
-                  <th>Player 1 Balls</th>
-                  <th>Player 1 Name</th>
-                  <th class="fw-bold text-center">Partnership Runs</th>
-                  <th>Player 2 Name</th>
-                  <th>Player 2 Balls</th>
-                  <th>Player 2 Runs</th>
+                  <th class="px-2">Wicket No</th>
+                  <th>Player 1</th>
+                  <th>Player 2</th>
+                  <th class="fw-bold text-center">Partnership</th>
+                  <th>Player out</th>
                 </tr>
               </thead>
               <tbody>
                 {% for row in ptnr_df1 %}
                 <tr>
-                  <td class="px-2">{{ row.player1_runs }}</td>
-                  <td>{{ row.player1_balls }}</td>
-                  <td>{{ row.player1 }}</td>
-                  <td class="fw-bold text-center">{{ row.partnershipRuns }}</td>
-                  <td>{{ row.player2 }}</td>
-                  <td>{{ row.player2_balls }}</td>
-                  <td>{{ row.player2_runs }}</td>
+                  <td class="px-2">{{ row.Wicket }}</td>
+                  <td>{{ row.Player_1 }}</td>
+                  <td>{{ row.Player_2 }}</td>
+                  <td class="fw-bold text-center">{{ row.Partnership }}</td>
+                  <td>{{ row.player_out }}</td>
                 </tr>
                 {% endfor %}
               </tbody>
@@ -410,25 +414,21 @@
             <table class="table table-sm mb-0">
               <thead>
                 <tr class="table-secondary">
-                  <th class="px-2">Player 1 Runs</th>
-                  <th>Player 1 Balls</th>
-                  <th>Player 1 Name</th>
-                  <th class="fw-bold text-center">Partnership Runs</th>
-                  <th>Player 2 Name</th>
-                  <th>Player 2 Balls</th>
-                  <th>Player 2 Runs</th>
+                  <th class="px-2">Wicket No</th>
+                  <th>Player 1</th>
+                  <th>Player 2</th>
+                  <th class="fw-bold text-center">Partnership</th>
+                  <th>Player out</th>
                 </tr>
               </thead>
               <tbody>
                 {% for row in ptnr_df2 %}
                 <tr>
-                  <td class="px-2">{{ row.player1_runs }}</td>
-                  <td>{{ row.player1_balls }}</td>
-                  <td>{{ row.player1 }}</td>
-                  <td class="fw-bold text-center">{{ row.partnershipRuns }}</td>
-                  <td>{{ row.player2 }}</td>
-                  <td>{{ row.player2_balls }}</td>
-                  <td>{{ row.player2_runs }}</td>
+                  <td class="px-2">{{ row.Wicket }}</td>
+                  <td>{{ row.Player_1 }}</td>
+                  <td>{{ row.Player_2 }}</td>
+                  <td class="fw-bold text-center">{{ row.Partnership }}</td>
+                  <td>{{ row.player_out }}</td>
                 </tr>
                 {% endfor %}
               </tbody>
@@ -460,6 +460,18 @@
           <div class="border rounded mb-2 overflow-hidden">
             <img src="data:image/png;base64,{{ i2_ov_runs }}" alt="Innings 2 Overs-Runs" style="width: 100%; max-height: min-content;">
           </div>
+          <h5>Distribution of Runs - {{team1_name}}</h5>
+          <iframe srcdoc="{{ i1_runs }}" width="100%" height="375" frameborder="0" scrolling="no"></iframe>
+
+          <h5>Distribution of Runs - {{team2_name}}</h5>
+          <iframe srcdoc="{{ i2_runs }}" width="100%" height="375" frameborder="0" scrolling="no"></iframe>
+
+          <!-- <div class="border rounded mb-2 overflow-hidden">
+            <img src="data:image/png;base64,{{ i1_runs }}" alt="Innings 1 Runs distribution" style="width: 100%; max-height: min-content;">
+          </div>
+          <div class="border rounded mb-2 overflow-hidden">
+            <img src="data:image/png;base64,{{ i2_runs }}" alt="Innings 2 Runs distribution" style="width: 100%; max-height: min-content;">
+          </div> -->
         {% endif %}
         <!-- <div class="border rounded p-2 mb-2" style="width: 100%; height: 300px; background-color: white;">
           <p class="text-center" style="font-size: small;">Advertisement is going to displayed here</p>
@@ -544,7 +556,7 @@
           <div>
             <p class="my-0">Sincerely,</p>
             <p class="my-0">T20Sense</p>
-            <p class="mt-0">[Contact Email Address]</p>
+            <p class="mt-0"><a class="link-primary link-offset-3-hover link-underline link-underline-opacity-0 link-underline-opacity-100-hover" href="mailto:admin@cloudkarya.com">admin@cloudkarya.com</a></p>
           </div>
           <p>Last updated: 01-Sept-2023</p>
         </div>
@@ -553,13 +565,14 @@
         <div class="row">
           <div class="col-md-4">
             <p class="fs-5">Contact Us</p>
-            <p class="my-0">Email: <a class="link-primary link-offset-3-hover link-underline link-underline-opacity-0 link-underline-opacity-100-hover" href="mailto:example@example.com">example@example.com</a></p>
-            <p>Phone: <a class="link-primary link-offset-3-hover link-underline link-underline-opacity-0 link-underline-opacity-100-hover" href="tel:+1 1234567890">+1 123-456-7890</a></p>
+            <p class="my-0">Email: <a class="link-primary link-offset-3-hover link-underline link-underline-opacity-0 link-underline-opacity-100-hover" href="mailto:admin@cloudkarya.com">admin@cloudkarya.com</a></p>
+            <p>Phone: <a class="link-primary link-offset-3-hover link-underline link-underline-opacity-0 link-underline-opacity-100-hover" href="tel:+1 4084217409">+1 408-421-7409</a></p>
           </div>
           <div class="col-md-4 text-center">
             <p class="fs-5">Links</p>
             <ul class="list-unstyled">
               <li><a class="link-primary link-offset-3-hover link-underline link-underline-opacity-0 link-underline-opacity-100-hover" href="/">Home</a></li>
+              <li><a class="link-primary link-offset-3-hover link-underline link-underline-opacity-0 link-underline-opacity-100-hover" href="/">IPL</a></li>
               <li><a class="link-primary link-offset-3-hover link-underline link-underline-opacity-0 link-underline-opacity-100-hover" href="#">Info</a></li>
             </ul>
           </div>

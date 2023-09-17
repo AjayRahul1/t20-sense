@@ -585,3 +585,28 @@ def runs_in_ovs_fig(series_id, match_id):
   inn2_ovs_runs = conv_to_base64(fig)
   
   return inn1_ovs_runs, inn2_ovs_runs
+
+def data_query(series_id,match_id):
+  # Your BigQuery SQL query
+  q1 = """
+      SELECT batsman, SUM(batsmanruns) AS run
+  FROM `seriesipl.data`
+  WHERE series_id = 1345038
+  GROUP BY batsman
+  ORDER BY run DESC  -- Order the results by total score in descending order
+  LIMIT 50;          -- Limit the results to the top 50 batsmen by score
+
+      """
+  q2 = """
+  SELECT bowler, SUM(CASE WHEN iswicket = TRUE THEN 1 ELSE 0 END) AS total_wickets
+  FROM `seriesipl.data`
+  WHERE series_id = 1345038
+  GROUP BY bowler
+  ORDER BY total_wickets DESC  -- Order the results by total wickets in descending order
+  LIMIT 50;                     -- Limit the results to the top 50 bowlers by wickets
+  """
+
+  # Run the query
+  bat = client.query(q1).to_dataframe().to_dict(orient='records')# batsman data from the series
+  bowl = client.query(q2).to_dataframe().to_dict(orient='records')# bolwer data from the series
+  return bat,bowl

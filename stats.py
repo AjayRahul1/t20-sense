@@ -4,6 +4,11 @@ from google.cloud import storage  # Google Cloud Storage Imports
 import matplotlib.pyplot as plt
 from matplotlib.figure import Figure
 import io, base64
+import plotly.express as px
+import plotly.graph_objects as go
+import plotly.offline as pyo
+import plotly.io as pio
+
 
 # Set the path to your service account key file
 os.environ['GOOGLE_APPLICATION_CREDENTIALS'] = os.getenv('API_KEY') # 't20-sense-main.json'
@@ -58,6 +63,11 @@ def conv_to_base64(fig):
   img_stream.seek(0)
   img_data = base64.b64encode(img_stream.read()).decode("utf-8")
   return img_data
+
+def conv_to_html(fig):
+    # Convert the Plotly figure to HTML using plotly.io.to_html
+    fig_html = pio.to_html(fig, full_html=False)
+    return fig_html
 
 # Main Functions
 def fun_best_bowl_peformance(series_id, match_id):
@@ -497,26 +507,41 @@ def get_ptnship(series_id,match_id):
     partnership_df.at[index, 'p2_contrib'] = (row['player2_runs'] * 100 / row['partnershipRuns']) if row['partnershipRuns'] != 0 else 0
     partnership_df.at[index, 'player1_SR'] = (row['player1_runs'] * 100 / row['player1_balls']) if row['player1_balls'] != 0 else 0
     partnership_df.at[index, 'player2_SR'] = (row['player2_runs'] * 100 / row['player2_balls']) if row['player2_balls'] != 0 else 0
-  inn_1_part = partnership_df[partnership_df['innings'] == 1].reset_index(drop=True)
-  inn_2_part = partnership_df[partnership_df['innings'] == 2].reset_index(drop=True)
+
+  dff = pd.DataFrame(columns=['Innings','Wicket', 'Player 1', 'Player 2', 'Partnership'])
+  for index, row in partnership_df.iterrows():
+    inn = row["innings"]
+    wicket = index+1
+    player1 = f'{row["player1"]} {row["player1_runs"]}({row["player1_balls"]})'
+    player2 = f'{row["player2"]} {row["player2_runs"]}({row["player2_balls"]})'
+    partnership = f'{row["partnershipRuns"]}({row["partnershipBalls"]})'
+
+    # Add the formatted data to dff DataFrame
+    dff.loc[index] = [inn,wicket, player1, player2, partnership]
+
+  dff1 = dff[dff['Innings'] == 1].reset_index(drop=True)
+  dff2 = dff[dff['Innings'] == 2].reset_index(drop=True)
+  dff1 = dff1[::-1]
+  dff2 = dff2[::-1]
+
+  innings_1_partnership = partnership_df[partnership_df['innings'] == 1].reset_index(drop=True)
+  innings_2_partnership = partnership_df[partnership_df['innings'] == 2].reset_index(drop=True)
   # Create the plots for both innings
-  fig_1 = Figure(figsize=(10, 3))
-  ax_1 = fig_1.add_subplot(1, 1, 1)
-  fig_2 = Figure(figsize=(10, 3))
-  ax_2 = fig_2.add_subplot(1, 1, 1)
-  # f1, ax_1 = plt.subplots(figsize=(15, 2))
-  # f2, ax_2 = plt.subplots(figsize=(15, 2))
-  max_runs = max(inn_1_part['player1_runs'].max(), inn_1_part['player2_runs'].max())
+
+
+  fig_1, ax_1 = plt.subplots(figsize=(7, 6))
+  fig_2, ax_2 = plt.subplots(figsize=(7, 6))
+  max_runs = max(innings_1_partnership['player1_runs'].max(), innings_1_partnership['player2_runs'].max())
 
   ax_1.set_ylabel('Partnerships')
   ax_1.set_xlabel('Runs')
   ax_1.set_title('Partnerships Runs - Innings 1')
-  ax_1.set_yticks(range(len(inn_1_part)))
-  ax_1.set_yticklabels(inn_1_part['player2'] + ' & ' + inn_1_part['player1'])
+  ax_1.set_yticks(range(len(innings_1_partnership)))
+  ax_1.set_yticklabels(innings_1_partnership['player2'] + ' & ' + innings_1_partnership['player1'])
   # ax_1.legend()
 
-  ax_1.barh(range(len(inn_1_part)), inn_1_part['player1_runs'], color='tab:blue', label='Player 1 Runs')
-  ax_1.barh(range(len(inn_1_part)), -inn_1_part['player2_runs'], color='tab:orange', label='Player 2 Runs')
+  ax_1.barh(range(len(innings_1_partnership)), innings_1_partnership['player1_runs'], color='tab:blue', label='Player 1 Runs')
+  ax_1.barh(range(len(innings_1_partnership)), -innings_1_partnership['player2_runs'], color='tab:orange', label='Player 2 Runs')
   ax_1.set_xlim(-max_runs, max_runs)
 
   xticks = [-max_runs, -max_runs//2, 0, max_runs//2, max_runs]
@@ -526,24 +551,51 @@ def get_ptnship(series_id,match_id):
   ax_2.set_ylabel('Partnerships')
   ax_2.set_xlabel('Runs')
   ax_2.set_title('Partnerships Runs - Innings 2')
-  ax_2.set_yticks(range(len(inn_2_part)))
-  ax_2.set_yticklabels(inn_2_part['player2'] + ' & ' + inn_2_part['player1'])
+  ax_2.set_yticks(range(len(innings_2_partnership)))
+  ax_2.set_yticklabels(innings_2_partnership['player2'] + ' & ' + innings_2_partnership['player1'])
   # ax_2.legend()
 
-  ax_2.barh(range(len(inn_2_part)), inn_2_part['player1_runs'], color='tab:blue', label='Player 1 Runs')
-  ax_2.barh(range(len(inn_2_part)), -inn_2_part['player2_runs'], color='tab:orange', label='Player 2 Runs')
+  ax_2.barh(range(len(innings_2_partnership)), innings_2_partnership['player1_runs'], color='tab:blue', label='Player 1 Runs')
+  ax_2.barh(range(len(innings_2_partnership)), -innings_2_partnership['player2_runs'], color='tab:orange', label='Player 2 Runs')
   ax_2.set_xlim(-max_runs, max_runs)
 
   ax_2.set_xticks(xticks)
   ax_2.set_xticklabels([abs(x) for x in xticks])
 
-  plt.tight_layout()
+  # plt.tight_layout()
+  i1_partnership = pd.DataFrame(columns=['Wicket', 'Player_1', 'Player_2', 'Partnership', 'player_out'])
+  i2_partnership = pd.DataFrame(columns=['Wicket', 'Player_1', 'Player_2', 'Partnership', 'player_out'])
 
-  f1 = conv_to_base64(fig_1)
-  f2 = conv_to_base64(fig_2)
+  for index, row in innings_1_partnership.iterrows():
+    wicket = index+1
+    player1 = f'{row["player1"]} {row["player1_runs"]}({row["player1_balls"]})'
+    player2 = f'{row["player2"]} {row["player2_runs"]}({row["player2_balls"]})'
+    partnership = f'{row["partnershipRuns"]}({row["partnershipBalls"]})'
+    player_out = row["player_out"]
+    # Add the formatted data to dff DataFrame
+    i1_partnership.loc[index] = [wicket, player1, player2, partnership, player_out]
+
+  for index, row in innings_2_partnership.iterrows():
+    wicket = index+1
+    player1 = f'{row["player1"]} {row["player1_runs"]}({row["player1_balls"]})'
+    player2 = f'{row["player2"]} {row["player2_runs"]}({row["player2_balls"]})'
+    partnership = f'{row["partnershipRuns"]}({row["partnershipBalls"]})'
+    player_out = row["player_out"]
+    # Add the formatted data to dff DataFrame
+    i2_partnership.loc[index] = [wicket, player1, player2, partnership, player_out]
+
+  buf1 = io.BytesIO()
+  fig_1.savefig(buf1, format='png')
+  buf1.seek(0)
+  figdata1 = base64.b64encode(buf1.getvalue()).decode('utf-8')
+
+  buf2 = io.BytesIO()
+  fig_2.savefig(buf2, format='png')
+  buf2.seek(0)
+  figdata2 = base64.b64encode(buf2.getvalue()).decode('utf-8')
 
   # Return the DataFrames and the figures
-  return inn_1_part, inn_2_part, f1, f2
+  return i1_partnership,i2_partnership, figdata1, figdata2
 
 def runs_in_ovs_fig(series_id, match_id):
   url=f"https://hs-consumer-api.espncricinfo.com/v1/pages/match/home?lang=en&seriesId={series_id}&matchId={match_id}"
@@ -585,6 +637,81 @@ def runs_in_ovs_fig(series_id, match_id):
   inn2_ovs_runs = conv_to_base64(fig)
   
   return inn1_ovs_runs, inn2_ovs_runs
+
+
+def division_of_runs(series_id, match_id):
+    inn1_runs = [0, 0, 0, 0, 0, 0]
+    inn2_runs = [0, 0, 0, 0, 0, 0]
+
+    for innings in [1, 2]:
+        try:
+            url = f"https://hs-consumer-api.espncricinfo.com/v1/pages/match/comments?lang=en&seriesId={series_id}&matchId={match_id}&inningNumber={innings}&commentType=ALL&sortDirection=DESC&fromInningOver=-1"
+            output = requests.get(url)
+            comments = output.json()['comments']
+
+            for i in range(0, len(comments)):
+                runs = comments[i]['batsmanRuns']
+                wides = comments[i]['wides']
+                four = comments[i]['isFour']
+                six = comments[i]['isSix']
+
+                if runs == 1:
+                    inn_runs = inn1_runs if innings == 1 else inn2_runs
+                    inn_runs[1] += 1
+                elif runs == 2:
+                    inn_runs = inn1_runs if innings == 1 else inn2_runs
+                    inn_runs[2] += 1
+                elif runs == 3:
+                    inn_runs = inn1_runs if innings == 1 else inn2_runs
+                    inn_runs[3] += 1
+                if runs == 0 and wides == 0:
+                    inn_runs = inn1_runs if innings == 1 else inn2_runs
+                    inn_runs[0] += 1
+                if four:
+                    inn_runs = inn1_runs if innings == 1 else inn2_runs
+                    inn_runs[4] += 1
+                if six:
+                    inn_runs = inn1_runs if innings == 1 else inn2_runs
+                    inn_runs[5] += 1
+        except:
+            print(innings)
+            continue
+    lab=["dots","1s","2s","3s","4s","6s"]
+    fig1 = go.Figure(data=[go.Pie(labels=lab, values=inn1_runs, textinfo='value')])
+    fig2 = go.Figure(data=[go.Pie(labels=lab, values=inn2_runs, textinfo='value')])
+    i1_runs = conv_to_html(fig1)
+    i2_runs = conv_to_html(fig2)
+    return i1_runs, i2_runs
+
+
+def DNB(series_id,match_id):
+  url=f"https://hs-consumer-api.espncricinfo.com/v1/pages/match/home?lang=en&seriesId={series_id}&matchId={match_id}"
+  output=requests.get(url)
+  innings=output.json()['content']['innings']
+  DNB1=[]
+  DNB2=[]
+  for k in range(0,len(innings)):
+    if(k==0):
+      inningBatsmen=innings[k]['inningBatsmen']
+      for i in range(0,len(inningBatsmen)):
+        batsman_id=inningBatsmen[i]['player']['id']
+        batsman_name=inningBatsmen[i]['player']['longName']
+        battedtype=inningBatsmen[i]['battedType']
+        if(battedtype=="DNB"):
+          DNB1.append(batsman_name)
+        else:
+          continue
+    if(k==1):
+      inningBatsmen=innings[k]['inningBatsmen']
+      for i in range(0,len(inningBatsmen)):
+        batsman_id=inningBatsmen[i]['player']['id']
+        batsman_name=inningBatsmen[i]['player']['longName']
+        battedtype=inningBatsmen[i]['battedType']
+        if(battedtype=="DNB"):
+          DNB2.append(batsman_name)
+        else:
+          continue
+  return DNB1,DNB2
 
 def data_query(series_id,match_id):
   # Your BigQuery SQL query

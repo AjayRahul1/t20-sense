@@ -734,6 +734,6 @@ def data_query(series_id,match_id):
   """
 
   # Run the query
-  bat = client.query(q1).to_dataframe().to_dict(orient='records')# batsman data from the series
-  bowl = client.query(q2).to_dataframe().to_dict(orient='records')# bolwer data from the series
+  bat = storage_client.query(q1).to_dataframe().to_dict(orient='records')# batsman data from the series
+  bowl = storage_client.query(q2).to_dataframe().to_dict(orient='records')# bolwer data from the series
   return bat,bowl

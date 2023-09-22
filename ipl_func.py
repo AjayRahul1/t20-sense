@@ -6,6 +6,10 @@ import asyncio, os, io
 # Google Cloud Storage Imports
 from google.cloud import storage
 
+# Load .env variables into the environment
+from dotenv import load_dotenv
+load_dotenv()
+
 # Settings the warnings to be ignored
 warnings.filterwarnings('ignore')
 
@@ -431,24 +435,23 @@ def get_all_series_info(all_series_ids_list):
         continue
   return temp_df_to_concat
   
-def get_all_toss_info():
+def get_all_toss_info(series_id):
   client, bucket = set_cloud_bucket_env()
   files_path = {}
-  for series_id in all_series_ids:
-    # Get the blob (file) from the bucket
-    blob1 = bucket.blob(f"all_series_toss_info/{series_id}_toss_info.csv")
+  # Get the blob (file) from the bucket
+  blob1 = bucket.blob(f"all_series_toss_info/{series_id}_toss_info.csv")
 
-    # Read the file contents into memory
-    file_content1 = blob1.download_as_text()
+  # Read the file contents into memory
+  file_content1 = blob1.download_as_text()
 
-    # Create a StringIO object to treat the file content as a file-like object
-    csv_io = io.StringIO(file_content1)
+  # Create a StringIO object to treat the file content as a file-like object
+  csv_io = io.StringIO(file_content1)
 
-    files_path[series_id] = pd.read_csv(csv_io)
+  files_path[series_id] = pd.read_csv(csv_io)
   return files_path
 
 def get_team_name_score_ground(series_id, match_id):
-  all_toss_infos = get_all_toss_info()
+  all_toss_infos = get_all_toss_info(series_id)
   particular_match_toss_info = all_toss_infos[series_id]
   particular_match_toss_info = pd.DataFrame(particular_match_toss_info)
   particular_match_toss_info = particular_match_toss_info[particular_match_toss_info['match_id'] == match_id]

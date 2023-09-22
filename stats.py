@@ -713,6 +713,35 @@ def DNB(series_id,match_id):
           continue
   return DNB1,DNB2
 
+def team_squads(series_id,match_id):
+  team1_squad=[]
+  team2_squad=[]
+  url=f"https://hs-consumer-api.espncricinfo.com/v1/pages/match/home?lang=en&seriesId={series_id}&matchId={match_id}"
+  output=requests.get(url)
+  teamplayers=output.json()['content']['matchPlayers']['teamPlayers']
+  inn1_players=teamplayers[0]['players']
+  inn2_players=teamplayers[1]['players']
+  for i in range(0,len(inn1_players)):
+    player_id=inn1_players[i]['player']['id']
+    player_name=inn1_players[i]['player']['longName']
+    playerrole=inn1_players[i]['playerRoleType']
+    if playerrole == "C":
+     player_name = player_name + " (C)"
+    if playerrole == "WK":
+     player_name = player_name + " (WK)"
+    team1_squad.append(player_name)
+  for j in range(0,len(inn2_players)):
+    player_id=inn2_players[j]['player']['id']
+    player_name=inn2_players[j]['player']['longName']
+    playerrole=inn2_players[j]['playerRoleType']
+    if playerrole == "C":
+     player_name = player_name + " (C)"
+    if playerrole == "WK":
+     player_name = player_name + " (WK)"
+    team2_squad.append(player_name)
+  return team1_squad,team2_squad
+
+
 def data_query(series_id,match_id):
   # Your BigQuery SQL query
   q1 = """

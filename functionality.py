@@ -18,7 +18,7 @@ def get_match_ids_from_series(series_id):
         match_num = output_1['title']
         title = team1_sn + " vs " + team2_sn + " " + match_num
         matches_names_list.append(title)
-      match_dict=dict(zip(matches_id_list, matches_names_list))
+      match_dict=dict(zip(matches_names_list, matches_id_list))
       return match_dict
         
   except Exception as e:
@@ -73,5 +73,7 @@ def get_match_ids_from_series_fast(series_id):
     # 2008
     elif(series_id == 313494):
       return { 'KKR vs RCB 1st match': 335982, 'CSK vs KXIP 2nd match': 335983, 'RR vs DC 3rd match': 335984, 'DC vs KKR 4th match': 335986, 'MI vs RCB 5th match': 335985, 'KXIP vs RR 6th match': 335987, 'DC vs DC 7th match': 335988, 'CSK vs MI 8th match': 335989, 'DC vs RR 9th match': 335990, 'KXIP vs MI 10th match': 335991, 'KKR vs CSK 11th match': 335993, 'RCB vs RR 12th match': 335992, 'DC vs KXIP 13th match': 335995, 'MI vs DC 14th match': 335994, 'CSK vs RCB 15th match': 335996, 'KKR vs MI 16th match': 335997, 'DC vs RCB 17th match': 335998, 'RR vs KKR 18th match': 336000, 'DC vs KXIP 19th match': 335999, 'CSK vs DC 20th match': 336001, 'RCB vs DC 21st match': 336034, 'KXIP vs KKR 22nd match': 336003, 'MI vs DC 23rd match': 336004, 'CSK vs RR 24th match': 336005, 'RCB vs KXIP 25th match': 336006, 'CSK vs DC 26th match': 336007, 'RR vs MI 27th match': 336008, 'DC vs CSK 28th match': 336009, 'KKR vs RCB 29th match': 336010, 'DC vs RR 30th match': 336011, 'CSK vs KXIP 31st match': 336013, 'KKR vs DC 32nd match': 336014, 'DC vs RR 33rd match': 336015, 'RCB vs KXIP 34th match': 336016, 'KKR vs DC 35th match': 336017, 'CSK vs MI 36th match': 336018, 'DC vs DC 37th match': 336020, 'KKR vs MI 38th match': 336021, 'RR vs RCB 39th match': 336023, 'DC vs KXIP 40th match': 336022, 'KKR vs CSK 41st match': 336025, 'MI vs DC 42nd match': 336024, 'RCB vs DC 43rd match': 336026, 'KKR vs RR 44th match': 336027, 'KXIP vs MI 45th match': 336028, 'RCB vs CSK 46th match': 336029, 'DC vs KKR 47th match': 336030, 'DC vs KXIP 48th match': 336031, 'RR vs CSK 49th match': 336033, 'MI vs DC 50th match': 336032, 'DC vs RCB 51st match': 336002, 'KXIP vs KKR 52nd match': 336035, 'MI vs RR 53rd match': 336036, 'DC vs CSK 54th match': 336037, 'RCB vs MI 55th match': 336012, 'KXIP vs RR 56th match': 336019, 'RR vs DC 1st Semi-Final': 336038, 'KXIP vs CSK 2nd Semi-Final': 336039, 'CSK vs RR Final': 336040}
+    elif(series_id == 1357742):
+      return {'TSK vs LAKR 1st Match': 1381361, 'SF vs MI NY 2nd Match': 1381362, 'WSH vs SEA 3rd Match': 1381363, 'SEA vs SF 4th Match': 1381364, 'WSH vs TSK 5th Match': 1381365, 'MI NY vs LAKR 6th Match': 1381366, 'TSK vs MI NY 7th Match': 1381367, 'SF vs LAKR 8th Match': 1381368, 'LAKR vs WSH 9th Match': 1381369, 'TSK vs SEA 10th Match': 1381370, 'WSH vs SF 11th Match': 1381371, 'SEA vs LAKR 12th Match': 1381372, 'WSH vs MI NY 13th Match': 1381373, 'SF vs TSK 14th Match': 1381374, 'MI NY vs SEA 15th Match': 1381375, 'MI NY vs WSH Eliminator': 1381376, 'TSK vs SEA Qualifier 1': 1381377, 'TSK vs MI NY Qualifier 2': 1381378, 'SEA vs MI NY Final': 1381379}
     else:
       return get_match_ids_from_series(series_id)

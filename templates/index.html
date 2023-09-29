@@ -182,10 +182,9 @@
                 {% endfor %}
               </tbody>
             </table>
-            <div>   
-              &nbsp; <strong> Did not bat</strong> : {{dnb1}} 
+            <div>
+              <p class="my-0 p-1"><strong> Did not bat - </strong> {% for b in dnb1 %} {{ b }} | {% endfor %} </p>
             </div>
-            <br>
             <div style="display: flex; justify-content: space-around;">
               <p style="margin-block: 0;"> <strong>Total</strong> - {{team1_score}} ({{innings1_overs}})</p>
               <p style="margin-block: 0;"> <strong>Target</strong> - {{target}}</p>
@@ -275,9 +274,8 @@
               </tbody>
             </table>
             <div>   
-              &nbsp; <strong> Did not bat</strong> : {{dnb2}} 
+              <p class="my-0 p-1"><strong> Did not bat - </strong> {% for b in dnb2 %} {{ b }} | {% endfor %} </p>
             </div>
-            <br>
             <div class="mt-0" style="display: flex; justify-content: space-around;">
               <p style="margin-block: 0;"><strong>Total</strong> - {{team2_score}} ({{innings2_overs}})</p>
             </div>
@@ -485,89 +483,96 @@
       </div>
     </div>
 
-    <footer class="bd-footer pb-3" style="background-color: #ffffff;">
+    <footer class="bd-footer pb-2">
       <hr>
-      <div class="container">
-        <p class="fs-2 accordion-header">T20Sense Privacy Notice</p>
-        <p><br>Thank you for visiting T20Sense, a website that provides cricket match scorecards without collecting any personal information from its users. We are committed to protecting your privacy and ensuring that your browsing experience on our website remains secure. This Privacy Notice explains how we handle the limited data we may collect and outlines our commitment to safeguarding your privacy.</p>
+      <div class="container accordion">
+        <div class="accordion-item">
+          <p class="fs-2 accordion-header" id="accPrNcParent">
+            <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#privNoticeMain" aria-expanded="true" aria-controls="privInfoCol">
+              T20Sense Privacy Notice
+            </button>
+          </p>
+          <div id="privNoticeMain" class="accordion-collapse collapse p-3" aria-labelledby="accPrNcParent">
+            <p>Thank you for visiting T20Sense, a website that provides cricket match scorecards without collecting any personal information from its users. We are committed to protecting your privacy and ensuring that your browsing experience on our website remains secure. This Privacy Notice explains how we handle the limited data we may collect and outlines our commitment to safeguarding your privacy.</p>
+            <div class="accordion" id="accPrNcContent">
+              <div class="accordion-item">
+                <p class="fs-4 accordion-header" id="headerInfoCollect">
+                  <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#privInfoCol" aria-expanded="true" aria-controls="privInfoCol">
+                    Information We Collect
+                  </button>
+                </p>
+                <div id="privInfoCol" class="accordion-collapse collapse p-3" aria-labelledby="headerInfoCollect" data-bs-parent="#accPrNcContent">
+                  <p>At T20Sense, we follow a strict policy of not collecting any personal information from our users. We do not require you to provide any personal details such as your name, email address, phone number, or location to access the cricket match scorecards,stats & other interesting information.</p>
+                </div>
+              </div>
 
-        <div class="accordion" id="accordionExample">
-          <div class="accordion-item">
-            <p class="fs-4 accordion-header" id="headerInfoCollect">
-              <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#privInfoCol" aria-expanded="true" aria-controls="privInfoCol">
-                Information We Collect
-              </button>
-            </p>
-            <div id="privInfoCol" class="accordion-collapse collapse show p-3" aria-labelledby="headerInfoCollect" data-bs-parent="#accordionExample">
-              <p>At T20Sense, we follow a strict policy of not collecting any personal information from our users. We do not require you to provide any personal details such as your name, email address, phone number, or location to access the cricket match scorecards,stats & other interesting information.</p>
-            </div>
-          </div>
+              <div class="accordion-item">
+                <p class="fs-4 accordion-header" id="headerAutoColInfo">
+                  <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#privAutoColInfo" aria-expanded="true" aria-controls="privAutoColInfo">
+                    Automatically Collected Information
+                  </button>
+                </p>
+                <div id="privAutoColInfo" class="accordion-collapse collapse p-3" aria-labelledby="headerAutoColInfo" data-bs-parent="#accPrNcContent">
+                  <p>We may collect certain non-personal information automatically as you browse our website. This information includes:</p>
+                  <ol>
+                    <li>
+                      <p><strong>Log Data: </strong>When you access T20Sense, our servers automatically record information that your browser sends. This may include your IP address, browser type, browser version, the pages you visit, the time and date of your visit, and other statistics.</p>
+                    </li>
+                    <li><p><strong>Cookies: </strong>We may use cookies, which are small data files stored on your device, to enhance your browsing experience. Cookies help us analyse how users interact with our website and improve its functionality. You can manage your cookie preferences through your browser settings.</p>
+                    </li>
+                  </ol>
+                </div>
+              </div>
+              
+              <div class="accordion-item">
+                <p class="fs-4 accordion-header" id="headerThirdPartyLink">
+                  <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#privThirdPartyLink" aria-expanded="false" aria-controls="privThirdPartyLink">
+                    Third-party Links
+                  </button>
+                </p>
+                <div id="privThirdPartyLink" class="accordion-collapse collapse p-3" aria-labelledby="headerThirdPartyLink" data-bs-parent="#accPrNcContent">
+                  <p>T20Sense may contain links to third-party websites, such as cricket teams' official websites or relevant news sources. Please note that these websites have their own privacy policies, and we encourage you to review them before providing any personal information on those sites. We are not responsible for the privacy practices or content of these third-party websites.</p>
+                </div>
+              </div>
+              
+              <div class="accordion-item">
+                <p class="fs-4 accordion-header" id="headerDataSecurity">
+                  <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#privDataSecurity" aria-expanded="true" aria-controls="privDataSecurity">
+                    Data Security
+                  </button>
+                </p>
+                <div id="privDataSecurity" class="accordion-collapse collapse p-3" aria-labelledby="headerDataSecurity" data-bs-parent="#accPrNcContent">
+                  <p>We take the security of your information seriously. While we strive to protect the data we collect, please be aware that no method of transmission over the internet or electronic storage is completely secure. We cannot guarantee the absolute security of your information.</p>
+                </div>
+              </div>
+              
+              <div class="accordion-item">
+                <p class="fs-4 accordion-header" id="headerPrivCHangeNotice">
+                  <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#privChangeNotice" aria-expanded="true" aria-controls="privChangeNotice">
+                    Changes to this Privacy Notice:
+                  </button>
+                </p>
+                <div id="privChangeNotice" class="accordion-collapse collapse p-3" aria-labelledby="headerPrivCHangeNotice" data-bs-parent="#accPrNcContent">
+                  <p>We may update this Privacy Notice from time to time to reflect changes in our practices or for other operational, legal, or regulatory reasons. The updated version will be posted on our website, and the date of the latest revision will be indicated at the top of the notice.</p>
+                </div>
+              </div>
 
-          <div class="accordion-item">
-            <p class="fs-4 accordion-header" id="headerAutoColInfo">
-              <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#privAutoColInfo" aria-expanded="true" aria-controls="privAutoColInfo">
-                Automatically Collected Information
-              </button>
-            </p>
-            <div id="privAutoColInfo" class="accordion-collapse collapse p-3" aria-labelledby="headerAutoColInfo" data-bs-parent="#accordionExample">
-              <p>We may collect certain non-personal information automatically as you browse our website. This information includes:</p>
-              <ol>
-                <li>
-                  <p><strong>Log Data: </strong>When you access T20Sense, our servers automatically record information that your browser sends. This may include your IP address, browser type, browser version, the pages you visit, the time and date of your visit, and other statistics.</p>
-                </li>
-                <li><p><strong>Cookies: </strong>We may use cookies, which are small data files stored on your device, to enhance your browsing experience. Cookies help us analyse how users interact with our website and improve its functionality. You can manage your cookie preferences through your browser settings.</p>
-                </li>
-              </ol>
-            </div>
-          </div>
-          
-          <div class="accordion-item">
-            <p class="fs-4 accordion-header" id="headerThirdPartyLink">
-              <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#privThirdPartyLink" aria-expanded="false" aria-controls="privThirdPartyLink">
-                Third-party Links
-              </button>
-            </p>
-            <div id="privThirdPartyLink" class="accordion-collapse collapse p-3" aria-labelledby="headerThirdPartyLink" data-bs-parent="#accordionExample">
-              <p>T20Sense may contain links to third-party websites, such as cricket teams' official websites or relevant news sources. Please note that these websites have their own privacy policies, and we encourage you to review them before providing any personal information on those sites. We are not responsible for the privacy practices or content of these third-party websites.</p>
-            </div>
-          </div>
-          
-          <div class="accordion-item">
-            <p class="fs-4 accordion-header" id="headerDataSecurity">
-              <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#privDataSecurity" aria-expanded="true" aria-controls="privDataSecurity">
-                Data Security
-              </button>
-            </p>
-            <div id="privDataSecurity" class="accordion-collapse collapse p-3" aria-labelledby="headerDataSecurity" data-bs-parent="#accordionExample">
-              <p>We take the security of your information seriously. While we strive to protect the data we collect, please be aware that no method of transmission over the internet or electronic storage is completely secure. We cannot guarantee the absolute security of your information.</p>
-            </div>
-          </div>
-          
-          <div class="accordion-item">
-            <p class="fs-4 accordion-header" id="headerPrivCHangeNotice">
-              <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#privChangeNotice" aria-expanded="true" aria-controls="privChangeNotice">
-                Changes to this Privacy Notice:
-              </button>
-            </p>
-            <div id="privChangeNotice" class="accordion-collapse collapse p-3" aria-labelledby="headerPrivCHangeNotice" data-bs-parent="#accordionExample">
-              <p>We may update this Privacy Notice from time to time to reflect changes in our practices or for other operational, legal, or regulatory reasons. The updated version will be posted on our website, and the date of the latest revision will be indicated at the top of the notice.</p>
-            </div>
-          </div>
+              <br>
 
-          <br>
-
-          <!-- <p class="fs-2">Contact Us</p> -->
-          <p class="fs-4">Finally,</p>
-          <p>If you have any questions or concerns about this Privacy Notice or your interactions with T20Sense, you can contact us at [contact email address].<br>Thank you for choosing T20Sense. Enjoy browsing the cricket match scorecards without worrying about your privacy!</p>
-          <div>
-            <p class="my-0">Sincerely,</p>
-            <p class="my-0">T20Sense</p>
-            <p class="mt-0"><a class="link-primary link-offset-3-hover link-underline link-underline-opacity-0 link-underline-opacity-100-hover" href="mailto:admin@cloudkarya.com">admin@cloudkarya.com</a></p>
+              <!-- <p class="fs-2">Contact Us</p> -->
+              <p class="fs-4">Finally,</p>
+              <p>If you have any questions or concerns about this Privacy Notice or your interactions with T20Sense, you can contact us at <a class="link-primary link-offset-3-hover link-underline link-underline-opacity-0 link-underline-opacity-100-hover" href="mailto:admin@cloudkarya.com">admin@cloudkarya.com</a>.<br>Thank you for choosing T20Sense. Enjoy browsing the cricket match scorecards without worrying about your privacy!</p>
+              <div>
+                <p class="my-0">Sincerely,</p>
+                <p class="my-0">T20Sense</p>
+                <p class="mt-0"><a class="link-primary link-offset-3-hover link-underline link-underline-opacity-0 link-underline-opacity-100-hover" href="mailto:admin@cloudkarya.com">admin@cloudkarya.com</a></p>
+              </div>
+              <p>Last updated: 01-Sept-2023</p>
+            </div>
           </div>
-          <p>Last updated: 01-Sept-2023</p>
         </div>
       </div>
-      <div class="container">
+      <div class="container mt-2">
         <div class="row">
           <div class="col-md-4">
             <p class="fs-5">Contact Us</p>
@@ -592,6 +597,7 @@
           </div>
         </div>
       </div>
+      <hr>
     </footer>
   </body>
 </html>

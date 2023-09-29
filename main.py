@@ -20,7 +20,7 @@ app.mount("/static", StaticFiles(directory="static"), name="static")
 # all_ipl_series_info = get_all_csv_files_from_cloud()
 matches_names_and_ids_dict = {}
 
-all_ipl_series_ids = {1345038: 2023, 1298423: 2022, 1249214: 2021, 1210595: 2020, 1165643: 2019, 1131611: 2018, 1078425: 2017, 968923: 2016, 791129: 2015, 695871: 2014, 586733: 2013, 520932: 2012, 466304: 2011, 418064: 2010, 374163: 2009, 313494: 2008} # Generate a list of years from 2008 to 2023
+drdnSerIds = {}
 match_ids = ["Select the Match"]  # Example match IDs
 
 gbl_series_id=0
@@ -28,14 +28,19 @@ gbl_match_id=0
 
 @app.get("/", response_class=HTMLResponse)
 def index(request: Request):
+  global drdnSerIds
+  all_ipl_series_ids = {1345038: 2023, 1298423: 2022, 1249214: 2021, 1210595: 2020, 1165643: 2019, 1131611: 2018, 1078425: 2017, 968923: 2016, 791129: 2015, 695871: 2014, 586733: 2013, 520932: 2012, 466304: 2011, 418064: 2010, 374163: 2009, 313494: 2008} # Generate a list of years from 2008 to 2023
   # years = [313494, 374163, 418064, 466304, 520932, 586733, 695871, 791129, 968923, 1078425, 1131611, 1165643, 1210595, 1249214, 1298423, 1345038]
+  drdnSerIds = all_ipl_series_ids
   finals_and_champs_df = pd.read_csv('Finals.csv')
   finals_and_champs_df = finals_and_champs_df.to_dict(orient='records')
   return templates.TemplateResponse("index.html", {"request": request, "years": all_ipl_series_ids, "match_ids": match_ids, "finals_and_champs_df":finals_and_champs_df})
 
 @app.get("/mlc", response_class=HTMLResponse)
 def mlc_home(request: Request):
+  global drdnSerIds
   mlc_years = {1357742 : 2023}
+  drdnSerIds = mlc_years
   match_ids = ["Select the Match"]  # Example match IDs
   return templates.TemplateResponse("index.html", {"request": request, "years": mlc_years, "match_ids": match_ids})
 
@@ -126,7 +131,7 @@ async def process(
     squad1,squad2 = team_squads(series_id,match_id)
     
     return templates.TemplateResponse("index.html", {   "selected_year": series_id, "selected_match_id": match_id,
-                              "request": request, "years" : all_ipl_series_ids, "match_ids" : match_ids,
+                              "request": request, "years" : drdnSerIds, "match_ids" : match_ids,
                               "batting1": batting1, "bowling1": bowling1,
                               "batting2": batting2, "bowling2": bowling2,
                               "team1_name": team1_name, "team2_name": team2_name,

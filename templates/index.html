@@ -81,6 +81,26 @@
 
       <!-- 2nd Frame --> <!-- Data displayed in center -->
       <div class="col-lg-7 col-12 mb-3">
+        {% if mlc_home %}
+        <div id="mlc-content">
+          <p class="fs-1">MLC - Major Cricket League</p>
+          <img src="static/mlc-teams-bg.jpeg" width="100%" height="min-content" alt="MLC Header">  
+          <p class="mt-1">It is a professional T20 league in the USA (United States of America), and it debuted in July 2023 with six teams representing the country's major cities. The inaugural MLC champions, MI New York, were announced at the league's final on July 31, 2023. 
+          the teams that were part of the MLC inaugural edition were
+          <ul>
+            <li>MI New York (MI NY)</li>
+            <li>Texas Super Kings (TSK)</li>
+            <li>Seattle Orcas (SEA)</li>
+            <li>Washington Freedom (WSH)</li>
+            <li>San Francisco Unicorns (SF)</li>
+            <li>Los Angeles Knight Riders (LAKR)</li>
+          </ul>
+          </p>
+          <p><strong>Nicholas pooran</strong> a MI explosive batsman has been aggregated as leading run getter of the tournament</p>
+          <p><strong>Trent Boult</strong>, a pitcher for MI, has been named the tournament's top wicket-taker overall.</p>
+        </div>
+        {% endif %}
+
         <!-- Finals and Champions Table Division -->
         {% if not batting1 and finals_and_champs_df %}
         <div class="border rounded" style="background-color: #ffffff;">
@@ -136,8 +156,10 @@
 
         <div class="border rounded mt-2 p-2" style="background-color: #ffffff;">
           <p class="fw-bold my-1" style="margin-block-end: 0;">Team Squads</p>
-          <p class="my-1"><strong> {{team1_name}}</strong>  : {{squad1}}</p>
-          <p class="my-1"><strong> {{team2_name}}</strong>  : {{squad2}}</p>
+          <p class="mb-0"><strong> {{team1_name}}</strong></p>
+          <p class="mt-0">{% for i in squad1 %}{{i}}, {% endfor %}</p>
+          <p class="mb-0"><strong> {{team2_name}}</strong></p>
+          <p class="my-0">{% for i in squad2 %} {{i}}, {% endfor %}</p>
         </div>
         
         <!-- 1st Innings -->
@@ -465,10 +487,10 @@
             <img src="data:image/png;base64,{{ i2_ov_runs }}" alt="Innings 2 Overs-Runs" style="width: 100%; max-height: min-content;">
           </div>
           <h5>Distribution of Runs - {{team1_name}}</h5>
-          <iframe srcdoc="{{ i1_runs }}" width="100%" height="375" frameborder="0" scrolling="no"></iframe>
+          <iframe srcdoc="{{ i1_runs }}" width="100%" height="400px" frameborder="0" scrolling="no"></iframe>
 
           <h5>Distribution of Runs - {{team2_name}}</h5>
-          <iframe srcdoc="{{ i2_runs }}" width="100%" height="375" frameborder="0" scrolling="no"></iframe>
+          <iframe srcdoc="{{ i2_runs }}" width="100%" height="400px" frameborder="0" scrolling="no"></iframe>
 
           <!-- <div class="border rounded mb-2 overflow-hidden">
             <img src="data:image/png;base64,{{ i1_runs }}" alt="Innings 1 Runs distribution" style="width: 100%; max-height: min-content;">

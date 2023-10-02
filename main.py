@@ -21,7 +21,6 @@ app.mount("/static", StaticFiles(directory="static"), name="static")
 matches_names_and_ids_dict = {}
 
 drdnSerIds = {}
-match_ids = ["Select the Match"]  # Example match IDs
 
 gbl_series_id=0
 gbl_match_id=0
@@ -34,15 +33,15 @@ def index(request: Request):
   drdnSerIds = all_ipl_series_ids
   finals_and_champs_df = pd.read_csv('Finals.csv')
   finals_and_champs_df = finals_and_champs_df.to_dict(orient='records')
-  return templates.TemplateResponse("index.html", {"request": request, "years": all_ipl_series_ids, "match_ids": match_ids, "finals_and_champs_df":finals_and_champs_df})
+  return templates.TemplateResponse("index.html", {"request": request, "years": all_ipl_series_ids, "finals_and_champs_df":finals_and_champs_df})
 
 @app.get("/mlc", response_class=HTMLResponse)
 def mlc_home(request: Request):
   global drdnSerIds
   mlc_years = {1357742 : 2023}
   drdnSerIds = mlc_years
-  match_ids = ["Select the Match"]  # Example match IDs
-  return templates.TemplateResponse("index.html", {"request": request, "years": mlc_years, "match_ids": match_ids})
+  mlc_home_p = True
+  return templates.TemplateResponse("index.html", {"request": request, "years": mlc_years, "mlc_home": mlc_home_p})
 
 @app.post("/redirect_to_scorecard")
 def submit_form(series_id: int = Form(...), match_id: int = Form(...)):
@@ -131,7 +130,7 @@ async def process(
     squad1,squad2 = team_squads(series_id,match_id)
     
     return templates.TemplateResponse("index.html", {   "selected_year": series_id, "selected_match_id": match_id,
-                              "request": request, "years" : drdnSerIds, "match_ids" : match_ids,
+                              "request": request, "years" : drdnSerIds,
                               "batting1": batting1, "bowling1": bowling1,
                               "batting2": batting2, "bowling2": bowling2,
                               "team1_name": team1_name, "team2_name": team2_name,

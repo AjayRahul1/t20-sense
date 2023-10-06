@@ -33,7 +33,7 @@ def index(request: Request):
   drdnSerIds = all_ipl_series_ids
   finals_and_champs_df = pd.read_csv('Finals.csv')
   finals_and_champs_df = finals_and_champs_df.to_dict(orient='records')
-  return templates.TemplateResponse("index.html", {"request": request, "years": all_ipl_series_ids, "finals_and_champs_df":finals_and_champs_df})
+  return templates.TemplateResponse("tournament_home.html", {"request": request, "years": all_ipl_series_ids, "finals_and_champs_df":finals_and_champs_df})
 
 @app.get("/mlc", response_class=HTMLResponse)
 def mlc_home(request: Request):

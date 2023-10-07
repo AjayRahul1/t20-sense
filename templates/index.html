@@ -26,35 +26,7 @@
   </head>
   <body class="bg-light">
     <!-- Navigation Bar -->
-    <nav class="navbar navbar-expand-lg shadow-sm" style="background-color: #ffdea6;">
-      <div class="container-fluid">
-        <a class="navbar-brand" href="/"><img src="/static/t20-sense-logo.svg" width="112.8px" height="30px" alt="T20 Sense Logo"></a>
-        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-          <span class="navbar-toggler-icon"></span>
-        </button>
-        <div class="collapse navbar-collapse" id="navbarNav">
-          <ul class="navbar-nav">
-            <li class="nav-item">
-              <a class="nav-link active" aria-current="page" href="/">IPL</a>
-            </li>
-            <!-- <li class="nav-item">
-              <a class="nav-link" href="#">T20 WC</a>
-            </li>
-            <li class="nav-item">
-              <a class="nav-link" href="#">ODI WC</a>
-            </li> -->
-            <li class="nav-item">
-              <a class="nav-link" href="/mlc">MLC</a>
-            </li>
-          </ul>
-          <!-- Search Bar -->
-          <!-- <form class="form-inline my-2 my-lg-0">
-            <input class="form-control mr-sm-2 rounded-pill" type="search" placeholder="Search any match" aria-label="Search">
-            <button class="btn btn-outline-dark my-2 my-sm-0 rounded-pill" type="submit">Search</button>
-          </form> -->
-        </div>
-      </div>
-    </nav>
+    {% include "layout/navbar.html" %}
         
     <div class="row mt-2 container-fluid">
       <div class="col-lg-2 col-12 mb-3">

@@ -51,10 +51,22 @@ def submit_form(series_id: int = Form(...), match_id: int = Form(...)):
   redirect_url = f"/get_scorecard/{series_id}/{match_id}"
   return RedirectResponse(url=redirect_url, status_code=303)
 
-# @app.get('/get_mom')
-# async def get_mom():
-#   man_of_the_match = get_man_of_the_match(series_id, match_id)
-#   return f"{man_of_the_match}"
+@app.get('/api/series-links')
+async def getSeriesLinks():
+    all_series_ids = [313494, 374163, 418064, 466304, 520932, 586733, 695871, 791129, 968923, 1078425, 1131611, 1165643, 1210595, 1249214, 1298423, 1345038]
+    st = 2008
+    l = []  # l stands for links.
+    for i in all_series_ids:
+      l.append({"title" : st, "url" : f"/series/{i}"})
+      st = st + 1
+    return l
+
+@app.get("/series/{series_id}")
+def seriesPage(series_id: int):
+  import requests
+  url=f"https://hs-consumer-api.espncricinfo.com/v1/pages/series/schedule?lang=en&seriesId={series_id}"
+  reqJSON = requests.get(url).json()
+  return reqJSON
 
 def updating_match_details_for_refresh(series_id):
   global matches_names_and_ids_dict
@@ -72,7 +84,7 @@ async def ret_match_ids(series_id : int, request : Request):
 # async def get_impact_points(request : Request, series_id: int, match_id: int):
 #   return templates.TemplateResponse('content_templates/imp_pts_tbl.html', {"request" : request, })
 
-@app.get("/get_scorecard/{series_id}/{match_id}", response_class=HTMLResponse)
+@app.get("/scorecards/{series_id}/{match_id}", response_class=HTMLResponse)
 async def process(
     request: Request,
     series_id: int,

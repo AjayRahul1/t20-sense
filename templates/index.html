@@ -54,9 +54,9 @@
       <!-- 2nd Frame --> <!-- Data displayed in center -->
       <div class="col-lg-7 col-12 mb-3">
         {% if mlc_home %}
-        <div id="mlc-content">
+        <div class="p-3" id="mlc-content">
           <p class="fs-1">MLC - Major Cricket League</p>
-          <img src="static/mlc-teams-bg.jpeg" width="100%" height="min-content" alt="MLC Header">  
+          <img class="border rounded" src="static/mlc-teams-bg.jpeg" width="100%" height="min-content" alt="MLC Header">  
           <p class="mt-1">It is a professional T20 league in the USA (United States of America), and it debuted in July 2023 with six teams representing the country's major cities. The inaugural MLC champions, MI New York, were announced at the league's final on July 31, 2023. 
           the teams that were part of the MLC inaugural edition were
           <ul>
@@ -75,14 +75,14 @@
 
         <!-- Finals and Champions Table Division -->
         {% if not batting1 and finals_and_champs_df %}
-        <div class="border rounded" style="background-color: #ffffff;">
-          <p class="fw-bold p-1 border rounded-top" style="margin-bottom: 0; background-color: #bbe6f0;">
+        <div class="border rounded overflow-hidden" style="background-color: #ffffff;">
+          <p class="fw-bold p-2 border rounded-top" style="margin-bottom: 0; background-color: #bbe6f0;">
             Finals & Champions
           </p>
           <table class="table table-sm table-striped" style="width: 100%; margin-bottom: 0;">
             <thead>
               <tr>
-                <th class="px-1">Year</th>
+                <th class="px-2">Year</th>
                 <th>Final</th>
                 <th>Champion</th>
                 <th>Runner Up</th>
@@ -93,7 +93,7 @@
             <tbody>
               {% for data in finals_and_champs_df %}
                 <tr>
-                  <td class="px-1">{{data.Year}}</td>
+                  <td class="px-2">{{data.Year}}</td>
                   <td>{{data.Final}}</td>
                   <td class="fw-bold">{{data['Champions']}}</td>
                   <td>{{data['Runner up']}}</td>
@@ -477,121 +477,7 @@
       </div>
     </div>
 
-    <footer class="bd-footer pb-2">
-      <hr>
-      <div class="container accordion">
-        <div class="accordion-item">
-          <p class="fs-2 accordion-header" id="accPrNcParent">
-            <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#privNoticeMain" aria-expanded="true" aria-controls="privInfoCol">
-              T20Sense Privacy Notice
-            </button>
-          </p>
-          <div id="privNoticeMain" class="accordion-collapse collapse p-3" aria-labelledby="accPrNcParent">
-            <p>Thank you for visiting T20Sense, a website that provides cricket match scorecards without collecting any personal information from its users. We are committed to protecting your privacy and ensuring that your browsing experience on our website remains secure. This Privacy Notice explains how we handle the limited data we may collect and outlines our commitment to safeguarding your privacy.</p>
-            <div class="accordion" id="accPrNcContent">
-              <div class="accordion-item">
-                <p class="fs-4 accordion-header" id="headerInfoCollect">
-                  <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#privInfoCol" aria-expanded="true" aria-controls="privInfoCol">
-                    Information We Collect
-                  </button>
-                </p>
-                <div id="privInfoCol" class="accordion-collapse collapse p-3" aria-labelledby="headerInfoCollect" data-bs-parent="#accPrNcContent">
-                  <p>At T20Sense, we follow a strict policy of not collecting any personal information from our users. We do not require you to provide any personal details such as your name, email address, phone number, or location to access the cricket match scorecards,stats & other interesting information.</p>
-                </div>
-              </div>
-
-              <div class="accordion-item">
-                <p class="fs-4 accordion-header" id="headerAutoColInfo">
-                  <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#privAutoColInfo" aria-expanded="true" aria-controls="privAutoColInfo">
-                    Automatically Collected Information
-                  </button>
-                </p>
-                <div id="privAutoColInfo" class="accordion-collapse collapse p-3" aria-labelledby="headerAutoColInfo" data-bs-parent="#accPrNcContent">
-                  <p>We may collect certain non-personal information automatically as you browse our website. This information includes:</p>
-                  <ol>
-                    <li>
-                      <p><strong>Log Data: </strong>When you access T20Sense, our servers automatically record information that your browser sends. This may include your IP address, browser type, browser version, the pages you visit, the time and date of your visit, and other statistics.</p>
-                    </li>
-                    <li><p><strong>Cookies: </strong>We may use cookies, which are small data files stored on your device, to enhance your browsing experience. Cookies help us analyse how users interact with our website and improve its functionality. You can manage your cookie preferences through your browser settings.</p>
-                    </li>
-                  </ol>
-                </div>
-              </div>
-              
-              <div class="accordion-item">
-                <p class="fs-4 accordion-header" id="headerThirdPartyLink">
-                  <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#privThirdPartyLink" aria-expanded="false" aria-controls="privThirdPartyLink">
-                    Third-party Links
-                  </button>
-                </p>
-                <div id="privThirdPartyLink" class="accordion-collapse collapse p-3" aria-labelledby="headerThirdPartyLink" data-bs-parent="#accPrNcContent">
-                  <p>T20Sense may contain links to third-party websites, such as cricket teams' official websites or relevant news sources. Please note that these websites have their own privacy policies, and we encourage you to review them before providing any personal information on those sites. We are not responsible for the privacy practices or content of these third-party websites.</p>
-                </div>
-              </div>
-              
-              <div class="accordion-item">
-                <p class="fs-4 accordion-header" id="headerDataSecurity">
-                  <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#privDataSecurity" aria-expanded="true" aria-controls="privDataSecurity">
-                    Data Security
-                  </button>
-                </p>
-                <div id="privDataSecurity" class="accordion-collapse collapse p-3" aria-labelledby="headerDataSecurity" data-bs-parent="#accPrNcContent">
-                  <p>We take the security of your information seriously. While we strive to protect the data we collect, please be aware that no method of transmission over the internet or electronic storage is completely secure. We cannot guarantee the absolute security of your information.</p>
-                </div>
-              </div>
-              
-              <div class="accordion-item">
-                <p class="fs-4 accordion-header" id="headerPrivCHangeNotice">
-                  <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#privChangeNotice" aria-expanded="true" aria-controls="privChangeNotice">
-                    Changes to this Privacy Notice:
-                  </button>
-                </p>
-                <div id="privChangeNotice" class="accordion-collapse collapse p-3" aria-labelledby="headerPrivCHangeNotice" data-bs-parent="#accPrNcContent">
-                  <p>We may update this Privacy Notice from time to time to reflect changes in our practices or for other operational, legal, or regulatory reasons. The updated version will be posted on our website, and the date of the latest revision will be indicated at the top of the notice.</p>
-                </div>
-              </div>
-
-              <br>
-
-              <!-- <p class="fs-2">Contact Us</p> -->
-              <p class="fs-4">Finally,</p>
-              <p>If you have any questions or concerns about this Privacy Notice or your interactions with T20Sense, you can contact us at <a class="link-primary link-offset-3-hover link-underline link-underline-opacity-0 link-underline-opacity-100-hover" href="mailto:admin@cloudkarya.com">admin@cloudkarya.com</a>.<br>Thank you for choosing T20Sense. Enjoy browsing the cricket match scorecards without worrying about your privacy!</p>
-              <div>
-                <p class="my-0">Sincerely,</p>
-                <p class="my-0">T20Sense</p>
-                <p class="mt-0"><a class="link-primary link-offset-3-hover link-underline link-underline-opacity-0 link-underline-opacity-100-hover" href="mailto:admin@cloudkarya.com">admin@cloudkarya.com</a></p>
-              </div>
-              <p>Last updated: 01-Sept-2023</p>
-            </div>
-          </div>
-        </div>
-      </div>
-      <div class="container mt-2">
-        <div class="row">
-          <div class="col-4">
-            <p class="fs-5 mb-1">Contact Us</p>
-            <p class="my-0">Email: <a class="link-primary link-offset-3-hover link-underline link-underline-opacity-0 link-underline-opacity-100-hover" href="mailto:admin@cloudkarya.com">admin@cloudkarya.com</a></p>
-            <p>Phone: <a class="link-primary link-offset-3-hover link-underline link-underline-opacity-0 link-underline-opacity-100-hover" href="tel:+1 4084217409">+1 408-421-7409</a></p>
-          </div>
-          <div class="col-4 text-center">
-            <p class="fs-5 mb-1">Links</p>
-            <ul class="list-unstyled">
-              <li><a class="link-primary link-offset-3-hover link-underline link-underline-opacity-0 link-underline-opacity-100-hover" href="/">Home</a></li>
-              <li><a class="link-primary link-offset-3-hover link-underline link-underline-opacity-0 link-underline-opacity-100-hover" href="/">IPL</a></li>
-              <li><a class="link-primary link-offset-3-hover link-underline link-underline-opacity-0 link-underline-opacity-100-hover" href="#">Info</a></li>
-            </ul>
-          </div>
-          <div class="col-4 text-end">
-            <p class="fs-5 mb-1">Social Media</p>
-            <ul class="list-unstyled">
-                <li><a class="link-primary link-offset-3-hover link-underline link-underline-opacity-0 link-underline-opacity-100-hover" href="#">Facebook</a></li>
-                <li><a class="link-primary link-offset-3-hover link-underline link-underline-opacity-0 link-underline-opacity-100-hover" href="#">Twitter</a></li>
-                <li><a class="link-primary link-offset-3-hover link-underline link-underline-opacity-0 link-underline-opacity-100-hover" href="#">Instagram</a></li>
-            </ul>
-          </div>
-        </div>
-      </div>
-      <hr>
-    </footer>
+    <!-- Footer -->
+    {% include "layout/footer.html" %}
   </body>
 </html>

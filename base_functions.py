@@ -1,6 +1,53 @@
-import pandas as pd, requests, traceback, os
-from stats import get_series_data_from_bucket, get_match_data_from_bucket
+import pandas as pd, traceback, os, pickle
 from google.cloud import storage
+
+# Set the path to your service account key file
+os.environ['GOOGLE_APPLICATION_CREDENTIALS'] = os.getenv('API_KEY') # 't20-sense-main.json'
+
+# Create a client using the credentials
+storage_client = storage.Client()
+
+# Base Functions
+def get_series_data_from_bucket(series_id):
+  try:
+    bucket_name = os.getenv('BUCKET_NAME')
+    # fp stands for File Path
+    fp = f't20_sense_series_info/s_{series_id}_data.pkl'
+    bucket = storage_client.get_bucket(bucket_name)
+    # Get the blob (file) from the bucket
+    blob = bucket.blob(fp)
+    # Lets us know whether bucket is used or API
+    print("Using GCS Bucket to get Series Data")
+    # Download the pickle file data as bytes
+    pickled_data = blob.download_as_bytes()
+    # Load the pickled data
+    ld = pickle.loads(pickled_data)
+  except:
+    import requests
+    print("GCS Bucket has some exception. So turning to ESPN Cricinfo API to get Series Data")
+    url = f"https://hs-consumer-api.espncricinfo.com/v1/pages/series/schedule?lang=en&seriesId={series_id}"
+    ld = requests.get(url).json()
+  return ld # ld stands for the loaded data that came from JSON
+
+def get_match_data_from_bucket(series_id, match_id):
+  try:
+    bucket_name = os.getenv('BUCKET_NAME')
+    fp = f't20_sense_match_info/s_{series_id}_m_{match_id}_data.pkl' # fp stands for File Path
+    bucket = storage_client.get_bucket(bucket_name)
+    # Get the blob (file) from the bucket
+    blob = bucket.blob(fp)
+    # Lets us know whether bucket is used or API
+    print("Using GCS Bucket to get Match Data")
+    # Download the pickle file data as bytes
+    pickled_data = blob.download_as_bytes()
+    # Load the pickled data
+    ld = pickle.loads(pickled_data)
+  except:
+    import requests
+    print("GCS Bucket has some exception. So turning to ESPN Cricinfo API to get Match Data")
+    url = f"https://hs-consumer-api.espncricinfo.com/v1/pages/match/home?lang=en&seriesId={series_id}&matchId={match_id}"
+    ld = requests.get(url).json()
+  return ld # ld stands for the loaded data that came from JSON
 
 def get_match_ids_from_series(series_id):
   try:

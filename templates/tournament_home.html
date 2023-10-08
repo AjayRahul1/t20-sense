@@ -3,7 +3,10 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Tournament Home</title>
+  <title>
+    {% if tournament_title %}{{ tournament_title }}
+    {% else %} Tournament Home {% endif %}
+  </title>
   
   <!-- Google tag (gtag.js) -->
   <script async src="https://www.googletagmanager.com/gtag/js?id=G-LWDCC125HK"></script>
@@ -22,42 +25,51 @@
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-4bw+/aepP/YC94hEpVNVgiZdgIC5+VKNBQNGCHeKRQN+PtmoHDEXuppvnDJzQIu9" crossorigin="anonymous">
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/js/bootstrap.bundle.min.js" integrity="sha384-HwwvtgBNo3bZJJLYd8oVXjrBZt8cqVSpeBNS5n7C8IVInixGAoxmnlMuBnhbgrkm" crossorigin="anonymous"></script>
   
-  <script type="text/javascript" src="static/script.js"></script>
+  <script type="text/javascript" src="script.js"></script>
 </head>
 <body>
+  <!-- Navbar -->
   {% include "layout/navbar.html" %}
-  <div class="container">
-    <div class="row" id="links-list"></div>
+  
+  <div class="container mt-2">
+    <div class="container">
+      <div class="row" id="links-list"></div>
+    </div>
   </div>
+
+  <!-- Footer -->
+  {% include "layout/footer.html" %}
 </body>
 </html>
-
+<!-- Javascript Functions -->
 <script>
   function createCard(link) {
     const card = document.createElement("div");
-    card.className = "col-md-4 mb-3";
+    card.className = "col-md-3 mb-2";
 
     const cardContent = `
     <a class="link-dark link-offset-2-hover link-underline link-underline-opacity-0 link-underline-opacity-100-hover" href="${link.url}">
         <div class="card">
             <div class="card-body">
-                <p class="card-title fs-5">${link.title}</p>
+                <p class="card-title fs-5 text-center">${link.title}</p>
             </div>
         </div>
-    </a>
-    `;
+    </a>`;
 
     card.innerHTML = cardContent;
     return card;
   }
-  fetch("/api/series-links")
-      .then(response => response.json())
-      .then(links => {
-          const linksList = document.getElementById("links-list");
-          links.forEach(link => {
-              const card = createCard(link);
-              linksList.appendChild(card);
-          });
-      })
-      .catch(error => console.error("Error fetching links:", error)); 
+  function getTournamentData(seriesTitle) {
+    fetch("/api/series-links/" + seriesTitle)
+        .then(response => response.json())
+        .then(links => {
+            const linksList = document.getElementById("links-list");
+            links.forEach(link => {
+                const card = createCard(link);
+                linksList.appendChild(card);
+            });
+        })
+        .catch(error => console.error("Error fetching links:", error));
+  }
+  getTournamentData("IPL")
 </script>

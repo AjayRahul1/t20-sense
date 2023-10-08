@@ -4,18 +4,18 @@ from fastapi.templating import Jinja2Templates
 from starlette.responses import RedirectResponse
 from fastapi.staticfiles import StaticFiles
 import pandas as pd, traceback
-
-# Load .env variables into the environment
-from dotenv import load_dotenv
-load_dotenv()
+import dotenv
 
 from ipl_func import get_particular_match_whole_score, get_match_info, get_team_name_score_ground, get_graphical_stats_from_each_ball_data
-from functionality import get_match_ids_from_series_fast
+from base_functions import get_match_ids_from_series_fast, get_match_data_from_bucket, get_series_data_from_bucket
 from stats import get_man_of_the_match, get_best_shots, fun_best_bowl_peformance, batting_impact_points, bowlers_impact_points, get_ptnship, runs_in_ovs_fig,division_of_runs,DNB,team_squads
 
 app = FastAPI()
 templates = Jinja2Templates(directory="templates")
 app.mount("/static", StaticFiles(directory="static"), name="static")
+
+# Load .env variables into the environment
+dotenv.load_dotenv(".env")
 
 # all_ipl_series_info = get_all_csv_files_from_cloud()
 matches_names_and_ids_dict = {}
@@ -33,7 +33,9 @@ def index(request: Request):
   drdnSerIds = all_ipl_series_ids
   finals_and_champs_df = pd.read_csv('Finals.csv')
   finals_and_champs_df = finals_and_champs_df.to_dict(orient='records')
-  return templates.TemplateResponse("tournament_home.html", {"request": request, "years": all_ipl_series_ids, "finals_and_champs_df":finals_and_champs_df})
+  return templates.TemplateResponse("index.html",
+    {"request": request, "years": all_ipl_series_ids, "finals_and_champs_df": finals_and_champs_df, "tournament_title" : "IPL @ T20Sense"}
+  )
 
 @app.get("/mlc", response_class=HTMLResponse)
 def mlc_home(request: Request):
@@ -48,24 +50,23 @@ def submit_form(series_id: int = Form(...), match_id: int = Form(...)):
   global gbl_series_id, gbl_match_id
   gbl_series_id = series_id
   gbl_match_id = match_id
-  redirect_url = f"/get_scorecard/{series_id}/{match_id}"
+  redirect_url = f"/scorecards/{series_id}/{match_id}"
   return RedirectResponse(url=redirect_url, status_code=303)
 
-@app.get('/api/series-links')
-async def getSeriesLinks():
+@app.get('/api/series-links/{series_title}')
+async def getSeriesLinks(series_title : str):
+  if series_title == "IPL":
     all_series_ids = [313494, 374163, 418064, 466304, 520932, 586733, 695871, 791129, 968923, 1078425, 1131611, 1165643, 1210595, 1249214, 1298423, 1345038]
     st = 2008
     l = []  # l stands for links.
     for i in all_series_ids:
-      l.append({"title" : st, "url" : f"/series/{i}"})
+      l.append({"title" : f"{series_title} {st}", "url" : f"/series/{i}"})
       st = st + 1
-    return l
+  return l
 
 @app.get("/series/{series_id}")
 def seriesPage(series_id: int):
-  import requests
-  url=f"https://hs-consumer-api.espncricinfo.com/v1/pages/series/schedule?lang=en&seriesId={series_id}"
-  reqJSON = requests.get(url).json()
+  reqJSON = get_series_data_from_bucket(series_id=series_id)
   return reqJSON
 
 def updating_match_details_for_refresh(series_id):
@@ -86,9 +87,7 @@ async def ret_match_ids(series_id : int, request : Request):
 
 @app.get("/scorecards/{series_id}/{match_id}", response_class=HTMLResponse)
 async def process(
-    request: Request,
-    series_id: int,
-    match_id: int
+    request: Request, series_id: int, match_id: int
   ):
   try:
     matches_names_and_ids_dict = updating_match_details_for_refresh(series_id)

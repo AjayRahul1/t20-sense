@@ -574,9 +574,7 @@ def get_ptnship(series_id,match_id):
   return i1_partnership,i2_partnership, figdata1, figdata2
 
 def runs_in_ovs_fig(series_id, match_id):
-  url=f"https://hs-consumer-api.espncricinfo.com/v1/pages/match/home?lang=en&seriesId={series_id}&matchId={match_id}"
-  output_p = requests.get(url)
-  content = output_p.json()['content']['innings']
+  content = get_match_data_from_bucket(series_id, match_id)['content']['innings']
   for k in range(0,len(content)):
     inningovers=content[k]['inningOvers']
     if k==0:
@@ -596,21 +594,23 @@ def runs_in_ovs_fig(series_id, match_id):
         ov_runs_2.append(inningovers[i]['overRuns'])
         ov_wkts_2.append(inningovers[i]['overWickets'])
   
-  fig = Figure(figsize=(8, 6))
+  fig1 = Figure(figsize=(8, 6))
+  fig2 = Figure(figsize=(8, 6))
+  
 
-  ax = fig.add_subplot(1, 1, 1)
+  ax = fig1.add_subplot(1, 1, 1)
   ax.set_ylabel('Runs')
   ax.set_xlabel('Overs')
   ax.set_title('Runs Per Over - Innings 1')
   ax.bar(ov_no_1, ov_runs_1)
-  inn1_ovs_runs = conv_to_base64(fig)
+  inn1_ovs_runs = conv_to_base64(fig1)
   
-  ax = fig.add_subplot(1, 1, 1)
+  ax = fig2.add_subplot(1, 1, 1)
   ax.set_ylabel('Runs')
   ax.set_xlabel('Overs')
   ax.set_title('Runs Per Over - Innings 2')
   ax.bar(ov_no_2, ov_runs_2)
-  inn2_ovs_runs = conv_to_base64(fig)
+  inn2_ovs_runs = conv_to_base64(fig2)
   
   return inn1_ovs_runs, inn2_ovs_runs
 
@@ -658,7 +658,6 @@ def division_of_runs(series_id, match_id):
     i1_runs = conv_to_html(fig1)
     i2_runs = conv_to_html(fig2)
     return i1_runs, i2_runs
-
 
 def DNB(series_id,match_id):
   url=f"https://hs-consumer-api.espncricinfo.com/v1/pages/match/home?lang=en&seriesId={series_id}&matchId={match_id}"

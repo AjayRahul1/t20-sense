@@ -3,10 +3,63 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="icon" type="image/png" href="/static/favicon-t20-sense.png">
   <title>Series Page</title>
+
+  <!-- HTMX Import -->
+  <script src="https://unpkg.com/htmx.org@1.9.2"></script>
+
+  <!-- Bootstrap Import -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-4bw+/aepP/YC94hEpVNVgiZdgIC5+VKNBQNGCHeKRQN+PtmoHDEXuppvnDJzQIu9" crossorigin="anonymous">
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/js/bootstrap.bundle.min.js" integrity="sha384-HwwvtgBNo3bZJJLYd8oVXjrBZt8cqVSpeBNS5n7C8IVInixGAoxmnlMuBnhbgrkm" crossorigin="anonymous"></script>
+  
+  <script type="text/javascript" src="script.js"></script>
 </head>
 <body>
   {% include "layout/navbar.html" %}
-  <p>Series Page Text</p>
+  <div class="container">
+    <p class="fs-1">{{ ser_data.series.longName }} {{ser_data.series.year}}</p>
+    <div class="container mt-2">
+      <div class="container">
+        <div class="row" id="links-list"></div>
+      </div>
+    </div>
+  </div>
+
+  {% include "layout/footer.html" %}
 </body>
 </html>
+
+<script>
+  function createCard(link) {
+    const card = document.createElement("div");
+    card.className = "col-md-3 mb-2";
+
+    const cardContent = `
+    <a class="link-dark link-offset-2-hover link-underline link-underline-opacity-0 link-underline-opacity-100-hover" href="/scorecards/${link.series.objectId}/${link.objectId}">
+        <div class="card">
+            <div class="card-body">
+                <p class="text-center">${link.title}</p>
+            </div>
+        </div>
+    </a>`;
+
+    card.innerHTML = cardContent;
+    return card;
+  }
+  function getTournamentData(seriesTitle) {
+    fetch("/api/matches-links/" + seriesTitle)
+        .then(response => response.json())
+        .then(links => {
+            const linksList = document.getElementById("links-list");
+            links.forEach(link => {
+                const card = createCard(link);
+                linksList.appendChild(card);
+            });
+        })
+        .catch(error => console.error("Error fetching links:", error));
+  }
+  // To check whether the Jinja Variable sent 
+  // console.log("API from JS being used for {{ series_name_for_api }} Page")
+  getTournamentData("{{ series_id }}")
+</script>

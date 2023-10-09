@@ -2,3 +2,6 @@
 .env
 venv/
 __pycache__/
+
+# JSON used for page indexing so that we know what API to call.
+!page_indices.json

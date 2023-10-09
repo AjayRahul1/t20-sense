@@ -3,8 +3,7 @@ from fastapi.responses import HTMLResponse
 from fastapi.templating import Jinja2Templates
 from starlette.responses import RedirectResponse
 from fastapi.staticfiles import StaticFiles
-import pandas as pd, traceback
-import dotenv
+import pandas as pd, traceback, dotenv, json
 
 from ipl_func import get_particular_match_whole_score, get_match_info, get_team_name_score_ground, get_graphical_stats_from_each_ball_data
 from base_functions import get_match_ids_from_series_fast, get_match_data_from_bucket, get_series_data_from_bucket
@@ -20,30 +19,35 @@ dotenv.load_dotenv(".env")
 # all_ipl_series_info = get_all_csv_files_from_cloud()
 matches_names_and_ids_dict = {}
 
+# Note: series_name_for_api key is important for every tournament home page since it decides what page we are in.
+with open("page_indices.json", "r") as file:
+  page_indices = json.load(file)
+
 drdnSerIds = {}
 
 gbl_series_id=0
 gbl_match_id=0
 
+all_ipl_series_ids = {1345038: 2023, 1298423: 2022, 1249214: 2021, 1210595: 2020, 1165643: 2019, 1131611: 2018, 1078425: 2017, 968923: 2016, 791129: 2015, 695871: 2014, 586733: 2013, 520932: 2012, 466304: 2011, 418064: 2010, 374163: 2009, 313494: 2008} # Generate a list of years from 2008 to 2023
+mlc_years = {1357742 : 2023}
+
 @app.get("/", response_class=HTMLResponse)
 def index(request: Request):
-  global drdnSerIds
-  all_ipl_series_ids = {1345038: 2023, 1298423: 2022, 1249214: 2021, 1210595: 2020, 1165643: 2019, 1131611: 2018, 1078425: 2017, 968923: 2016, 791129: 2015, 695871: 2014, 586733: 2013, 520932: 2012, 466304: 2011, 418064: 2010, 374163: 2009, 313494: 2008} # Generate a list of years from 2008 to 2023
+  global drdnSerIds, all_ipl_series_ids
   # years = [313494, 374163, 418064, 466304, 520932, 586733, 695871, 791129, 968923, 1078425, 1131611, 1165643, 1210595, 1249214, 1298423, 1345038]
   drdnSerIds = all_ipl_series_ids
-  finals_and_champs_df = pd.read_csv('Finals.csv')
-  finals_and_champs_df = finals_and_champs_df.to_dict(orient='records')
-  return templates.TemplateResponse("index.html",
-    {"request": request, "years": all_ipl_series_ids, "finals_and_champs_df": finals_and_champs_df, "tournament_title" : "IPL @ T20Sense"}
+  finals_and_champs_df = pd.read_csv('Finals.csv').to_dict(orient='records')
+  return templates.TemplateResponse("tournament_home.html",
+    {"request": request, "years": all_ipl_series_ids, "finals_and_champs_df": finals_and_champs_df, "tournament_title" : "IPL - T20Sense", "series_name_for_api": page_indices["0"] }
   )
 
 @app.get("/mlc", response_class=HTMLResponse)
 def mlc_home(request: Request):
-  global drdnSerIds
-  mlc_years = {1357742 : 2023}
+  global drdnSerIds, mlc_years
   drdnSerIds = mlc_years
   mlc_home_p = True
-  return templates.TemplateResponse("index.html", {"request": request, "years": mlc_years, "mlc_home": mlc_home_p})
+  return templates.TemplateResponse("index.html", # page_indices["1"] indicates MLC acc to 
+    {"request": request, "years": mlc_years, "mlc_home": mlc_home_p, "series_name_for_api": page_indices["1"]})
 
 @app.post("/redirect_to_scorecard")
 def submit_form(series_id: int = Form(...), match_id: int = Form(...)):
@@ -55,19 +59,31 @@ def submit_form(series_id: int = Form(...), match_id: int = Form(...)):
 
 @app.get('/api/series-links/{series_title}')
 async def getSeriesLinks(series_title : str):
-  if series_title == "IPL":
-    all_series_ids = [313494, 374163, 418064, 466304, 520932, 586733, 695871, 791129, 968923, 1078425, 1131611, 1165643, 1210595, 1249214, 1298423, 1345038]
-    st = 2008
+  global all_ipl_series_ids, mlc_years
+  st = 2023
+  if series_title == page_indices["0"]:
+    all_series_ids = list(all_ipl_series_ids.keys())
     l = []  # l stands for links.
     for i in all_series_ids:
       l.append({"title" : f"{series_title} {st}", "url" : f"/series/{i}"})
-      st = st + 1
+      st = st - 1
+  if series_title == page_indices["1"]:
+    l = []  # l stands for links.
+    all_series_ids = list(mlc_years.keys())
+    for i in all_series_ids:
+      l.append({"title" : f"{series_title} {st}", "url" : f"/series/{i}"})
+      st = st - 1
   return l
 
+@app.get('/api/matches-links/{series_id}')
+async def getSeriesLinks(series_id : int):
+  ser_json = get_series_data_from_bucket(series_id)
+  return ser_json["content"]["matches"]
+
 @app.get("/series/{series_id}")
-def seriesPage(series_id: int):
-  reqJSON = get_series_data_from_bucket(series_id=series_id)
-  return reqJSON
+def seriesPage(request: Request, series_id: int):
+  ser_data = get_series_data_from_bucket(series_id=series_id)
+  return templates.TemplateResponse("series_page.html", {"request": request, "series_id": series_id, "ser_data": ser_data})
 
 def updating_match_details_for_refresh(series_id):
   global matches_names_and_ids_dict

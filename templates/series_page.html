@@ -20,8 +20,31 @@
   <div class="container">
     <p class="fs-1">{{ ser_data.series.longName }} {{ser_data.series.year}}</p>
     <div class="container mt-2">
+      <!-- All matches links in the series div -->
       <div class="container">
-        <div class="row" id="links-list"></div>
+        <div class="row" id="matchesInSeriesLinks">
+          {% for match in ser_data.content.matches %}
+          <div class="col-md-3 mb-2">
+            <div class="card">
+                <a class="link-dark link-offset-2-hover link-underline link-underline-opacity-0 link-underline-opacity-100-hover" href="/scorecards/{{ match.series.objectId }}/{{ match.objectId }}">
+                  <div class="card-body">
+                    <p>{{ match.title }}</p>
+                    <div class="row">
+                      <div class="mb-1">
+                        <img class="border rounded-circle h-auto w-25 d-inline-block" src="https://img1.hscicdn.com/image/upload/f_auto,t_ds_square_w_80/lsci{{ match.teams[0].team.imageUrl }}" alt="{{ match.teams[0].team.image.caption }}">
+                        <p class="d-inline-block p-1">{{ match.teams[0].team.longName }}</p>
+                      </div>
+                      <div class="mt-1">
+                        <img class="d-inline-block border rounded-circle h-auto w-25" src="https://img1.hscicdn.com/image/upload/f_auto,t_ds_square_w_80/lsci{{ match.teams[1].team.imageUrl }}" alt="{{ match.teams[1].team.image.caption }}">
+                        <p class="d-inline-block p-1">{{ match.teams[1].team.longName }}</p>
+                      </div>
+                    </div>
+                  </div>
+                </a>
+            </div>
+          </div>
+          {% endfor %}
+        </div>
       </div>
     </div>
   </div>
@@ -29,37 +52,3 @@
   {% include "layout/footer.html" %}
 </body>
 </html>
-
-<script>
-  function createCard(link) {
-    const card = document.createElement("div");
-    card.className = "col-md-3 mb-2";
-
-    const cardContent = `
-    <a class="link-dark link-offset-2-hover link-underline link-underline-opacity-0 link-underline-opacity-100-hover" href="/scorecards/${link.series.objectId}/${link.objectId}">
-        <div class="card">
-            <div class="card-body">
-                <p class="text-center">${link.title}</p>
-            </div>
-        </div>
-    </a>`;
-
-    card.innerHTML = cardContent;
-    return card;
-  }
-  function getTournamentData(seriesTitle) {
-    fetch("/api/matches-links/" + seriesTitle)
-        .then(response => response.json())
-        .then(links => {
-            const linksList = document.getElementById("links-list");
-            links.forEach(link => {
-                const card = createCard(link);
-                linksList.appendChild(card);
-            });
-        })
-        .catch(error => console.error("Error fetching links:", error));
-  }
-  // To check whether the Jinja Variable sent 
-  // console.log("API from JS being used for {{ series_name_for_api }} Page")
-  getTournamentData("{{ series_id }}")
-</script>

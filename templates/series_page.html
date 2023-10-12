@@ -24,20 +24,21 @@
         <div class="row" id="matchesInSeriesLinks">
           {% for match in ser_data.content.matches %}
           <div class="col-md-3 mb-2">
-            <div class="card">
+            <div class="card" style="max-height: max-content; max-width: max-content;">
                 <a class="link-dark link-offset-2-hover link-underline link-underline-opacity-0 link-underline-opacity-100-hover" href="/scorecards/{{ match.series.objectId }}/{{ match.objectId }}">
                   <div class="card-body">
                     <p>{{ match.title }}</p>
                     <div class="row">
                       <div class="mb-1">
-                        <img class="border rounded-circle h-auto w-25 d-inline-block" src="https://img1.hscicdn.com/image/upload/f_auto,t_ds_square_w_80/lsci{{ match.teams[0].team.imageUrl }}" alt="{{ match.teams[0].team.image.caption }}">
-                        <p class="d-inline-block p-1">{{ match.teams[0].team.longName }}</p>
+                        <img class="border rounded-circle h-auto w-25 d-inline-block" style="height: 30px; width: 30px;" src="https://img1.hscicdn.com/image/upload/f_auto,t_ds_square_w_80/lsci{{ match.teams[0].team.imageUrl }}" alt="{{ match.teams[0].team.image.caption }}">
+                        <p class="d-inline-block p-1" style="font-size: small;">{{ match.teams[0].team.longName }}</p>
                       </div>
                       <div class="mt-1">
-                        <img class="d-inline-block border rounded-circle h-auto w-25" src="https://img1.hscicdn.com/image/upload/f_auto,t_ds_square_w_80/lsci{{ match.teams[1].team.imageUrl }}" alt="{{ match.teams[1].team.image.caption }}">
-                        <p class="d-inline-block p-1">{{ match.teams[1].team.longName }}</p>
+                        <img class="d-inline-block border rounded-circle h-auto w-25" style="height: 30px; width: 30px;" src="https://img1.hscicdn.com/image/upload/f_auto,t_ds_square_w_80/lsci{{ match.teams[1].team.imageUrl }}" alt="{{ match.teams[1].team.image.caption }}">
+                        <p class="d-inline-block p-1" style="font-size: small;">{{ match.teams[1].team.longName }}</p>
                       </div>
                     </div>
+                    <p class="text-nowrap overflow-hidden" style="font-size: small">{{ match.statusText }}</p>
                   </div>
                 </a>
             </div>

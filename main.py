@@ -38,7 +38,7 @@ def index(request: Request):
   drdnSerIds = all_ipl_series_ids
   finals_and_champs_df = pd.read_csv('Finals.csv').to_dict(orient='records')
   return templates.TemplateResponse("tournament_home.html", # page_indices["0"] indicates IPL acc to page_indices.json
-    {"request": request, "years": all_ipl_series_ids, "finals_and_champs_df": finals_and_champs_df, "tournament_title" : "IPL - T20Sense", "series_name_for_api": page_indices["0"] }
+    {"request": request, "years": all_ipl_series_ids, "finals_and_champs_df": finals_and_champs_df, "tournament_title" : "IPL", "series_name_for_api": page_indices["0"] }
   )
 
 @app.get("/mlc", response_class=HTMLResponse)
@@ -47,7 +47,7 @@ def mlc_home(request: Request):
   drdnSerIds = mlc_years
   mlc_home_p = True
   return templates.TemplateResponse("tournament_home.html", # page_indices["1"] indicates MLC acc to page_indices.json
-    {"request": request, "years": mlc_years, "mlc_home": mlc_home_p, "series_name_for_api": page_indices["1"]})
+    {"request": request, "years": mlc_years, "mlc_home": mlc_home_p, "series_name_for_api": page_indices["1"], "tournament_title" : "MLC"})
 
 @app.post("/redirect_to_scorecard")
 def submit_form(series_id: int = Form(...), match_id: int = Form(...)):

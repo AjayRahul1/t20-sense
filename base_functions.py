@@ -49,16 +49,24 @@ def get_match_data_from_bucket(series_id, match_id):
     ld = requests.get(url).json()
   return ld # ld stands for the loaded data that came from JSON
 
-def get_latest_match_data():
-  # Define a custom sorting key to order the latest matches in the order of SCHEDULED, RUNNING, FINISHED
-  def custom_sort(item):
-    order = {"RUNNING": 0, "SCHEDULED": 1, "FINISHED": 2}
-    return order.get(item['stage'], float('inf'))
-  
+# Define a custom sorting key to order the latest matches in the order of RUNNING, SCHEDULED, FINISHED
+def custom_sort(item):
+  order = {"RUNNING": 0, "SCHEDULED": 1, "FINISHED": 2}
+  return order.get(item['stage'], float('inf'))
+
+def get_latest_intl_match_data():
   import requests
   ld = requests.get("https://hs-consumer-api.espncricinfo.com/v1/pages/matches/current?lang=en&latest=true").json()
   ld['matches'] = sorted(ld['matches'], key=lambda x: x['objectId'])
   ld['matches'] = [it for it in ld['matches'] if it['internationalClassId'] is not None]
+  ld['matches'] = sorted(ld['matches'], key=custom_sort)
+  return ld
+
+def get_latest_domestic_match_data():
+  import requests
+  ld = requests.get("https://hs-consumer-api.espncricinfo.com/v1/pages/matches/current?lang=en&latest=true").json()
+  ld['matches'] = sorted(ld['matches'], key=lambda x: x['objectId'])
+  ld['matches'] = [it for it in ld['matches'] if it['internationalClassId'] is None]
   ld['matches'] = sorted(ld['matches'], key=custom_sort)
   return ld
 

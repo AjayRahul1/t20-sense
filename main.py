@@ -31,8 +31,14 @@ gbl_match_id=0
 all_ipl_series_ids = {1345038: 2023, 1298423: 2022, 1249214: 2021, 1210595: 2020, 1165643: 2019, 1131611: 2018, 1078425: 2017, 968923: 2016, 791129: 2015, 695871: 2014, 586733: 2013, 520932: 2012, 466304: 2011, 418064: 2010, 374163: 2009, 313494: 2008} # Generate a list of years from 2008 to 2023
 mlc_years = {1357742 : 2023}
 
-@app.get("/", response_class=HTMLResponse)
-def index(request: Request):
+@app.get("/")
+def home(request: Request):
+  from base_functions import get_latest_intl_match_data
+  latest_data = get_latest_intl_match_data()
+  return templates.TemplateResponse("home.html",{"request": request, "latest_data":latest_data})
+
+@app.get("/ipl", response_class=HTMLResponse)
+def ipl_home(request: Request):
   global drdnSerIds, all_ipl_series_ids
   # years = [313494, 374163, 418064, 466304, 520932, 586733, 695871, 791129, 968923, 1078425, 1131611, 1165643, 1210595, 1249214, 1298423, 1345038]
   drdnSerIds = all_ipl_series_ids

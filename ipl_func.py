@@ -87,7 +87,7 @@ def get_match_info(series_id,match_id):
         result = output.json()['match']["statusText"]
         match_num = output.json()['match']['title']
         title = team1_sn + " vs " + team2_sn + " " + match_num
-        return team1, team2, match_date.strftime('%B %d %Y'), result, title
+        return match_date.strftime('%B %d %Y'), result, title
     except Exception as e:
         traceback.print_exc()
 

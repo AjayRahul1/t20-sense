@@ -7,7 +7,7 @@ import pandas as pd, traceback, dotenv, json
 
 from ipl_func import get_particular_match_whole_score, get_match_info, get_team_name_score_ground, get_graphical_stats_from_each_ball_data
 from base_functions import get_match_ids_from_series_fast, get_match_data_from_bucket, get_series_data_from_bucket
-from stats import get_man_of_the_match, get_best_shots, fun_best_bowl_peformance, batting_impact_points, bowlers_impact_points, get_ptnship, runs_in_ovs_fig,division_of_runs,DNB,team_squads
+from stats import get_best_shots, fun_best_bowl_peformance, batting_impact_points, bowlers_impact_points, get_ptnship, runs_in_ovs_fig,division_of_runs,DNB,team_squads
 
 app = FastAPI()
 templates = Jinja2Templates(directory="templates")
@@ -119,28 +119,17 @@ async def process(
     print("Series ID: ", series_id)
     # match_id = int(matches_names_and_ids_dict[match_name])
 
-    toss_row_df = get_team_name_score_ground(series_id=series_id, match_id=match_id)
-
-    ground_info = toss_row_df['ground'][0]
-    toss_info = toss_row_df['tossWinnerTeamId'][0] + " won the toss and " + toss_row_df['tossWinnerChoice'][0]
-    team1_name = toss_row_df['team_bat_first'][0]
-    team2_name = toss_row_df['team_bat_second'][0]
-    team1_score = toss_row_df['team1_score'][0]
-    team2_score = toss_row_df['team2_score'][0]
+    match_inn_data = get_match_data_from_bucket(series_id, match_id)
 
     batting1, bowling1, batting2, bowling2 = get_particular_match_whole_score(series_id, match_id)
-
-    innings1_overs = str(bowling1['Balls'].sum()//6) + "." + str(bowling1['Balls'].sum()%6) + " ov"
-    innings2_overs, team2_target =  toss_row_df['team2_score_info'][0].split(', T:')
 
     batting1 = batting1.to_dict(orient='records')
     bowling1 = bowling1.to_dict(orient='records')
     batting2 = batting2.to_dict(orient='records')
     bowling2 = bowling2.to_dict(orient='records')
 
-    team1_name, team2_name, match_date, result, match_title = get_match_info(series_id, match_id)
+    match_date, result, match_title = get_match_info(series_id, match_id)
     
-    man_of_the_match = get_man_of_the_match(series_id, match_id)
     bst_perf_bat_inn1, bst_perf_bat_inn2 = get_best_shots(series_id, match_id)
     bst_perf_bowl_inn1, bst_perf_bowl_inn2 = fun_best_bowl_peformance(series_id, match_id)
 
@@ -162,16 +151,12 @@ async def process(
 
     squad1,squad2 = team_squads(series_id,match_id)
     
-    return templates.TemplateResponse("index.html", {   "selected_year": series_id, "selected_match_id": match_id,
+    return templates.TemplateResponse("index.html", {   "selected_year": series_id, "selected_match_id": match_id, "match_data_json": match_inn_data,
                               "request": request, "years" : drdnSerIds,
                               "batting1": batting1, "bowling1": bowling1,
                               "batting2": batting2, "bowling2": bowling2,
-                              "team1_name": team1_name, "team2_name": team2_name,
                               "match_date": match_date, "result": result, "match_title":match_title,
-                              "ground_info": ground_info, "toss_info": toss_info, "man_of_the_match":man_of_the_match,
-                              "team1_name": team1_name, "team2_name":team2_name,
-                              "team1_score":team1_score, "team2_score":team2_score,
-                              "innings1_overs": innings1_overs, "innings2_overs": innings2_overs, "target" : team2_target,
+                              # "team1_name": team1_name, "team2_name":team2_name, "team1_score":team1_score, "target" : team2_target, "team2_score":team2_score,
                               "bst_perf_bat_inn1": bst_perf_bat_inn1, "bst_perf_bat_inn2": bst_perf_bat_inn2, 
                               "bst_perf_bowl_inn1": bst_perf_bowl_inn1, "bst_perf_bowl_inn2": bst_perf_bowl_inn2, 
                               "imp_pts": imp_pts, "bow_imp_pts": bow_imp_pts,

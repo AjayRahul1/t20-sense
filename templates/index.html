@@ -107,9 +107,17 @@
 
         {% if batting1 and bowling1 %}
         <div class="border rounded text-wrap p-2" style="background-color: #ffffff;">
-          <p class="fw-bold my-1">{{match_title}}, {{match_date}}, {{ground_info}}</p>
-          <p class="my-1">{{toss_info}}</p>
-          <p class="my-1 fw-bold">Man of the Match - {{man_of_the_match}}</p>  <!-- Man of the match -->
+          <p class="fw-bold my-1">{{match_title}}, {{match_data_json.match.daysInfo}}, {{match_data_json.match.ground.name}}</p>
+          <p class="my-1">
+            {% for team_data in match_data_json.match.teams %}
+              {% if team_data.team.id == match_data_json.match.tossWinnerTeamId %}
+                <!-- Setting a Jinja2 Variable for the tossWinnerTeamId -->
+                {{ team_data.team.longName }}, elected to {% if match_data_json.match.tossWinnerChoice == 1 %} bat {% else %} field {% endif %} first.
+                <!-- TeamName elected to bat/field first -->
+              {% endif %}
+            {% endfor %}
+        </p>
+          <p class="my-1 fw-bold">Man of the Match - {{ match_data_json.content.matchPlayerAwards[0].player.longName }}</p>  <!-- Man of the match -->
           <p class="my-1">Result - {{result}}</p>
         </div>
 
@@ -127,16 +135,15 @@
 
         <div class="border rounded mt-2 p-2" style="background-color: #ffffff;">
           <p class="fw-bold my-1" style="margin-block-end: 0;">Team Squads</p>
-          <p class="mb-0"><strong> {{team1_name}}</strong></p>
-          <p class="mt-0">{% for i in squad1 %}{{i}}, {% endfor %}</p>
-          <p class="mb-0"><strong> {{team2_name}}</strong></p>
-          <p class="my-0">{% for i in squad2 %} {{i}}, {% endfor %}</p>
+          <p class="mb-0"><strong> {{ match_data_json.match.teams[0].team.longName }}: </strong>{% for i in squad1 %} {{i}}, {% endfor %}</p>
+          <p class="mb-0"><strong> {{ match_data_json.match.teams[1].team.longName }}: </strong>{% for i in squad2 %} {{i}}, {% endfor %}</p>
         </div>
         
         <!-- 1st Innings -->
         <div class="border rounded mt-2 mb-2" style="background-color: #ffffff;">
           <button class="btn text-start" style="width: 100%; background-color: #e3f2fd; margin: 0;" data-bs-toggle="collapse" data-bs-target="#innings1_scorecard" aria-expanded="false">
-            <p class="font-weight-bold p-1" style="margin-block: 0;">{{team1_name}}</p>
+            <!-- Team 1 name -->
+            <p class="font-weight-bold p-1" style="margin-block: 0;"> {{ match_data_json.match.teams[0].team.longName }} </p>
           </button>
           <div id="innings1_scorecard">
             <table class="table table-sm mb-0">
@@ -176,11 +183,16 @@
               </tbody>
             </table>
             <div>
-              <p class="my-0 p-1"><strong> Did not bat - </strong> {% for b in dnb1 %} {{ b }} | {% endfor %} </p>
+              <p class="my-0 p-1"><strong> Did not bat - </strong> {% for b in dnb1 %} {{ b }}, {% endfor %} </p>
             </div>
             <div style="display: flex; justify-content: space-around;">
-              <p style="margin-block: 0;"> <strong>Total</strong> - {{team1_score}} ({{innings1_overs}})</p>
-              <p style="margin-block: 0;"> <strong>Target</strong> - {{target}}</p>
+              <p style="margin-block: 0;"> <strong>Total</strong> - 
+                {% for team_data in match_data_json.match.teams %}
+                  {% if team_data.inningNumbers[0] == 1 %} {{team_data.score}}
+                    {% if team_data.scoreInfo is none %} (20.0 Ov) {% else %} {{ team_data.scoreInfo }} {% endif %}
+                  {% endif %}
+                {% endfor %}
+              </p>
             </div>
             <table class="table table-sm mb-0">
               <tr class="table-secondary">
@@ -226,7 +238,7 @@
         <div class="border rounded mt-2 mb-2" style="background-color: #ffffff;">
           <button class="btn text-start" style="width: 100%; background-color: #e3f2fd; margin: 0;" data-bs-toggle="collapse" data-bs-target="#innings2_scorecard" aria-expanded="true">
             <div style="background-color: #e3f2fd; margin: 0;">
-              <p class="font-weight-bold p-1" style="margin-block: 0;">{{team2_name}}</p>
+              <p class="font-weight-bold p-1" style="margin-block: 0;">{{ match_data_json.match.teams[1].team.longName }}</p>
             </div>
           </button>
           <div id="innings2_scorecard">
@@ -267,10 +279,15 @@
               </tbody>
             </table>
             <div>   
-              <p class="my-0 p-1"><strong> Did not bat - </strong> {% for b in dnb2 %} {{ b }} | {% endfor %} </p>
+              <p class="my-0 p-1"><strong> Did not bat - </strong> {% for b in dnb2 %} {{ b }}, {% endfor %} </p>
             </div>
             <div class="mt-0" style="display: flex; justify-content: space-around;">
-              <p style="margin-block: 0;"><strong>Total</strong> - {{team2_score}} ({{innings2_overs}})</p>
+              {% set Team2ScoreTrgt = match_data_json.match.teams[1].scoreInfo.split(', T:') %}
+              {% set team2_score = match_data_json.match.teams[1].score %}
+              {% set inn2_ovs = Team2ScoreTrgt[0] %}
+              {% set target = Team2ScoreTrgt[1] %}
+              <p style="margin-block: 0;"><strong>Total</strong> - {{team2_score}} ({{inn2_ovs}})</p>
+              <p style="margin-block: 0;"> <strong>Target</strong> - {{target}}</p>
             </div>
   
             <table class="table table-sm mb-0">

@@ -16,12 +16,12 @@ def get_series_data_from_bucket(series_id):
     bucket = storage_client.get_bucket(bucket_name)
     # Get the blob (file) from the bucket
     blob = bucket.blob(fp)
-    # Lets us know whether bucket is used or API
-    print("Using GCS Bucket to get Series Data")
     # Download the pickle file data as bytes
     pickled_data = blob.download_as_bytes()
     # Load the pickled data
     ld = pickle.loads(pickled_data)
+    # Lets us know whether bucket is used or API
+    print("Using GCS Bucket to get Series Data")
   except:
     import requests
     print("GCS Bucket has some exception. So turning to ESPN Cricinfo API to get Series Data")
@@ -36,12 +36,12 @@ def get_match_data_from_bucket(series_id, match_id):
     bucket = storage_client.get_bucket(bucket_name)
     # Get the blob (file) from the bucket
     blob = bucket.blob(fp)
-    # Lets us know whether bucket is used or API
-    print("Using GCS Bucket to get Match Data")
     # Download the pickle file data as bytes
     pickled_data = blob.download_as_bytes()
     # Load the pickled data
     ld = pickle.loads(pickled_data)
+    # Lets us know whether bucket is used or API
+    print("Using GCS Bucket to get Match Data")
   except:
     import requests
     print("GCS Bucket has some exception. So turning to ESPN Cricinfo API to get Match Data")

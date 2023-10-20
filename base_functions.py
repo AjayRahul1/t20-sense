@@ -58,7 +58,7 @@ def get_latest_intl_match_data():
   import requests
   ld = requests.get("https://hs-consumer-api.espncricinfo.com/v1/pages/matches/current?lang=en&latest=true").json()
   ld['matches'] = sorted(ld['matches'], key=lambda x: x['objectId'])
-  ld['matches'] = [it for it in ld['matches'] if it['internationalClassId'] is not None]
+  ld['matches'] = [it for it in ld['matches'] if it['internationalClassId'] is not None and it['internationalNumber'] is not None]
   ld['matches'] = sorted(ld['matches'], key=custom_sort)
   return ld
 

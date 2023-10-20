@@ -44,10 +44,16 @@
                     <div class="mb-0">
                       <img class="rounded d-inline-block" style="height: 40px; width: 40px;" src="https://img1.hscicdn.com/image/upload/f_auto,t_ds_square_w_80/lsci{{ match.teams[0].team.imageUrl }}" alt="{{ match.teams[0].team.image.caption }}">
                       <p class="d-inline-block p-1" style="font-size: x-small;">{{ match.teams[0].team.longName }}</p>
+                      {% if match.teams[0].score is not none %}
+                      <p class="d-inline-block p-1 fw-bold" style="font-size: x-small;">{{ match.teams[0].score }}</p>
+                      {% endif %}
                     </div>
                     <div class="mb-0">
                       <img class="d-inline-block rounded" style="height: 40px; width: 40px;" src="https://img1.hscicdn.com/image/upload/f_auto,t_ds_square_w_80/lsci{{ match.teams[1].team.imageUrl }}" alt="{{ match.teams[1].team.image.caption }}">
                       <p class="d-inline-block px-1" style="font-size: x-small;">{{ match.teams[1].team.longName }}</p>
+                      {% if match.teams[1].score is not none %}
+                      <p class="d-inline-block p-1 fw-bold" style="font-size: x-small;">{{ match.teams[0].score }}</p>
+                      {% endif %}
                     </div>
                     <p class="text-nowrap overflow-hidden mt-0 mb-0" style="font-size: x-small">{{ match.statusText }}</p>
                   </div>

@@ -101,7 +101,7 @@ def preprocessing_innings_df(req_response):
   cols = ["batsman", "bowler", "title", "batsmanPlayerId", "bowlerPlayerId", "noballs", "legbyes", "byes", "wides",
           "isFour", "isSix", "isWicket", "totalRuns", "batsmanRuns", "dismissalType"]
   main_df = pd.json_normalize(data=req_response.json()['comments'])
-
+  print(main_df)
   # Splitting the features of title to batsman and batsman
   main_df[['bowler', 'batsman']] = main_df['title'].str.split(' to ', expand=True).iloc[:, :2]
 
@@ -253,13 +253,16 @@ def scorecard_to_csv_gen(series_id, match_id):
     bowling.to_csv(f'ser{series_id}_mat{match_id}_inn{match_innings}_bowling.csv', index=False)
 
 def get_particular_match_whole_score(series_id, match_id):
-  batting = {}
-  bowling = {}
-  for match_innings in [1,2]:
-    batting[match_innings],bowling[match_innings] = get_innings_df(series_id, match_id, match_innings)
-
-  asyncio.sleep(1)
-  return batting[1], bowling[1], batting[2], bowling[2]
+  batting1 = pd.DataFrame()
+  bowling1 = pd.DataFrame()
+  batting2 = pd.DataFrame()
+  bowling2 = pd.DataFrame()
+  try:
+    batting1, bowling1 = get_innings_df(series_id, match_id, 1)
+    batting2, bowling2 = get_innings_df(series_id, match_id, 2)
+  except Exception as e:
+    traceback.print_exc(e)
+  return batting1, bowling1, batting2, bowling2
 
 def get_request_response_API(series_id, match_id, innings_id):
   url = f'https://hs-consumer-api.espncricinfo.com/v1/pages/match/comments?lang=en&seriesId={series_id}&matchId={match_id}&inningNumber={innings_id}&commentType=ALL&sortDirection=DESC&fromInningOver=-1'

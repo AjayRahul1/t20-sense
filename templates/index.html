@@ -175,11 +175,11 @@
             <div><p class="my-0 p-1"><strong>Did not bat - </strong> {% for b in dnb1 %} {{ b }}, {% endfor %}</p></div>
             <div style="display: flex; justify-content: space-around;">
               <p style="margin-block: 0;"> <strong>Total</strong> - 
-                {% for team_data in match_data_json.match.teams %}
-                  {% if team_data.inningNumbers[0] == 1 %} {{team_data.score}}
-                    {% if team_data.scoreInfo is none %} (20.0 Ov) {% else %} {{ team_data.scoreInfo }} {% endif %}
-                  {% endif %}
-                {% endfor %}
+                {% if match_data_json.match.teams[0].score is not none %} {{ match_data_json.match.teams[0].score }}
+                  {% if match_data_json.match.teams[0].scoreInfo is none %} ({{ match_data_json.match.scheduledOvers }} Ov) {% else %} {{ match_data_json.match.teams[0].scoreInfo }} {% endif %}
+                {% else %}
+                  Yet to bat..
+                {% endif %}
               </p>
             </div>
             <div class="table-responsive">

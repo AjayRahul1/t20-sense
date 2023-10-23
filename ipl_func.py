@@ -78,10 +78,8 @@ def get_match_info(series_id,match_id):
         team1 = output.json()['match']["teams"][0]["team"]["longName"]
         team1_sn = output.json()['match']["teams"][0]["team"]["abbreviation"]
 
-
         team2 = output.json()['match']["teams"][1]["team"]["longName"]
         team2_sn = output.json()['match']["teams"][1]["team"]["abbreviation"]
-
 
         match_date = datetime.strptime(output.json()['match']['startDate'].split("T")[0], '%Y-%m-%d')
         result = output.json()['match']["statusText"]
@@ -101,7 +99,6 @@ def preprocessing_innings_df(req_response):
   cols = ["batsman", "bowler", "title", "batsmanPlayerId", "bowlerPlayerId", "noballs", "legbyes", "byes", "wides",
           "isFour", "isSix", "isWicket", "totalRuns", "batsmanRuns", "dismissalType"]
   main_df = pd.json_normalize(data=req_response.json()['comments'])
-  print(main_df)
   # Splitting the features of title to batsman and batsman
   main_df[['bowler', 'batsman']] = main_df['title'].str.split(' to ', expand=True).iloc[:, :2]
 
@@ -221,9 +218,7 @@ def batting_df_pre_operations(batsman_df):
 
 def get_innings_df(series_id, match_id, innings):
   # get respone from API and the data and save to req_response
-  req_response = requests.get(
-      f"https://hs-consumer-api.espncricinfo.com/v1/pages/match/comments?lang=en&seriesId={series_id}&matchId={match_id}&inningNumber={innings}&commentType=ALL&sortDirection=DESC&fromInningOver=-1"
-      )
+  req_response = requests.get(f"https://hs-consumer-api.espncricinfo.com/v1/pages/match/comments?lang=en&seriesId={series_id}&matchId={match_id}&inningNumber={innings}&commentType=ALL&sortDirection=DESC&fromInningOver=-1")
 
   # Preprocessing the dataframe required
   # Getting Batsman and Bowling Dataframes separated
@@ -253,15 +248,17 @@ def scorecard_to_csv_gen(series_id, match_id):
     bowling.to_csv(f'ser{series_id}_mat{match_id}_inn{match_innings}_bowling.csv', index=False)
 
 def get_particular_match_whole_score(series_id, match_id):
-  batting1 = pd.DataFrame()
-  bowling1 = pd.DataFrame()
-  batting2 = pd.DataFrame()
-  bowling2 = pd.DataFrame()
   try:
     batting1, bowling1 = get_innings_df(series_id, match_id, 1)
+  except:
+    batting1 = pd.DataFrame()
+    bowling1 = pd.DataFrame()
+  
+  try:
     batting2, bowling2 = get_innings_df(series_id, match_id, 2)
-  except Exception as e:
-    traceback.print_exc(e)
+  except:
+    batting2 = pd.DataFrame()
+    bowling2 = pd.DataFrame()
   return batting1, bowling1, batting2, bowling2
 
 def get_request_response_API(series_id, match_id, innings_id):
@@ -351,21 +348,28 @@ def get_one_innings_from_extracted_data(series_id, match_id, innings_id):
 
 def get_graphical_stats_from_each_ball_data(series_id, match_id):
   # Ball By Ball for 1st innings
-  req_response = get_request_response_API(series_id, match_id, 1)
-  ball_by_ball_json = pd.json_normalize(data=req_response.json()['comments'])
-  
-  inn1_team_color = get_match_info_response_API(series_id, match_id)['content']['innings'][0]['team']['primaryColor']
-  inn2_team_color = get_match_info_response_API(series_id, match_id)['content']['innings'][1]['team']['primaryColor']
-
-  nparr_each_ball_score_inn1 = np.array(ball_by_ball_json['totalInningRuns'])
-  nparr_over_no_where_team_score_at_inn1 = np.array(ball_by_ball_json['oversActual'])
+  try:
+    req_response = get_request_response_API(series_id, match_id, 1)
+    ball_by_ball_json = pd.json_normalize(data=req_response.json()['comments'])
+    inn1_team_color = get_match_info_response_API(series_id, match_id)['content']['innings'][0]['team']['primaryColor']
+    nparr_each_ball_score_inn1 = np.array(ball_by_ball_json['totalInningRuns'])
+    nparr_over_no_where_team_score_at_inn1 = np.array(ball_by_ball_json['oversActual'])
+  except:
+    inn1_team_color = "#00FFFFFF"
+    nparr_each_ball_score_inn1 = np.array([])
+    nparr_over_no_where_team_score_at_inn1 = np.array([])
   
   # Ball By Ball for 2nd innings
-  req_response = get_request_response_API(series_id, match_id, 2)
-  ball_by_ball_json = pd.json_normalize(data=req_response.json()['comments'])
-  
-  nparr_each_ball_score_inn2 = np.array(ball_by_ball_json['totalInningRuns'])
-  nparr_over_no_where_team_score_at_inn2 = np.array(ball_by_ball_json['oversActual'])
+  try:
+    req_response = get_request_response_API(series_id, match_id, 2)
+    ball_by_ball_json = pd.json_normalize(data=req_response.json()['comments'])
+    inn2_team_color = get_match_info_response_API(series_id, match_id)['content']['innings'][1]['team']['primaryColor']
+    nparr_each_ball_score_inn2 = np.array(ball_by_ball_json['totalInningRuns'])
+    nparr_over_no_where_team_score_at_inn2 = np.array(ball_by_ball_json['oversActual'])
+  except:
+    inn2_team_color = "#00FFFFFF"
+    nparr_each_ball_score_inn2 = np.array([])
+    nparr_over_no_where_team_score_at_inn2 = np.array([])
 
   fig = Figure()
   ax = fig.add_subplot(1, 1, 1)
@@ -382,19 +386,19 @@ def get_graphical_stats_from_each_ball_data(series_id, match_id):
   return line_plot_cumulative_team_score_graph_base64
 
 def get_matches_returns_list(series_id, stage="FINISHED"):
-    try:
-        url = f"https://hs-consumer-api.espncricinfo.com/v1/pages/series/schedule?lang=en&seriesId={series_id}"
-        output = requests.get(url)
-        matches = output.json()['content']["matches"]
-        df = pd.json_normalize(data=matches)
-        if stage:
-            df = df[df['stage']==stage]
-        df.rename(columns={"objectId": "match_id", "slug": "match_name"}, inplace=True)
-        df = pd.DataFrame(df[['match_id', 'match_name']].to_dict('records'))
-        df = df['match_id'].to_list()
-        return df
-    except Exception as e:
-        traceback.print_exc()
+  try:
+    url = f"https://hs-consumer-api.espncricinfo.com/v1/pages/series/schedule?lang=en&seriesId={series_id}"
+    output = requests.get(url)
+    matches = output.json()['content']["matches"]
+    df = pd.json_normalize(data=matches)
+    if stage:
+        df = df[df['stage']==stage]
+    df.rename(columns={"objectId": "match_id", "slug": "match_name"}, inplace=True)
+    df = pd.DataFrame(df[['match_id', 'match_name']].to_dict('records'))
+    df = df['match_id'].to_list()
+    return df
+  except Exception as e:
+    traceback.print_exc()
 
 """## Get single series Ball by Ball Data"""
 
@@ -437,34 +441,3 @@ def get_all_series_info(all_series_ids_list):
         print(f'The series {series_iter} - match {match_id_iter} - innings {innings_iter} did not take place')
         continue
   return temp_df_to_concat
-  
-def get_all_toss_info(series_id):
-  client, bucket = set_cloud_bucket_env()
-  files_path = {}
-  # Get the blob (file) from the bucket
-  blob1 = bucket.blob(f"all_series_toss_info/{series_id}_toss_info.csv")
-
-  # Read the file contents into memory
-  file_content1 = blob1.download_as_text()
-
-  # Create a StringIO object to treat the file content as a file-like object
-  csv_io = io.StringIO(file_content1)
-
-  files_path[series_id] = pd.read_csv(csv_io)
-  return files_path
-
-def get_team_name_score_ground(series_id, match_id):
-  all_toss_infos = get_all_toss_info(series_id)
-  particular_match_toss_info = all_toss_infos[series_id]
-  particular_match_toss_info = pd.DataFrame(particular_match_toss_info)
-  particular_match_toss_info = particular_match_toss_info[particular_match_toss_info['match_id'] == match_id]
-  particular_match_toss_info.reset_index(drop=True, inplace=True)
-  return particular_match_toss_info
-
-def get_best_shots(series_id, match_id):
-  url = f"https://hs-consumer-api.espncricinfo.com/v1/pages/match/home?lang=en&seriesId={series_id}&matchId={match_id}"
-  response = requests.get(url)
-  bst_perf_bat = response.json()['content']['bestPerformance']['batsmen']
-  perf_bat_inn1 = f"{bst_perf_bat[0]['teamAbbreviation']} - {bst_perf_bat[0]['player']['longName']} with {bst_perf_bat[0]['shot']} shot scoring {bst_perf_bat[0]['shotRuns']} out of {bst_perf_bat[0]['runs']} runs"
-  perf_bat_inn2 = f"{bst_perf_bat[1]['teamAbbreviation']} - {bst_perf_bat[1]['player']['longName']} with {bst_perf_bat[1]['shot']} shot scoring {bst_perf_bat[1]['shotRuns']} out of {bst_perf_bat[1]['runs']} runs"
-  return perf_bat_inn1, perf_bat_inn2

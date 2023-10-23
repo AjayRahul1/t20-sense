@@ -5,9 +5,9 @@ from starlette.responses import RedirectResponse
 from fastapi.staticfiles import StaticFiles
 import pandas as pd, traceback, dotenv, json
 
-from ipl_func import get_particular_match_whole_score, get_match_info, get_team_name_score_ground, get_graphical_stats_from_each_ball_data
+from ipl_func import get_particular_match_whole_score, get_match_info, get_graphical_stats_from_each_ball_data
 from base_functions import get_match_ids_from_series_fast, get_match_data_from_bucket, get_series_data_from_bucket
-from stats import get_best_shots, fun_best_bowl_peformance, batting_impact_points, bowlers_impact_points, get_ptnship, runs_in_ovs_fig,division_of_runs,DNB,team_squads
+from stats import batting_impact_points, bowlers_impact_points, get_ptnship, runs_in_ovs_fig,division_of_runs,DNB,team_squads
 
 app = FastAPI()
 templates = Jinja2Templates(directory="templates")
@@ -60,7 +60,7 @@ def submit_form(series_id: int = Form(...), match_id: int = Form(...)):
   global gbl_series_id, gbl_match_id
   gbl_series_id = series_id
   gbl_match_id = match_id
-  redirect_url = f"/scorecards/{series_id}/{match_id}"
+  redirect_url = f"/series/{series_id}/{match_id}/full-scorecard"
   return RedirectResponse(url=redirect_url, status_code=303)
 
 @app.get('/api/series-links/{series_title}')
@@ -107,7 +107,7 @@ async def ret_match_ids(series_id : int, request : Request):
 # async def get_impact_points(request : Request, series_id: int, match_id: int):
 #   return templates.TemplateResponse('content_templates/imp_pts_tbl.html', {"request" : request, })
 
-@app.get("/scorecards/{series_id}/{match_id}", response_class=HTMLResponse)
+@app.get("/series/{series_id}/{match_id}/full-scorecard", response_class=HTMLResponse)
 async def process(
     request: Request, series_id: int, match_id: int
   ):
@@ -130,35 +130,44 @@ async def process(
 
     match_date, result, match_title = get_match_info(series_id, match_id)
     
-    bst_perf_bat_inn1, bst_perf_bat_inn2 = get_best_shots(series_id, match_id)
-    bst_perf_bowl_inn1, bst_perf_bowl_inn2 = fun_best_bowl_peformance(series_id, match_id)
-
-    imp_pts, ptnrshp_df = batting_impact_points(series_id, match_id)  # Batting impact points
-    bat_df,bow_imp_pts = bowlers_impact_points(series_id,match_id)  #Bowlers impact points
-    imp_pts = imp_pts.to_dict(orient='records')
-    bow_imp_pts = bow_imp_pts.to_dict(orient='records')
+    imp_pts = {}
+    bow_imp_pts = {}
+    try:
+      imp_pts, ptnrshp_df = batting_impact_points(series_id, match_id)  # Batting impact points
+      bat_df, bow_imp_pts = bowlers_impact_points(series_id,match_id)  #Bowlers impact points
+      imp_pts = imp_pts.to_dict(orient='records')
+      bow_imp_pts = bow_imp_pts.to_dict(orient='records')
+    except Exception:
+      imp_pts = {}
+      bow_imp_pts = {}
 
     line_plot_cumulative_team_score_graph_base64 = get_graphical_stats_from_each_ball_data(series_id=series_id, match_id=match_id)
-    
-    i1_ptnr_df, i2_ptnr_df, ptnr_f1, ptnr_f2 = get_ptnship(series_id, match_id)
-    i1_ptnr_df = i1_ptnr_df.to_dict(orient='records')
-    i2_ptnr_df = i2_ptnr_df.to_dict(orient='records')
-    i1_ovs_runs, i2_ovs_runs = runs_in_ovs_fig(series_id, match_id)
+    i1_ptnr_df = {}
+    i2_ptnr_df = {}
+    ptnr_f1 = {}
+    ptnr_f2 = {}
+    try:
+      i1_ptnr_df, i2_ptnr_df, ptnr_f1, ptnr_f2 = get_ptnship(series_id, match_id)
+      i1_ptnr_df = i1_ptnr_df.to_dict(orient='records')
+      i2_ptnr_df = i2_ptnr_df.to_dict(orient='records')
+    except:
+      i1_ptnr_df = {}
+      i2_ptnr_df = {}
+      ptnr_f1 = {}
+      ptnr_f2 = {}
 
+    i1_ovs_runs, i2_ovs_runs = runs_in_ovs_fig(series_id, match_id)
     i1_runs,i2_runs=division_of_runs(series_id,match_id)
 
     dnb1,dnb2 = DNB(series_id,match_id)
 
     squad1,squad2 = team_squads(series_id,match_id)
-    
+
     return templates.TemplateResponse("index.html", {   "selected_year": series_id, "selected_match_id": match_id, "match_data_json": match_inn_data,
                               "request": request, "years" : drdnSerIds,
                               "batting1": batting1, "bowling1": bowling1,
                               "batting2": batting2, "bowling2": bowling2,
                               "match_date": match_date, "result": result, "match_title":match_title,
-                              # "team1_name": team1_name, "team2_name":team2_name, "team1_score":team1_score, "target" : team2_target, "team2_score":team2_score,
-                              "bst_perf_bat_inn1": bst_perf_bat_inn1, "bst_perf_bat_inn2": bst_perf_bat_inn2, 
-                              "bst_perf_bowl_inn1": bst_perf_bowl_inn1, "bst_perf_bowl_inn2": bst_perf_bowl_inn2, 
                               "imp_pts": imp_pts, "bow_imp_pts": bow_imp_pts,
                               "ptnr_df1": i1_ptnr_df, "ptnr_df2": i2_ptnr_df,
                               "ptnr_f1" : ptnr_f1, "ptnr_f2" : ptnr_f2,
@@ -167,7 +176,6 @@ async def process(
                               "squad1" : squad1, "squad2" : squad2,
                               "i1_ov_runs": i1_ovs_runs, "i2_ov_runs": i2_ovs_runs,
                               "each_team_cumulative_score_per_over" : line_plot_cumulative_team_score_graph_base64 })
-  except Exception as e:
+  except:
     traceback.print_exc()
     return templates.TemplateResponse('error_pages/no_scorecard.html', {"request": request})
-

@@ -23,282 +23,210 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-4bw+/aepP/YC94hEpVNVgiZdgIC5+VKNBQNGCHeKRQN+PtmoHDEXuppvnDJzQIu9" crossorigin="anonymous">
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/js/bootstrap.bundle.min.js" integrity="sha384-HwwvtgBNo3bZJJLYd8oVXjrBZt8cqVSpeBNS5n7C8IVInixGAoxmnlMuBnhbgrkm" crossorigin="anonymous"></script>
   </head>
-  <body class="bg-light">
+  <body>
     <!-- Navigation Bar -->
     {% include "layout/navbar.html" %}
-    
-    <div class="row m-2">
-      <!-- 2nd Frame --> <!-- Data displayed in center -->
-      <div class="col-lg-8 col-12 mb-3">
-        {% if mlc_home %}
-        <div class="p-3" id="mlc-content">
-          <p class="fs-1">MLC - Major Cricket League</p>
-          <img class="border rounded" src="static/mlc-teams-bg.jpeg" width="100%" height="min-content" alt="MLC Header">  
-          <p class="mt-1">It is a professional T20 league in the USA (United States of America), and it debuted in July 2023 with six teams representing the country's major cities. The inaugural MLC champions, MI New York, were announced at the league's final on July 31, 2023. 
-          the teams that were part of the MLC inaugural edition were
-          <ul>
-            <li>MI New York (MI NY)</li>
-            <li>Texas Super Kings (TSK)</li>
-            <li>Seattle Orcas (SEA)</li>
-            <li>Washington Freedom (WSH)</li>
-            <li>San Francisco Unicorns (SF)</li>
-            <li>Los Angeles Knight Riders (LAKR)</li>
-          </ul>
-          </p>
-          <p><strong>Nicholas pooran</strong> a MI explosive batsman has been aggregated as leading run getter of the tournament</p>
-          <p><strong>Trent Boult</strong>, a pitcher for MI, has been named the tournament's top wicket-taker overall.</p>
-        </div>
-        {% endif %}
+    <div class="container">
+      <div class="row">
+      <!-- 1st Frame -->
+        <div class="col-lg-8 col-12 mb-3">
+          {% if mlc_home %}
+          <div class="p-3" id="mlc-content">
+            <p class="fs-1">MLC - Major Cricket League</p>
+            <img class="border rounded" src="static/mlc-teams-bg.jpeg" width="100%" height="min-content" alt="MLC Header">  
+            <p class="mt-1">It is a professional T20 league in the USA (United States of America), and it debuted in July 2023 with six teams representing the country's major cities. The inaugural MLC champions, MI New York, were announced at the league's final on July 31, 2023. 
+            the teams that were part of the MLC inaugural edition were
+            <ul>
+              <li>MI New York (MI NY)</li>
+              <li>Texas Super Kings (TSK)</li>
+              <li>Seattle Orcas (SEA)</li>
+              <li>Washington Freedom (WSH)</li>
+              <li>San Francisco Unicorns (SF)</li>
+              <li>Los Angeles Knight Riders (LAKR)</li>
+            </ul>
+            </p>
+            <p><strong>Nicholas pooran</strong> a MI explosive batsman has been aggregated as leading run getter of the tournament</p>
+            <p><strong>Trent Boult</strong>, a pitcher for MI, has been named the tournament's top wicket-taker overall.</p>
+          </div>
+          {% endif %}
 
-        <!-- Finals and Champions Table Division -->
-        {% if not batting1 and finals_and_champs_df %}
-        <div class="border rounded overflow-hidden" style="background-color: #ffffff;">
-          <p class="fw-bold p-2 border rounded-top" style="margin-bottom: 0; background-color: #bbe6f0;">
-            Finals & Champions
-          </p>
-          <table class="table table-sm table-striped" style="width: 100%; margin-bottom: 0;">
-            <thead>
-              <tr>
-                <th class="px-2">Year</th>
-                <th>Final</th>
-                <th>Champion</th>
-                <th>Runner Up</th>
-                <th>Orange Cap</th>
-                <th>Purple Cap</th>
-              </tr>
-            </thead>
-            <tbody>
-              {% for data in finals_and_champs_df %}
+          <!-- Finals and Champions Table Division -->
+          {% if not batting1 and finals_and_champs_df %}
+          <div class="border rounded overflow-hidden bg-light">
+            <p class="fw-bold p-2 border rounded-top" style="margin-bottom: 0; background-color: #bbe6f0;">
+              Finals & Champions
+            </p>
+            <table class="table table-sm table-striped" style="width: 100%; margin-bottom: 0;">
+              <thead>
                 <tr>
-                  <td class="px-2">{{data.Year}}</td>
-                  <td>{{data.Final}}</td>
-                  <td class="fw-bold">{{data['Champions']}}</td>
-                  <td>{{data['Runner up']}}</td>
-                  <td>{{data['Orange Cap']}}</td>
-                  <td>{{data['Purple Cap']}}</td>
+                  <th class="px-2">Year</th>
+                  <th>Final</th>
+                  <th>Champion</th>
+                  <th>Runner Up</th>
+                  <th>Orange Cap</th>
+                  <th>Purple Cap</th>
                 </tr>
-              {% endfor %}
-            </tbody>
-          </table>
-        </div>
-        {% endif %}
-
-        <div class="border rounded text-wrap p-2" style="background-color: #ffffff;">
-          <p class="fw-bold my-1">{{match_title}}, {{match_data_json.match.daysInfo}}, {{match_data_json.match.ground.name}}</p>
-          <p class="my-1">
-            {% for team_data in match_data_json.match.teams %}
-              {% if team_data.team.id == match_data_json.match.tossWinnerTeamId %}
-                <!-- Setting a Jinja2 Variable for the tossWinnerTeamId -->
-                {{ team_data.team.longName }}, elected to {% if match_data_json.match.tossWinnerChoice == 1 %} bat {% else %} field {% endif %} first.
-                <!-- TeamName elected to bat/field first -->
-              {% endif %}
-            {% endfor %}
-          </p>
-          {% if match_data_json.content.matchPlayerAwards | length != 0 %}
-          <p class="my-1 fw-bold">Man of the Match - {{ match_data_json.content.matchPlayerAwards[0].player.longName }}</p>  <!-- Man of the match -->
-          {% endif %}
-          <!-- Result <-> Status Text - Result at the end of the match, Target while 2nd inn, toss while 1st inn -->
-          <p class="my-1">{{result}}</p>
-        </div>
-
-        <div class="border rounded mt-2 p-2" style="background-color: #ffffff;">
-          <p class="fw-bold my-1" style="margin-block-end: 0;">Best Performances in Batting</p>
-          {% if match_data_json.content.bestPerformance is not none %}
-          <p class="my-1">{{match_data_json.content.bestPerformance.batsmen[0].teamAbbreviation}} - {{match_data_json.content.bestPerformance.batsmen[0]['player']['longName']}} with {{match_data_json.content.bestPerformance.batsmen[0]['shot']}} shot scoring {{match_data_json.content.bestPerformance.batsmen[0]['shotRuns']}} out of {{match_data_json.content.bestPerformance.batsmen[0]['runs']}} runs</p>
-          <p class="my-1">{{match_data_json.content.bestPerformance.batsmen[1].teamAbbreviation}} - {{match_data_json.content.bestPerformance.batsmen[1]['player']['longName']}} with {{match_data_json.content.bestPerformance.batsmen[1]['shot']}} shot scoring {{match_data_json.content.bestPerformance.batsmen[1]['shotRuns']}} out of {{match_data_json.content.bestPerformance.batsmen[1]['runs']}} runs</p>
-          {% else %}
-          <p class="my-1">Yet to be decided</p>
-          {% endif %}
-        </div>
-        
-        <div class="border rounded mt-2 p-2" style="background-color: #ffffff;">
-          <p class="fw-bold my-1" style="margin-block-end: 0;">Best Performances in Bowling</p>
-          {% if match_data_json.content.bestPerformance is not none %}
-          <p class="my-1">{{match_data_json.content.bestPerformance.bowlers[0].teamAbbreviation}} - {{match_data_json.content.bestPerformance.bowlers[0].player.longName}} - [{{match_data_json.content.bestPerformance.bowlers[0].overs}}-{{match_data_json.content.bestPerformance.bowlers[0].maidens}}-{{match_data_json.content.bestPerformance.bowlers[0].conceded}}-{{match_data_json.content.bestPerformance.bowlers[0].wickets}}] conceding {{match_data_json.content.bestPerformance.bowlers[0].dots}} dots and Econ. {{match_data_json.content.bestPerformance.bowlers[0].economy}}</p>
-          <p class="my-1">{{match_data_json.content.bestPerformance.bowlers[1].teamAbbreviation}} - {{match_data_json.content.bestPerformance.bowlers[1].player.longName}} - [{{match_data_json.content.bestPerformance.bowlers[1].overs}}-{{match_data_json.content.bestPerformance.bowlers[1].maidens}}-{{match_data_json.content.bestPerformance.bowlers[1].conceded}}-{{match_data_json.content.bestPerformance.bowlers[1].wickets}}] conceding {{match_data_json.content.bestPerformance.bowlers[1].dots}} dots and Econ. {{match_data_json.content.bestPerformance.bowlers[1].economy}}</p>
-          {% else %}
-          <p class="my-1">Yet to be decided</p>
-          {% endif %}
-        </div>
-
-        <div class="border rounded mt-2 p-2" style="background-color: #ffffff;">
-          <p class="fw-bold my-1" style="margin-block-end: 0;">Team Squads</p>
-          <p class="mb-0"><strong> {{ match_data_json.match.teams[0].team.longName }}: </strong>{% for i in squad1 %} {{i}}, {% endfor %}</p>
-          <p class="mb-0"><strong> {{ match_data_json.match.teams[1].team.longName }}: </strong>{% for i in squad2 %} {{i}}, {% endfor %}</p>
-        </div>
-        
-        <!-- 1st Innings -->
-        <div class="border rounded mt-2 mb-2" style="background-color: #ffffff;">
-          <button class="btn text-start" style="width: 100%; background-color: #e3f2fd; margin: 0;" data-bs-toggle="collapse" data-bs-target="#innings1_scorecard" aria-expanded="false">
-            <!-- Team 1 name -->
-            <p class="font-weight-bold p-1" style="margin-block: 0;"> {{ match_data_json.match.teams[0].team.longName }} </p>
-          </button>
-          <div id="innings1_scorecard">
-            <div class="table-responsive">
-              <table class="table table-sm mb-0">
-                <thead>
-                  <tr class="table-secondary">
-                    <th class="px-2">Batsman</th>
-                    <th>R</th>
-                    <th>B</th>
-                    <th>Dots</th>
-                    <th>4s</th>
-                    <th>6s</th>
-                    <th>SR</th>
-                    <th>NDSR</th>
-                    <th>DB%</th>
-                    <th>4s SR</th>
-                    <th>6s SR</th>
-                    <th>4&6 SR</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {% for record in batting1 %}
+              </thead>
+              <tbody>
+                {% for data in finals_and_champs_df %}
                   <tr>
-                    <td class="px-2">{{ record['Batsman'] }}</td>
-                    <td class="fw-bold">{{ record['Runs'] }}</td>
-                    <td>{{ record['Balls'] }}</td>
-                    <td>{{ record['Dots'] }}</td>
-                    <td>{{ record['Fours'] }}</td>
-                    <td>{{ record['Sixes'] }}</td>
-                    <td>{{ record['SR'] }}</td>
-                    <td>{{ record['NDSR'] }}</td>
-                    <td>{{ record['DB%'] }}</td>
-                    <td>{{ record['4s_SR'] }}</td>
-                    <td>{{ record['6s_SR'] }}</td>
-                    <td>{{ record['4&6_SR'] }}</td>
+                    <td class="px-2">{{data.Year}}</td>
+                    <td>{{data.Final}}</td>
+                    <td class="fw-bold">{{data['Champions']}}</td>
+                    <td>{{data['Runner up']}}</td>
+                    <td>{{data['Orange Cap']}}</td>
+                    <td>{{data['Purple Cap']}}</td>
                   </tr>
-                  {% endfor %}
-                </tbody>
-              </table>
-            </div>  
-            <div><p class="my-0 p-1"><strong>Did not bat - </strong> {% for b in dnb1 %} {{ b }}, {% endfor %}</p></div>
-            <div style="display: flex; justify-content: space-around;">
-              <p style="margin-block: 0;"> <strong>Total</strong> - 
-                {% if match_data_json.match.teams[0].score is not none %} {{ match_data_json.match.teams[0].score }}
-                  {% if match_data_json.match.teams[0].scoreInfo is none %} ({{ match_data_json.match.scheduledOvers }} Ov) {% else %} {{ match_data_json.match.teams[0].scoreInfo }} {% endif %}
-                {% else %}
-                  Yet to bat..
-                {% endif %}
-              </p>
-            </div>
-            <div class="table-responsive">
-              <table class="table table-sm mb-0">
-                <tr class="table-secondary">
-                  <th class="px-2">Bowler</th>
-                  <th>Ov</th>
-                  <th>B</th>
-                  <th>R</th>
-                  <th>W</th>
-                  <th>Dots</th>
-                  <th>4s</th>
-                  <th>6s</th>
-                  <th>WD</th>
-                  <th>NB</th>
-                  <th>B</th>
-                  <th>LB</th>
-                  <th>Econ</th>
-                  <th>DB%</th> 
-                </tr>
-                {% for bowler in bowling1 %}
-                <tr>
-                  <td class="px-2">{{ bowler.Bowler }}</td>
-                  <td>{{ bowler.Overs }}</td>
-                  <td>{{ bowler.Balls }}</td>
-                  <td>{{ bowler.Runs }}</td>
-                  <td>{{ bowler.Wickets }}</td>
-                  <td>{{ bowler.Dots }}</td>
-                  <td>{{ bowler.Fours }}</td>
-                  <td>{{ bowler.Sixers }}</td>
-                  <td>{{ bowler.WD }}</td>
-                  <td>{{ bowler.NB }}</td>
-                  <td>{{ bowler.Byes }}</td>
-                  <td>{{ bowler.LB }}</td>
-                  <td>{{ bowler.Econ }}</td>
-                  <td>{{ bowler["DB%"] }}</td>
-                </tr>
                 {% endfor %}
-              </table>
+              </tbody>
+            </table>
+          </div>
+          {% endif %}
+
+          <p class="border rounded text-wrap p-2 my-1 bg-light fw-bold">{{match_title}}, {{match_data_json.match.daysInfo}}, {{match_data_json.match.ground.name}}, <a class="link-dark my-1" href="/series/{{match_data_json.match.series.objectId}}">{{match_data_json.match.series.longName}} {{match_data_json.match.series.season}}</a></p>
+          <div class="container mt-2">
+            <div class="row">
+              <div class="col-md-6 col-12 p-2 mb-md-0 mb-2 border rounded-start text-wrap bg-light">
+                <p class="my-1">
+                  {% for team_data in match_data_json.match.teams %}
+                    {% if team_data.team.id == match_data_json.match.tossWinnerTeamId %}
+                      <!-- Setting a Jinja2 Variable for the tossWinnerTeamId -->
+                      {{ team_data.team.longName }}, elected to {% if match_data_json.match.tossWinnerChoice == 1 %} bat {% else %} field {% endif %} first.
+                      <!-- TeamName elected to bat/field first -->
+                    {% endif %}
+                  {% endfor %}
+                </p>
+                {% if match_data_json.content.matchPlayerAwards | length != 0 %}
+                <p class="my-1 fw-bold">Man of the Match - {{ match_data_json.content.matchPlayerAwards[0].player.longName }}</p>  <!-- Man of the match -->
+                {% endif %}
+                <!-- Result <-> Status Text - Result at the end of the match, Target while 2nd inn, toss while 1st inn -->
+                <p class="my-1">{{result}}</p>
+              </div>
+              <div class="col-md-6 col-12 p-2 border rounded-end text-wrap bg-light">
+                <div class="my-1">
+                  {% if match_data_json.match.teams[0].team.imageUrl is not none %}
+                  <img class="me-2 rounded d-inline-block" style="height: 40px; width: 40px;" src="https://img1.hscicdn.com/image/upload/f_auto,t_ds_square_w_80/lsci{{ match_data_json.match.teams[0].team.imageUrl }}" alt="{{ match_data_json.match.teams[0].team.image.caption }}">
+                  {% endif %}
+                  <p class="fw-bold d-inline-block" {% if match_data_json.match.teams[0].team.primaryColor is not none %} style="color: {{ match_data_json.match.teams[0].team.primaryColor }};" {% endif %}>{{ match_data_json.match.teams[0].team.longName }}</p>
+                  {% if match_data_json.match.teams[0].score is not none %}
+                  <p class="ms-2 fw-bold d-inline-block">{{ match_data_json.match.teams[0].score }}</p>
+                  {% endif %}
+                </div>
+                <div class="my-1">
+                  {% if match_data_json.match.teams[1].team.imageUrl is not none %}
+                  <img class="me-2 rounded d-inline-block" style="height: 40px; width: 40px;" src="https://img1.hscicdn.com/image/upload/f_auto,t_ds_square_w_80/lsci{{ match_data_json.match.teams[1].team.imageUrl }}" alt="{{ match_data_json.match.teams[1].team.image.caption }}">
+                  {% endif %}
+                  <p class="fw-bold d-inline-block" {% if match_data_json.match.teams[1].team.primaryColor is not none %} style="color: {{ match_data_json.match.teams[1].team.primaryColor }};" {% endif %}>{{ match_data_json.match.teams[1].team.longName }}</p>
+                  <p class="ms-2 fw-bold d-inline-block">
+                    {% if match_data_json.match.teams[1].score is not none %}
+                      {{ match_data_json.match.teams[1].score }}
+                    {% else %}-{% endif %}
+                  </p>
+                </div>
+              </div>
             </div>
           </div>
-        </div>
 
-        <!-- 2nd Innings -->
-        <div class="border rounded mt-2 mb-2" style="background-color: #ffffff;">
-          <button class="btn text-start" style="width: 100%; background-color: #e3f2fd; margin: 0;" data-bs-toggle="collapse" data-bs-target="#innings2_scorecard" aria-expanded="true">
-            <div style="background-color: #e3f2fd; margin: 0;">
-              <p class="font-weight-bold p-1" style="margin-block: 0;">{{ match_data_json.match.teams[1].team.longName }}</p>
-            </div>
-          </button>
-          <div id="innings2_scorecard">
-            {% if match_data_json.match.teams[1].inningNumbers | length !=0 %}
-            <div class="table-responsive">
-              <table class="table table-sm mb-0">
-                <thead>
+          <div class="mt-2 p-2 border rounded bg-light">
+            <p class="fw-bold my-1">Best Performances in Batting</p>
+            {% if match_data_json.content.bestPerformance is not none %}
+            <p class="my-1">{{match_data_json.content.bestPerformance.batsmen[0].teamAbbreviation}} - {{match_data_json.content.bestPerformance.batsmen[0]['player']['longName']}} with {{match_data_json.content.bestPerformance.batsmen[0]['shot']}} shot scoring {{match_data_json.content.bestPerformance.batsmen[0]['shotRuns']}} out of {{match_data_json.content.bestPerformance.batsmen[0]['runs']}} runs</p>
+            <p class="my-1">{{match_data_json.content.bestPerformance.batsmen[1].teamAbbreviation}} - {{match_data_json.content.bestPerformance.batsmen[1]['player']['longName']}} with {{match_data_json.content.bestPerformance.batsmen[1]['shot']}} shot scoring {{match_data_json.content.bestPerformance.batsmen[1]['shotRuns']}} out of {{match_data_json.content.bestPerformance.batsmen[1]['runs']}} runs</p>
+            {% else %}
+            <p class="my-1">Yet to be decided</p>
+            {% endif %}
+          </div>
+          
+          <div class="mt-2 p-2 border rounded bg-light">
+            <p class="fw-bold my-1">Best Performances in Bowling</p>
+            {% if match_data_json.content.bestPerformance is not none %}
+            <p class="my-1">{{match_data_json.content.bestPerformance.bowlers[0].teamAbbreviation}} - {{match_data_json.content.bestPerformance.bowlers[0].player.longName}} - [{{match_data_json.content.bestPerformance.bowlers[0].overs}}-{{match_data_json.content.bestPerformance.bowlers[0].maidens}}-{{match_data_json.content.bestPerformance.bowlers[0].conceded}}-{{match_data_json.content.bestPerformance.bowlers[0].wickets}}] conceding {{match_data_json.content.bestPerformance.bowlers[0].dots}} dots and Econ. {{match_data_json.content.bestPerformance.bowlers[0].economy}}</p>
+            <p class="my-1">{{match_data_json.content.bestPerformance.bowlers[1].teamAbbreviation}} - {{match_data_json.content.bestPerformance.bowlers[1].player.longName}} - [{{match_data_json.content.bestPerformance.bowlers[1].overs}}-{{match_data_json.content.bestPerformance.bowlers[1].maidens}}-{{match_data_json.content.bestPerformance.bowlers[1].conceded}}-{{match_data_json.content.bestPerformance.bowlers[1].wickets}}] conceding {{match_data_json.content.bestPerformance.bowlers[1].dots}} dots and Econ. {{match_data_json.content.bestPerformance.bowlers[1].economy}}</p>
+            {% else %}
+            <p class="my-1">Yet to be decided</p>
+            {% endif %}
+          </div>
+
+          <div class="mt-2 p-2 border rounded bg-light">
+            <p class="fw-bold my-1">Team Squads</p>
+            <p class="mb-0"><strong> {{ match_data_json.match.teams[0].team.longName }}: </strong>{% for i in squad1 %} {{i}}, {% endfor %}</p>
+            <p class="mb-0"><strong> {{ match_data_json.match.teams[1].team.longName }}: </strong>{% for i in squad2 %} {{i}}, {% endfor %}</p>
+          </div>
+          
+          <!-- 1st Innings -->
+          <div class="mt-2 mb-2 border rounded bg-light">
+            <button class="btn text-start m-0" style="width: 100%; background-color: #e3f2fd;" data-bs-toggle="collapse" data-bs-target="#innings1_scorecard" aria-expanded="false">
+              <!-- Team 1 name -->
+              <p class="font-weight-bold p-1" style="margin-block: 0;"> {{ match_data_json.match.teams[0].team.longName }} </p>
+            </button>
+            <div id="innings1_scorecard">
+              <div class="table-responsive">
+                <table class="table table-sm mb-0">
+                  <thead>
+                    <tr class="table-secondary">
+                      <th class="px-2">Batsman</th>
+                      <th>R</th>
+                      <th>B</th>
+                      <th>Dots</th>
+                      <th>4s</th>
+                      <th>6s</th>
+                      <th>SR</th>
+                      <th>NDSR</th>
+                      <th>DB%</th>
+                      <th>4s SR</th>
+                      <th>6s SR</th>
+                      <th>4&6 SR</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {% for record in batting1 %}
+                    <tr>
+                      <td class="px-2">{{ record['Batsman'] }}</td>
+                      <td class="fw-bold">{{ record['Runs'] }}</td>
+                      <td>{{ record['Balls'] }}</td>
+                      <td>{{ record['Dots'] }}</td>
+                      <td>{{ record['Fours'] }}</td>
+                      <td>{{ record['Sixes'] }}</td>
+                      <td>{{ record['SR'] }}</td>
+                      <td>{{ record['NDSR'] }}</td>
+                      <td>{{ record['DB%'] }}</td>
+                      <td>{{ record['4s_SR'] }}</td>
+                      <td>{{ record['6s_SR'] }}</td>
+                      <td>{{ record['4&6_SR'] }}</td>
+                    </tr>
+                    {% endfor %}
+                  </tbody>
+                </table>
+              </div>
+              <div><p class="my-0 p-1"><strong>Did not bat - </strong> {% for b in dnb1 %} {{ b }}, {% endfor %}</p></div>
+              <div class="d-flex justify-content-around">
+                <p class="mb-0"> <strong>Total</strong> - 
+                  {% if match_data_json.match.teams[0].score is not none %} {{ match_data_json.match.teams[0].score }}
+                    {% if match_data_json.match.teams[0].scoreInfo is none %} ({{ match_data_json.match.scheduledOvers }} Ov) {% else %} {{ match_data_json.match.teams[0].scoreInfo }} {% endif %}
+                  {% else %}
+                    Yet to bat..
+                  {% endif %}
+                </p>
+              </div>
+              <div class="table-responsive">
+                <table class="table table-sm mb-0">
                   <tr class="table-secondary">
-                    <th class="px-2">Batsman</th>
-                    <th>R</th>
+                    <th class="px-2">Bowler</th>
+                    <th>Ov</th>
                     <th>B</th>
+                    <th>R</th>
+                    <th>W</th>
                     <th>Dots</th>
                     <th>4s</th>
                     <th>6s</th>
-                    <th>SR</th>
-                    <th>NDSR</th>
-                    <th>DB%</th>
-                    <th>4s SR</th>
-                    <th>6s SR</th>
-                    <th>4&6 SR</th>
+                    <th>WD</th>
+                    <th>NB</th>
+                    <th>B</th>
+                    <th>LB</th>
+                    <th>Econ</th>
+                    <th>DB%</th> 
                   </tr>
-                </thead>
-                <tbody>
-                  {% for record in batting2 %}
-                  <tr>
-                    <td class="px-2">{{ record['Batsman'] }}</td>
-                    <td class="fw-bold">{{ record['Runs'] }}</td>
-                    <td>{{ record['Balls'] }}</td>
-                    <td>{{ record['Dots'] }}</td>
-                    <td>{{ record['Fours'] }}</td>
-                    <td>{{ record['Sixes'] }}</td>
-                    <td>{{ record['SR'] }}</td>
-                    <td>{{ record['NDSR'] }}</td>
-                    <td>{{ record['DB%'] }}</td>
-                    <td>{{ record['4s_SR'] }}</td>
-                    <td>{{ record['6s_SR'] }}</td>
-                    <td>{{ record['4&6_SR'] }}</td>
-                  </tr>
-                  {% endfor %}
-                </tbody>
-              </table>
-            </div>
-            <div><p class="my-0 p-1"><strong> Did not bat - </strong> {% for b in dnb2 %} {{ b }}, {% endfor %}</p></div>
-            <div class="mt-0" style="display: flex; justify-content: space-around;">
-              {% set Team2ScoreTrgt = match_data_json.match.teams[1].scoreInfo.split(', T:') %}
-              {% set team2_score = match_data_json.match.teams[1].score %}
-              {% set inn2_ovs = Team2ScoreTrgt[0] %}
-              {% set target = Team2ScoreTrgt[1] %}
-              <p class="mb-0"><strong>Total</strong> - {{team2_score}} ({{inn2_ovs}})</p>
-              <p class="mb-0"><strong>Target</strong> - {{target}}</p>
-            </div>
-            
-            <div class="table-responsive">
-              <table class="table table-sm mb-0">
-                <tr class="table-secondary">
-                  <th class="px-2">Bowler</th>
-                  <th>Ov</th>
-                  <th>B</th>
-                  <th>R</th>
-                  <th>W</th>
-                  <th>Dots</th>
-                  <th>4s</th>
-                  <th>6s</th>
-                  <th>WD</th>
-                  <th>NB</th>
-                  <th>B</th>
-                  <th>LB</th>
-                  <th>Econ</th>
-                  <th>DB%</th>
-                </tr>
-                {% for bowler in bowling2 %}
+                  {% for bowler in bowling1 %}
                   <tr>
                     <td class="px-2">{{ bowler.Bowler }}</td>
                     <td>{{ bowler.Overs }}</td>
@@ -315,174 +243,278 @@
                     <td>{{ bowler.Econ }}</td>
                     <td>{{ bowler["DB%"] }}</td>
                   </tr>
-                {% endfor %}
+                  {% endfor %}
+                </table>
+              </div>
+            </div>
+          </div>
+
+          <!-- 2nd Innings -->
+          <div class="border rounded mt-2 mb-2 bg-light">
+            <button class="btn text-start" style="width: 100%; background-color: #e3f2fd; margin: 0;" data-bs-toggle="collapse" data-bs-target="#innings2_scorecard" aria-expanded="true">
+              <div style="background-color: #e3f2fd; margin: 0;">
+                <p class="font-weight-bold p-1" style="margin-block: 0;">{{ match_data_json.match.teams[1].team.longName }}</p>
+              </div>
+            </button>
+            <div id="innings2_scorecard">
+              {% if match_data_json.match.teams[1].inningNumbers | length !=0 %}
+              <div class="table-responsive">
+                <table class="table table-sm mb-0">
+                  <thead>
+                    <tr class="table-secondary">
+                      <th class="px-2">Batsman</th>
+                      <th>R</th>
+                      <th>B</th>
+                      <th>Dots</th>
+                      <th>4s</th>
+                      <th>6s</th>
+                      <th>SR</th>
+                      <th>NDSR</th>
+                      <th>DB%</th>
+                      <th>4s SR</th>
+                      <th>6s SR</th>
+                      <th>4&6 SR</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {% for record in batting2 %}
+                    <tr>
+                      <td class="px-2">{{ record['Batsman'] }}</td>
+                      <td class="fw-bold">{{ record['Runs'] }}</td>
+                      <td>{{ record['Balls'] }}</td>
+                      <td>{{ record['Dots'] }}</td>
+                      <td>{{ record['Fours'] }}</td>
+                      <td>{{ record['Sixes'] }}</td>
+                      <td>{{ record['SR'] }}</td>
+                      <td>{{ record['NDSR'] }}</td>
+                      <td>{{ record['DB%'] }}</td>
+                      <td>{{ record['4s_SR'] }}</td>
+                      <td>{{ record['6s_SR'] }}</td>
+                      <td>{{ record['4&6_SR'] }}</td>
+                    </tr>
+                    {% endfor %}
+                  </tbody>
+                </table>
+              </div>
+              <div><p class="my-0 p-1"><strong> Did not bat - </strong> {% for b in dnb2 %} {{ b }}, {% endfor %}</p></div>
+              <div class="mt-0 d-flex justify-content-around">
+                {% set Team2ScoreTrgt = match_data_json.match.teams[1].scoreInfo.split(', T:') %}
+                {% set team2_score = match_data_json.match.teams[1].score %}
+                {% set inn2_ovs = Team2ScoreTrgt[0] %}
+                {% set target = Team2ScoreTrgt[1] %}
+                <p class="mb-0"><strong>Total</strong> - {{team2_score}} ({{inn2_ovs}})</p>
+                <p class="mb-0"><strong>Target</strong> - {{target}}</p>
+              </div>
+              
+              <div class="table-responsive">
+                <table class="table table-sm mb-0">
+                  <tr class="table-secondary">
+                    <th class="px-2">Bowler</th>
+                    <th>Ov</th>
+                    <th>B</th>
+                    <th>R</th>
+                    <th>W</th>
+                    <th>Dots</th>
+                    <th>4s</th>
+                    <th>6s</th>
+                    <th>WD</th>
+                    <th>NB</th>
+                    <th>B</th>
+                    <th>LB</th>
+                    <th>Econ</th>
+                    <th>DB%</th>
+                  </tr>
+                  {% for bowler in bowling2 %}
+                    <tr>
+                      <td class="px-2">{{ bowler.Bowler }}</td>
+                      <td>{{ bowler.Overs }}</td>
+                      <td>{{ bowler.Balls }}</td>
+                      <td>{{ bowler.Runs }}</td>
+                      <td>{{ bowler.Wickets }}</td>
+                      <td>{{ bowler.Dots }}</td>
+                      <td>{{ bowler.Fours }}</td>
+                      <td>{{ bowler.Sixers }}</td>
+                      <td>{{ bowler.WD }}</td>
+                      <td>{{ bowler.NB }}</td>
+                      <td>{{ bowler.Byes }}</td>
+                      <td>{{ bowler.LB }}</td>
+                      <td>{{ bowler.Econ }}</td>
+                      <td>{{ bowler["DB%"] }}</td>
+                    </tr>
+                  {% endfor %}
+                </table>
+              </div>
+              {% else %}
+              <p class="m-0 p-3 text-center">Yet to be Played</p>
+              {% endif %}
+            </div>
+          </div>
+          
+          <div class="border rounded mt-2 mb-2 bg-light">
+            <button class="btn text-start" style="width: 100%; background-color: #e3f2fd; margin: 0;">
+              <p class="font-weight-bold p-1" style="margin-block: 0;">Batting Impact points</p>
+            </button>
+            <div class="table-responsive" id="imp_pts">
+              <table class="table table-sm mb-0">
+                <thead>
+                  <tr class="table-secondary">
+                    <th class="px-2">Name</th>
+                    <th>Team</th>
+                    <th>Runs</th>
+                    <th>SR</th>
+                    <th>Points</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {% for row in imp_pts %}
+                  <tr>
+                    <td class="px-2">{{ row['player name'] }}</td>
+                    <td>{{ row.team }}</td>
+                    <td>{{ row.runs }}</td>
+                    <td>{{ row.SR }}</td>
+                    <td>{{ row.impact_points }}</td>
+                  </tr>
+                  {% endfor %}
+                </tbody>
               </table>
             </div>
-            {% else %}
-            <p class="m-0 p-3 text-center">Yet to be Played</p>
-            {% endif %}
           </div>
+
+          <div class="border rounded mt-2 mb-2 bg-light">
+            <button class="btn text-start" style="width: 100%; background-color: #e3f2fd; margin: 0;">
+              <p class="font-weight-bold p-1" style="margin-block: 0;">Bowling Impact points</p>
+            </button>
+            <div class="table-responsive" id="bow_imp_pts">
+              <table class="table table-sm mb-0">
+                <thead>
+                  <tr class="table-secondary">
+                    <th class="px-2">Name</th>
+                    <th>Team</th>
+                    <th>Balls</th>
+                    <th>Wickets</th>
+                    <th>Points</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {% for row in bow_imp_pts %}
+                  <tr>
+                    <td class="px-2">{{ row['player name'] }}</td>
+                    <td>{{ row.team }}</td>
+                    <td>{{ row.balls }}</td>
+                    <td>{{ row.wickets }}</td>
+                    <td>{{ row.impact_points }}</td>
+                  </tr>
+                  {% endfor %}
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <div class="border rounded mt-2 mb-2 bg-light">
+            <button class="btn text-start" style="width: 100%; background-color: #e3f2fd; margin: 0;">
+              <p class="font-weight-bold p-1" style="margin-block: 0;">Partnerships - Innings 1</p>
+            </button>
+            <div class="table-responsive" id="ptnr_df1">
+              <table class="table table-sm mb-0">
+                <thead>
+                  <tr class="table-secondary">
+                    <th class="px-2">Wicket No</th>
+                    <th>Player 1</th>
+                    <th>Player 2</th>
+                    <th class="fw-bold text-center">Partnership</th>
+                    <th>Player out</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {% for row in ptnr_df1 %}
+                  <tr>
+                    <td class="px-2">{{ row.Wicket }}</td>
+                    <td>{{ row.Player_1 }}</td>
+                    <td>{{ row.Player_2 }}</td>
+                    <td class="fw-bold text-center">{{ row.Partnership }}</td>
+                    <td>{{ row.player_out }}</td>
+                  </tr>
+                  {% endfor %}
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <div class="border rounded mt-2 mb-2 bg-light">
+            <button class="btn text-start" style="width: 100%; background-color: #e3f2fd; margin: 0;">
+              <p class="font-weight-bold p-1" style="margin-block: 0;">Partnerships - Innings 2</p>
+            </button>
+            <div class="table-responsive" id="ptnr_df1">
+              <table class="table table-sm mb-0">
+                <thead>
+                  <tr class="table-secondary">
+                    <th class="px-2">Wicket No</th>
+                    <th>Player 1</th>
+                    <th>Player 2</th>
+                    <th class="fw-bold text-center">Partnership</th>
+                    <th>Player out</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {% for row in ptnr_df2 %}
+                  <tr>
+                    <td class="px-2">{{ row.Wicket }}</td>
+                    <td>{{ row.Player_1 }}</td>
+                    <td>{{ row.Player_2 }}</td>
+                    <td class="fw-bold text-center">{{ row.Partnership }}</td>
+                    <td>{{ row.player_out }}</td>
+                  </tr>
+                  {% endfor %}
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <!-- <div class="border rounded mt-2 mb-2 bg-light">
+            <button class="btn text-start" style="width: 100%; background-color: #e3f2fd; margin: 0;">
+              <p class="font-weight-bold p-1" style="margin-block: 0;">Partnerships</p>
+            </button>
+            <div id="ptnrsh_figs">
+              <img src="data:image/png;base64,{{ ptnr_f1 }}" alt="Innings 1 Partnerships Runs">
+            </div>
+          </div> -->
         </div>
         
-        <div class="border rounded mt-2 mb-2" style="background-color: #ffffff;">
-          <button class="btn text-start" style="width: 100%; background-color: #e3f2fd; margin: 0;">
-            <p class="font-weight-bold p-1" style="margin-block: 0;">Batting Impact points</p>
-          </button>
-          <div class="table-responsive" id="imp_pts">
-            <table class="table table-sm mb-0">
-              <thead>
-                <tr class="table-secondary">
-                  <th class="px-2">Name</th>
-                  <th>Team</th>
-                  <th>Runs</th>
-                  <th>SR</th>
-                  <th>Points</th>
-                </tr>
-              </thead>
-              <tbody>
-                {% for row in imp_pts %}
-                <tr>
-                  <td class="px-2">{{ row['player name'] }}</td>
-                  <td>{{ row.team }}</td>
-                  <td>{{ row.runs }}</td>
-                  <td>{{ row.SR }}</td>
-                  <td>{{ row.impact_points }}</td>
-                </tr>
-                {% endfor %}
-              </tbody>
-            </table>
-          </div>
-        </div>
-
-        <div class="border rounded mt-2 mb-2" style="background-color: #ffffff;">
-          <button class="btn text-start" style="width: 100%; background-color: #e3f2fd; margin: 0;">
-            <p class="font-weight-bold p-1" style="margin-block: 0;">Bowling Impact points</p>
-          </button>
-          <div class="table-responsive" id="bow_imp_pts">
-            <table class="table table-sm mb-0">
-              <thead>
-                <tr class="table-secondary">
-                  <th class="px-2">Name</th>
-                  <th>Team</th>
-                  <th>Balls</th>
-                  <th>Wickets</th>
-                  <th>Points</th>
-                </tr>
-              </thead>
-              <tbody>
-                {% for row in bow_imp_pts %}
-                <tr>
-                  <td class="px-2">{{ row['player name'] }}</td>
-                  <td>{{ row.team }}</td>
-                  <td>{{ row.balls }}</td>
-                  <td>{{ row.wickets }}</td>
-                  <td>{{ row.impact_points }}</td>
-                </tr>
-                {% endfor %}
-              </tbody>
-            </table>
-          </div>
-        </div>
-
-        <div class="border rounded mt-2 mb-2" style="background-color: #ffffff;">
-          <button class="btn text-start" style="width: 100%; background-color: #e3f2fd; margin: 0;">
-            <p class="font-weight-bold p-1" style="margin-block: 0;">Partnerships - Innings 1</p>
-          </button>
-          <div class="table-responsive" id="ptnr_df1">
-            <table class="table table-sm mb-0">
-              <thead>
-                <tr class="table-secondary">
-                  <th class="px-2">Wicket No</th>
-                  <th>Player 1</th>
-                  <th>Player 2</th>
-                  <th class="fw-bold text-center">Partnership</th>
-                  <th>Player out</th>
-                </tr>
-              </thead>
-              <tbody>
-                {% for row in ptnr_df1 %}
-                <tr>
-                  <td class="px-2">{{ row.Wicket }}</td>
-                  <td>{{ row.Player_1 }}</td>
-                  <td>{{ row.Player_2 }}</td>
-                  <td class="fw-bold text-center">{{ row.Partnership }}</td>
-                  <td>{{ row.player_out }}</td>
-                </tr>
-                {% endfor %}
-              </tbody>
-            </table>
-          </div>
-        </div>
-
-        <div class="border rounded mt-2 mb-2" style="background-color: #ffffff;">
-          <button class="btn text-start" style="width: 100%; background-color: #e3f2fd; margin: 0;">
-            <p class="font-weight-bold p-1" style="margin-block: 0;">Partnerships - Innings 2</p>
-          </button>
-          <div class="table-responsive" id="ptnr_df1">
-            <table class="table table-sm mb-0">
-              <thead>
-                <tr class="table-secondary">
-                  <th class="px-2">Wicket No</th>
-                  <th>Player 1</th>
-                  <th>Player 2</th>
-                  <th class="fw-bold text-center">Partnership</th>
-                  <th>Player out</th>
-                </tr>
-              </thead>
-              <tbody>
-                {% for row in ptnr_df2 %}
-                <tr>
-                  <td class="px-2">{{ row.Wicket }}</td>
-                  <td>{{ row.Player_1 }}</td>
-                  <td>{{ row.Player_2 }}</td>
-                  <td class="fw-bold text-center">{{ row.Partnership }}</td>
-                  <td>{{ row.player_out }}</td>
-                </tr>
-                {% endfor %}
-              </tbody>
-            </table>
-          </div>
-        </div>
-
-        <!-- <div class="border rounded mt-2 mb-2" style="background-color: #ffffff;">
-          <button class="btn text-start" style="width: 100%; background-color: #e3f2fd; margin: 0;">
-            <p class="font-weight-bold p-1" style="margin-block: 0;">Partnerships</p>
-          </button>
-          <div id="ptnrsh_figs">
-            <img src="data:image/png;base64,{{ ptnr_f1 }}" alt="Innings 1 Partnerships Runs">
-          </div>
-        </div> -->
-      </div>
-      
-      <!-- Third Frame -->
-      <div class="col-lg-4 col-12 mb-3">
-        {% if each_team_cumulative_score_per_over %}
+        <!-- Third Frame -->
+        <div class="col-lg-4 col-12 mb-3">
+          {% if each_team_cumulative_score_per_over %}
           <div class="border rounded mb-2 overflow-hidden">
             <img src="data:image/png;base64,{{ each_team_cumulative_score_per_over }}" alt="Cumulative Runs Graph" style="width: 100%; max-height: min-content;">
           </div>
+          {% endif %}
           <div class="border rounded mb-2 overflow-hidden">
             <img src="data:image/png;base64,{{ i1_ov_runs }}" alt="Innings 1 Overs-Runs" style="width: 100%; max-height: min-content;">
           </div>
+          {% if match_data_json.match.teams[1].score is not none %}
           <div class="border rounded mb-2 overflow-hidden">
             <img src="data:image/png;base64,{{ i2_ov_runs }}" alt="Innings 2 Overs-Runs" style="width: 100%; max-height: min-content;">
           </div>
+          {% endif %}
+          {% if match_data_json.match.teams[0].score is not none %}
           <hr>
           <p class="fs-5 fw-bold text-center">Distribution of Runs</p>
-          <p class="fs-6 mb-0 text-center">{{ team1_name }}</p>
+          <p class="fs-6 mb-0 text-center">{{ match_data_json.match.teams[0].team.longName }}</p>
           <iframe class="rounded" srcdoc="{{ i1_runs }}" width="100%" height="380px" frameborder="0" scrolling="no"></iframe>
-          <p class="fs-6 mb-0 text-center">{{ team2_name }}</p>
-          <iframe class="rounded" srcdoc="{{ i2_runs }}" width="100%" height="380px" frameborder="0" scrolling="no"></iframe>
-
+            {% if match_data_json.match.teams[1].score is not none %}
+            <p class="fs-6 mb-0 text-center">{{ match_data_json.match.teams[1].team.longName }}</p>
+            <iframe class="rounded" srcdoc="{{ i2_runs }}" width="100%" height="380px" frameborder="0" scrolling="no"></iframe>
+            {% endif %}
+          {% endif %}
           <!-- <div class="border rounded mb-2 overflow-hidden">
             <img src="data:image/png;base64,{{ i1_runs }}" alt="Innings 1 Runs distribution" style="width: 100%; max-height: min-content;">
           </div>
           <div class="border rounded mb-2 overflow-hidden">
             <img src="data:image/png;base64,{{ i2_runs }}" alt="Innings 2 Runs distribution" style="width: 100%; max-height: min-content;">
           </div> -->
-        {% endif %}
-        <!-- <div class="border rounded p-2 mb-2" style="width: 100%; height: 300px; background-color: white;">
-          <p class="text-center" style="font-size: small;">Advertisement is going to displayed here</p>
-        </div> -->
+          <!-- <div class="border rounded p-2 mb-2" style="width: 100%; height: 300px; background-color: white;">
+            <p class="text-center" style="font-size: small;">Advertisement is going to displayed here</p>
+          </div> -->
+        </div>
       </div>
     </div>
 

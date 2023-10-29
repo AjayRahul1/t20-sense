@@ -1,5 +1,4 @@
-fastapi
-uvicorn
+fastapi[all]
 google-cloud-storage
 google-cloud-bigquery
 numpy

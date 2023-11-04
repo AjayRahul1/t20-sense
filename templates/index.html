@@ -84,7 +84,7 @@
           {% endif %}
 
           <p class="border rounded text-wrap p-2 my-1 bg-light fw-bold">{{match_title}}, {{match_data_json.match.daysInfo}}, {{match_data_json.match.ground.name}}, <a class="link-dark my-1" href="/series/{{match_data_json.match.series.objectId}}">{{match_data_json.match.series.longName}} {{match_data_json.match.series.season}}</a></p>
-          <div class="container mt-2">
+          <div class="mx-2 mt-2">
             <div class="row">
               <div class="col-md-6 col-12 p-2 mb-md-0 mb-2 border rounded-start text-wrap bg-light">
                 <p class="my-1">
@@ -198,15 +198,17 @@
                   </tbody>
                 </table>
               </div>
-              <div><p class="my-0 p-1"><strong>Did not bat - </strong> {% for b in dnb1 %} {{ b }}, {% endfor %}</p></div>
-              <div class="d-flex justify-content-around">
-                <p class="mb-0"> <strong>Total</strong> - 
-                  {% if match_data_json.match.teams[0].score is not none %} {{ match_data_json.match.teams[0].score }}
-                    {% if match_data_json.match.teams[0].scoreInfo is none %} ({{ match_data_json.match.scheduledOvers }} Ov) {% else %} {{ match_data_json.match.teams[0].scoreInfo }} {% endif %}
-                  {% else %}
-                    Yet to bat..
-                  {% endif %}
-                </p>
+              <div>
+                <p class="my-0 p-1"><strong>Did not bat - </strong> {% for b in dnb1 %} {{ b }}, {% endfor %}</p>
+                <div class="d-flex justify-content-around">
+                  <p class="mb-0"> <strong>Total</strong> - 
+                    {% if match_data_json.match.teams[0].score is not none %} {{ match_data_json.match.teams[0].score }}
+                      {% if match_data_json.match.teams[0].scoreInfo is none %} ({{ match_data_json.match.scheduledOvers }} Ov) {% else %} {{ match_data_json.match.teams[0].scoreInfo }} {% endif %}
+                    {% else %}
+                      Yet to bat..
+                    {% endif %}
+                  </p>
+                </div>
               </div>
               <div class="table-responsive">
                 <table class="table table-sm mb-0">
@@ -296,14 +298,16 @@
                   </tbody>
                 </table>
               </div>
-              <div><p class="my-0 p-1"><strong> Did not bat - </strong> {% for b in dnb2 %} {{ b }}, {% endfor %}</p></div>
-              <div class="mt-0 d-flex justify-content-around">
-                {% set Team2ScoreTrgt = match_data_json.match.teams[1].scoreInfo.split(', T:') %}
-                {% set team2_score = match_data_json.match.teams[1].score %}
-                {% set inn2_ovs = Team2ScoreTrgt[0] %}
-                {% set target = Team2ScoreTrgt[1] %}
-                <p class="mb-0"><strong>Total</strong> - {{team2_score}} ({{inn2_ovs}})</p>
-                <p class="mb-0"><strong>Target</strong> - {{target}}</p>
+              <div>
+                <p class="my-0 p-1"><strong> Did not bat - </strong> {% for b in dnb2 %} {{ b }}, {% endfor %}</p>
+                <div class="mt-0 d-flex justify-content-around">
+                  {% set Team2ScoreTrgt = match_data_json.match.teams[1].scoreInfo.split(', T:') %}
+                  {% set team2_score = match_data_json.match.teams[1].score %}
+                  {% set inn2_ovs = Team2ScoreTrgt[0] %}
+                  {% set target = Team2ScoreTrgt[1] %}
+                  <p class="mb-0"><strong>Total</strong> - {{team2_score}} ({{inn2_ovs}})</p>
+                  <p class="mb-0"><strong>Target</strong> - {{target}}</p>
+                </div>
               </div>
               
               <div class="table-responsive">

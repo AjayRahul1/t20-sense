@@ -15,10 +15,6 @@ warnings.filterwarnings('ignore')
 
 all_series_ids = [313494, 374163, 418064, 466304, 520932, 586733, 695871, 791129, 968923, 1078425, 1131611, 1165643, 1210595, 1249214, 1298423, 1345038]
 
-series_id_taken = 418064
-match_id_taken = 419165
-innings_taken = 2
-
 """# Get matches data"""
 
 def set_cloud_bucket_env():
@@ -249,17 +245,21 @@ def scorecard_to_csv_gen(series_id, match_id):
 
 def get_particular_match_whole_score(series_id, match_id):
   try:
-    batting1, bowling1 = get_innings_df(series_id, match_id, 1)
+    bat1, bowl1 = get_innings_df(series_id, match_id, 1)
+    bat1 = bat1.to_dict(orient='records')
+    bowl1 = bowl1.to_dict(orient='records')
   except:
-    batting1 = pd.DataFrame()
-    bowling1 = pd.DataFrame()
+    batt1 = {}
+    bowl1 = {}
   
   try:
-    batting2, bowling2 = get_innings_df(series_id, match_id, 2)
+    bat2, bowl2 = get_innings_df(series_id, match_id, 2)
+    bat2 = bat2.to_dict(orient='records')
+    bowl2 = bowl2.to_dict(orient='records')
   except:
-    batting2 = pd.DataFrame()
-    bowling2 = pd.DataFrame()
-  return batting1, bowling1, batting2, bowling2
+    bat2 = {}
+    bowl2 = {}
+  return bat1, bowl1, bat2, bowl2
 
 def get_request_response_API(series_id, match_id, innings_id):
   url = f'https://hs-consumer-api.espncricinfo.com/v1/pages/match/comments?lang=en&seriesId={series_id}&matchId={match_id}&inningNumber={innings_id}&commentType=ALL&sortDirection=DESC&fromInningOver=-1'

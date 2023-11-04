@@ -13,39 +13,43 @@
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-4bw+/aepP/YC94hEpVNVgiZdgIC5+VKNBQNGCHeKRQN+PtmoHDEXuppvnDJzQIu9" crossorigin="anonymous">
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/js/bootstrap.bundle.min.js" integrity="sha384-HwwvtgBNo3bZJJLYd8oVXjrBZt8cqVSpeBNS5n7C8IVInixGAoxmnlMuBnhbgrkm" crossorigin="anonymous"></script>  
 </head>
-<body class="bg-light">
+<body>
   <!-- Navigation Bar Section -->
   {% include "layout/navbar.html" %}
 
-  <div class="container mt-2">
+  <div class="container-fluid">
     <p class="fs-1 m-0">{{ ser_data.series.longName }} {{ser_data.series.year}}</p>
     <div>
       <!-- All matches links in the series div -->
       <div>
         <div class="row" id="matchesInSeriesLinks">
           {% for match in ser_data.content.matches %}
-          <div class="col-md-3 mb-2">
-            <div class="card">
-                <a class="link-dark link-offset-1-hover link-underline link-underline-opacity-0 link-underline-opacity-100-hover" href="/series/{{ match.series.objectId }}/{{ match.objectId }}/full-scorecard">
+          <div class="col-lg-3 col-md-4 col-12 mb-2">
+            <div class="card bg-light">
+                <a class="link-body-emphasis link-underline-opacity-0 link-underline-opacity-0-hover" href="/series/{{ match.series.objectId }}/{{ match.objectId }}/full-scorecard">
                   <div class="card-body">
-                    <p class="m-0" style="font-size: x-small;">{{ match.title }} &bull; {{ match.ground.smallName }}</p>
-                    <div class="row">
-                      <div class="mb-0">
-                        <img class="rounded d-inline-block" style="height: 40px; width: 40px;" src="https://img1.hscicdn.com/image/upload/f_auto,t_ds_square_w_80/lsci{{ match.teams[0].team.imageUrl }}" alt="{{ match.teams[0].team.image.caption }}">
-                        <p class="d-inline-block p-1" style="font-size: x-small;">{{ match.teams[0].team.longName }}</p>
-                        {% if match.teams[0].score is not none %}
-                        <p class="d-inline-block p-1 fw-bold" style="font-size: x-small;">{{ match.teams[0].score }}</p>
-                        {% endif %}
-                      </div>
-                      <div class="mt-0">
-                        <img class="d-inline-block rounded" style="height: 40px; width: 40px;" src="https://img1.hscicdn.com/image/upload/f_auto,t_ds_square_w_80/lsci{{ match.teams[1].team.imageUrl }}" alt="{{ match.teams[1].team.image.caption }}">
-                        <p class="d-inline-block p-1" style="font-size: x-small;">{{ match.teams[1].team.longName }}</p>
-                        {% if match.teams[1].score is not none %}
-                        <p class="d-inline-block p-1 fw-bold" style="font-size: x-small;">{{ match.teams[1].score }}</p>
-                        {% endif %}
-                      </div>
+                    <p class="mb-1" style="font-size: small;">{{ match.title }} &bull; {{ match.ground.smallName }}</p>
+                    <div class="my-1">
+                      {% if match.teams[0].team.imageUrl is not none %}
+                      <img class="me-2 rounded d-inline-block" style="height: 40px; width: 40px;" src="https://img1.hscicdn.com/image/upload/f_auto,t_ds_square_w_80/lsci{{ match.teams[0].team.imageUrl }}" alt="{{ match.teams[0].team.image.caption }}">
+                      {% endif %}
+                      <p class="mx-1 d-inline-block" style="font-size: small;">{{ match.teams[0].team.abbreviation }}</p>
+                      <p class="ms-2 fw-bold d-inline-block" style="font-size: small;">
+                        {% if match.teams[0].score is not none %}{{ match.teams[0].score }}{% else %}-{% endif %}
+                      </p>
                     </div>
-                    <p class="text-nowrap overflow-hidden mb-0" style="font-size: x-small">{{ match.statusText }}</p>
+                    <div class="my-1">
+                      {% if match.teams[1].team.imageUrl is not none %}
+                      <img class="me-2 d-inline-block rounded" style="height: 40px; width: 40px;" src="https://img1.hscicdn.com/image/upload/f_auto,t_ds_square_w_80/lsci{{ match.teams[1].team.imageUrl }}" alt="{{ match.teams[1].team.image.caption }}">
+                      {% endif %}
+                      <p class="mx-1 d-inline-block" style="font-size: small;">{{ match.teams[1].team.abbreviation }}</p>
+                      <p class="ms-2 fw-bold d-inline-block" style="font-size: small;">
+                        {% if match.teams[1].score is not none %}
+                          {{ match.teams[1].score }}
+                        {% else %}-{% endif %}
+                      </p>
+                    </div>
+                    <p class="text-nowrap overflow-hidden mb-0" style="font-size: small">{{ match.statusText }}</p>
                   </div>
                 </a>
             </div>

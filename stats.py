@@ -1,9 +1,7 @@
-import requests, os
-import pandas as pd
+import requests, os, io, base64, pandas as pd
 from google.cloud import storage  # Google Cloud Storage Imports
 import matplotlib.pyplot as plt
 from matplotlib.figure import Figure
-import io, base64
 import plotly.express as px
 import plotly.graph_objects as go
 import plotly.offline as pyo
@@ -13,7 +11,6 @@ from base_functions import get_series_data_from_bucket, get_match_data_from_buck
 
 # Set the path to your service account key file
 os.environ['GOOGLE_APPLICATION_CREDENTIALS'] = os.getenv('API_KEY') # 't20-sense-main.json'
-
 # Create a client using the credentials
 storage_client = storage.Client()
 
@@ -37,7 +34,6 @@ def round_float(value):
         return round(value, 2)
 
 def batting_impact_points(series_id,match_id):
-
   url_p = f"https://hs-consumer-api.espncricinfo.com/v1/pages/match/home?lang=en&seriesId={series_id}&matchId={match_id}"
   output_p = requests.get(url_p)
   content = output_p.json()['content']
@@ -699,21 +695,21 @@ def team_squads(series_id, match_id):
   return team1_squad,team2_squad
 
 
-def data_query(series_id,match_id):
+def data_query(series_id, match_id):
   # Your BigQuery SQL query
-  q1 = """
+  q1 = f"""
       SELECT batsman, SUM(batsmanruns) AS run
   FROM `seriesipl.data`
-  WHERE series_id = 1345038
+  WHERE series_id = {series_id}
   GROUP BY batsman
   ORDER BY run DESC  -- Order the results by total score in descending order
   LIMIT 50;          -- Limit the results to the top 50 batsmen by score
 
       """
-  q2 = """
+  q2 = f"""
   SELECT bowler, SUM(CASE WHEN iswicket = TRUE THEN 1 ELSE 0 END) AS total_wickets
   FROM `seriesipl.data`
-  WHERE series_id = 1345038
+  WHERE series_id = {match_id}
   GROUP BY bowler
   ORDER BY total_wickets DESC  -- Order the results by total wickets in descending order
   LIMIT 50;                     -- Limit the results to the top 50 bowlers by wickets

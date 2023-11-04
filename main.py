@@ -6,8 +6,8 @@ from fastapi.staticfiles import StaticFiles
 import pandas as pd, traceback, dotenv, json
 
 from ipl_func import get_particular_match_whole_score, get_match_info, get_graphical_stats_from_each_ball_data
-from base_functions import get_match_ids_from_series_fast, get_match_data_from_bucket, get_series_data_from_bucket
-from stats import batting_impact_points, bowlers_impact_points, get_ptnship, runs_in_ovs_fig,division_of_runs,DNB,team_squads
+from base_functions import get_match_data_from_bucket, get_series_data_from_bucket
+from stats import batting_impact_points, bowlers_impact_points, get_ptnship, runs_in_ovs_fig,division_of_runs, DNB,team_squads
 
 app = FastAPI()
 templates = Jinja2Templates(directory="templates")
@@ -17,16 +17,10 @@ app.mount("/static", StaticFiles(directory="static"), name="static")
 dotenv.load_dotenv(".env")
 
 # all_ipl_series_info = get_all_csv_files_from_cloud()
-matches_names_and_ids_dict = {}
 
 # Note: series_name_for_api key is important for every tournament home page since it decides what page we are in.
 with open("page_indices.json", "r") as file:
   page_indices = json.load(file)
-
-drdnSerIds = {}
-
-gbl_series_id=0
-gbl_match_id=0
 
 all_ipl_series_ids = {1345038: 2023, 1298423: 2022, 1249214: 2021, 1210595: 2020, 1165643: 2019, 1131611: 2018, 1078425: 2017, 968923: 2016, 791129: 2015, 695871: 2014, 586733: 2013, 520932: 2012, 466304: 2011, 418064: 2010, 374163: 2009, 313494: 2008} # Generate a list of years from 2008 to 2023
 mlc_years = {1357742 : 2023}
@@ -39,9 +33,8 @@ def home(request: Request):
 
 @app.get("/ipl", response_class=HTMLResponse)
 def ipl_home(request: Request):
-  global drdnSerIds, all_ipl_series_ids
+  global all_ipl_series_ids
   # years = [313494, 374163, 418064, 466304, 520932, 586733, 695871, 791129, 968923, 1078425, 1131611, 1165643, 1210595, 1249214, 1298423, 1345038]
-  drdnSerIds = all_ipl_series_ids
   finals_and_champs_df = pd.read_csv('Finals.csv').to_dict(orient='records')
   return templates.TemplateResponse("tournament_home.html", # page_indices["0"] indicates IPL acc to page_indices.json
     {"request": request, "years": all_ipl_series_ids, "finals_and_champs_df": finals_and_champs_df, "tournament_title" : "IPL", "series_name_for_api": page_indices["0"] }
@@ -49,17 +42,13 @@ def ipl_home(request: Request):
 
 @app.get("/mlc", response_class=HTMLResponse)
 def mlc_home(request: Request):
-  global drdnSerIds, mlc_years
-  drdnSerIds = mlc_years
+  global mlc_years
   mlc_home_p = True
   return templates.TemplateResponse("tournament_home.html", # page_indices["1"] indicates MLC acc to page_indices.json
     {"request": request, "years": mlc_years, "mlc_home": mlc_home_p, "series_name_for_api": page_indices["1"], "tournament_title" : "MLC"})
 
 @app.post("/redirect_to_scorecard")
 def submit_form(series_id: int = Form(...), match_id: int = Form(...)):
-  global gbl_series_id, gbl_match_id
-  gbl_series_id = series_id
-  gbl_match_id = match_id
   redirect_url = f"/series/{series_id}/{match_id}/full-scorecard"
   return RedirectResponse(url=redirect_url, status_code=303)
 
@@ -91,18 +80,6 @@ def seriesPage(request: Request, series_id: int):
   ser_data = get_series_data_from_bucket(series_id=series_id)
   return templates.TemplateResponse("series_page.html", {"request": request, "series_id": series_id, "ser_data": ser_data})
 
-def updating_match_details_for_refresh(series_id):
-  global matches_names_and_ids_dict
-  # series_id = get_series_from_year(year)
-  matches_names_and_ids_dict = get_match_ids_from_series_fast(series_id)  # Your function to retrieve match_ids based on series_id
-  return matches_names_and_ids_dict
-
-@app.get("/return_matches_names")
-async def ret_match_ids(series_id : int, request : Request):
-  global matches_names_and_ids_dict
-  matches_names_and_ids_dict = updating_match_details_for_refresh(series_id)
-  return templates.TemplateResponse('content_templates/ipl_match_options.html', {"request" : request, "matches_names_and_ids_dict" : matches_names_and_ids_dict})
-
 # @app.get('/ld_imp_pts/{series_id}/{match_id}')
 # async def get_impact_points(request : Request, series_id: int, match_id: int):
 #   return templates.TemplateResponse('content_templates/imp_pts_tbl.html', {"request" : request, })
@@ -112,7 +89,6 @@ async def process(
     request: Request, series_id: int, match_id: int
   ):
   try:
-    matches_names_and_ids_dict = updating_match_details_for_refresh(series_id)
     # print("Year: ", year)
     print("Match ID: ", match_id)
     # series_id = get_series_from_year(year)
@@ -122,11 +98,6 @@ async def process(
     match_inn_data = get_match_data_from_bucket(series_id, match_id)
 
     batting1, bowling1, batting2, bowling2 = get_particular_match_whole_score(series_id, match_id)
-
-    batting1 = batting1.to_dict(orient='records')
-    bowling1 = bowling1.to_dict(orient='records')
-    batting2 = batting2.to_dict(orient='records')
-    bowling2 = bowling2.to_dict(orient='records')
 
     match_date, result, match_title = get_match_info(series_id, match_id)
     
@@ -163,19 +134,14 @@ async def process(
 
     squad1,squad2 = team_squads(series_id,match_id)
 
-    return templates.TemplateResponse("index.html", {   "selected_year": series_id, "selected_match_id": match_id, "match_data_json": match_inn_data,
-                              "request": request, "years" : drdnSerIds,
-                              "batting1": batting1, "bowling1": bowling1,
-                              "batting2": batting2, "bowling2": bowling2,
-                              "match_date": match_date, "result": result, "match_title":match_title,
-                              "imp_pts": imp_pts, "bow_imp_pts": bow_imp_pts,
-                              "ptnr_df1": i1_ptnr_df, "ptnr_df2": i2_ptnr_df,
-                              "ptnr_f1" : ptnr_f1, "ptnr_f2" : ptnr_f2,
-                              "i1_runs" : i1_runs, "i2_runs" : i2_runs,
-                              "dnb1" : dnb1, "dnb2" : dnb2,
-                              "squad1" : squad1, "squad2" : squad2,
-                              "i1_ov_runs": i1_ovs_runs, "i2_ov_runs": i2_ovs_runs,
-                              "each_team_cumulative_score_per_over" : line_plot_cumulative_team_score_graph_base64 })
+    context = {"request": request, "series_id": series_id, "match_id": match_id, "match_data_json": match_inn_data, "batting1": batting1, "bowling1": bowling1, "batting2": batting2, "bowling2": bowling2,
+               "match_date": match_date, "result": result, "match_title":match_title, "imp_pts": imp_pts, "bow_imp_pts": bow_imp_pts,
+               "ptnr_df1": i1_ptnr_df, "ptnr_df2": i2_ptnr_df, "ptnr_f1" : ptnr_f1, "ptnr_f2" : ptnr_f2,
+               "i1_runs" : i1_runs, "i2_runs" : i2_runs, "dnb1" : dnb1, "dnb2" : dnb2, "squad1" : squad1, "squad2" : squad2,
+               "i1_ov_runs": i1_ovs_runs, "i2_ov_runs": i2_ovs_runs,
+               "each_team_cumulative_score_per_over" : line_plot_cumulative_team_score_graph_base64}
+
+    return templates.TemplateResponse("index.html", context=context)
   except:
     traceback.print_exc()
     return templates.TemplateResponse('error_pages/no_scorecard.html', {"request": request})

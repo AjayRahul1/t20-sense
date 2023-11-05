@@ -250,6 +250,7 @@
           </div>
 
           <!-- 2nd Innings -->
+          {% if match_data_json.match.teams[1].inningNumbers | length !=0 %}
           <div class="accordion my-1 border rounded bg-light">
             <div class="accordion-item">
               <p class="fw-bold accordion-header" id="inn2AccHeader">
@@ -259,7 +260,6 @@
                 </button>
               </p>
               <div id="inn2_card" class="accordion-collapse table-responsive show" aria-labelledby="inn2AccHeader">
-                {% if match_data_json.match.teams[1].inningNumbers | length !=0 %}
                 <table class="table table-sm mb-0">
                   <thead>
                     <tr class="table-secondary">
@@ -345,12 +345,10 @@
                     </tr>
                   {% endfor %}
                 </table>
-                {% else %}
-                <p class="m-0 p-3 text-center">Yet to be Played</p>
-                {% endif %}
               </div>
             </div>
           </div>
+          {% endif %}
           
           <!-- Batting Impact Points -->
           <div class="accordion my-1 border rounded bg-light">
@@ -519,11 +517,11 @@
           {% if match_data_json.match.teams[0].score is not none %}
           <hr>
           <p class="fs-5 fw-bold text-center">Distribution of Runs</p>
-          <p class="fs-6 mb-0 text-center">{{ match_data_json.match.teams[0].team.longName }}</p>
           <iframe class="rounded" srcdoc="{{ i1_runs }}" width="100%" height="380px" frameborder="0" scrolling="no"></iframe>
+          <p class="fs-6 mb-0 text-center">{{ match_data_json.match.teams[0].team.longName }}</p>
             {% if match_data_json.match.teams[1].score is not none %}
-            <p class="fs-6 mb-0 text-center">{{ match_data_json.match.teams[1].team.longName }}</p>
             <iframe class="rounded" srcdoc="{{ i2_runs }}" width="100%" height="380px" frameborder="0" scrolling="no"></iframe>
+            <p class="fs-6 mb-0 text-center">{{ match_data_json.match.teams[1].team.longName }}</p>
             {% endif %}
           {% endif %}
           <!-- <div class="border rounded mb-2 overflow-hidden">

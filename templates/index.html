@@ -85,6 +85,9 @@
 
           <div class="p-2 my-1 border rounded text-wrap bg-light">
             <p class="my-0">{{match_title}}, {{match_data_json.match.daysInfo}}, {{match_data_json.match.ground.name}}, <a class="link-dark my-1" href="/series/{{match_data_json.match.series.objectId}}">{{match_data_json.match.series.longName}} {{match_data_json.match.series.season}}</a></p>
+            {% if match_data_json.content.matchPlayerAwards | length != 0 %}
+            <p class="my-0 fw-bold">Man of the Match - {{ match_data_json.content.matchPlayerAwards[0].player.longName }}</p>  <!-- Man of the match -->
+            {% endif %}
             <p class="my-0">
               {% for team_data in match_data_json.match.teams %}
                 {% if team_data.team.id == match_data_json.match.tossWinnerTeamId %}
@@ -94,11 +97,8 @@
                 {% endif %}
               {% endfor %}
             </p>
-            {% if match_data_json.content.matchPlayerAwards | length != 0 %}
-            <p class="my-0 fw-bold">Man of the Match - {{ match_data_json.content.matchPlayerAwards[0].player.longName }}</p>  <!-- Man of the match -->
-            {% endif %}
             <!-- Result <-> Status Text - Result at the end of the match, Target while 2nd inn, toss while 1st inn -->
-            <p class="my-0">{{result}}</p>
+            <p class="my-0 fw-bold">{{result}}</p>
           </div>
 
           <div class="p-2 my-1 border rounded text-wrap bg-light">
@@ -152,7 +152,7 @@
           </div>
           
           <!-- 1st Innings -->
-          <div class="accordion my-1 border rounded bg-light">
+          <div class="accordion accordion-flush my-1 border rounded bg-light overflow-hidden">
             <div class="accordion-item">
               <p class="fw-bold accordion-header" id="inn1AccHeader">
                 <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#inn1_card" aria-expanded="true" aria-controls="inn1_card">
@@ -251,7 +251,7 @@
 
           <!-- 2nd Innings -->
           {% if match_data_json.match.teams[1].inningNumbers | length !=0 %}
-          <div class="accordion my-1 border rounded bg-light">
+          <div class="accordion accordion-flush my-1 border rounded bg-light overflow-hidden">
             <div class="accordion-item">
               <p class="fw-bold accordion-header" id="inn2AccHeader">
                 <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#inn2_card" aria-expanded="true" aria-controls="inn2_card">
@@ -351,7 +351,7 @@
           {% endif %}
           
           <!-- Batting Impact Points -->
-          <div class="accordion my-1 border rounded bg-light">
+          <div class="accordion accordion-flush my-1 border rounded bg-light overflow-hidden">
             <div class="accordion-item">
               <p class="fw-bold accordion-header" id="batPtsHeader">
                 <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#bat_imp_pts" aria-expanded="true" aria-controls="bat_imp_pts">
@@ -386,7 +386,7 @@
           </div>
 
           <!-- Bowling Impact Points -->
-          <div class="accordion my-1 border rounded bg-light">
+          <div class="accordion accordion-flush my-1 border rounded bg-light overflow-hidden">
             <div class="accordion-item">
               <p class="fw-bold accordion-header" id="bowlPtsHeader">
                 <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#bowl_imp_pts" aria-expanded="true" aria-controls="bowl_imp_pts">
@@ -423,7 +423,7 @@
           </div>
 
           <!-- Innings 1 Partnerships -->
-          <div class="accordion my-1 border rounded bg-light">
+          <div class="accordion accordion-flush my-1 border rounded bg-light overflow-hidden">
             <div class="accordion-item">
               <p class="fw-bold accordion-header" id="ptnr_df1_head">
                 <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#ptnr_df1" aria-expanded="true" aria-controls="ptnr_df1">
@@ -460,7 +460,7 @@
           </div>
 
           <!-- Innings 2 Partnerships -->
-          <div class="accordion my-1 border rounded bg-light">
+          <div class="accordion accordion-flush my-1 border rounded bg-light overflow-hidden">
             <div class="accordion-item">
               <p class="fw-bold accordion-header" id="ptnr_df2_head">
                 <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#ptnr_df2" aria-expanded="true" aria-controls="ptnr_df2">
@@ -515,8 +515,7 @@
           </div>
           {% endif %}
           {% if match_data_json.match.teams[0].score is not none %}
-          <hr>
-          <p class="fs-5 fw-bold text-center">Distribution of Runs</p>
+          <p class="fs-5 fw-bold text-center border-top">Distribution of Runs</p>
           <iframe class="rounded" srcdoc="{{ i1_runs }}" width="100%" height="380px" frameborder="0" scrolling="no"></iframe>
           <p class="fs-6 mb-0 text-center">{{ match_data_json.match.teams[0].team.longName }}</p>
             {% if match_data_json.match.teams[1].score is not none %}

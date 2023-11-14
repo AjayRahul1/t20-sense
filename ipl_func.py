@@ -249,7 +249,7 @@ def get_particular_match_whole_score(series_id, match_id):
     bat1 = bat1.to_dict(orient='records')
     bowl1 = bowl1.to_dict(orient='records')
   except:
-    batt1 = {}
+    bat1 = {}
     bowl1 = {}
   
   try:

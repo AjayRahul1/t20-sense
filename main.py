@@ -5,9 +5,9 @@ from starlette.responses import RedirectResponse
 from fastapi.staticfiles import StaticFiles
 import pandas as pd, traceback, dotenv, json
 
-from ipl_func import get_particular_match_whole_score, get_match_info, get_graphical_stats_from_each_ball_data
+from ipl_func import get_particular_match_whole_score, get_match_info
 from base_functions import get_match_data_from_bucket, get_series_data_from_bucket
-from stats import batting_impact_points, bowlers_impact_points, get_ptnship, runs_in_ovs_fig,division_of_runs, DNB,team_squads
+from stats import bat_impact_pts, bowl_impact_pts, get_ptnship, runs_in_ovs_fig,division_of_runs, DNB, team_squads, graph_cricket_innings_progression
 
 app = FastAPI()
 templates = Jinja2Templates(directory="templates")
@@ -26,7 +26,7 @@ all_ipl_series_ids = {1345038: 2023, 1298423: 2022, 1249214: 2021, 1210595: 2020
 mlc_years = {1357742 : 2023}
 
 @app.get("/")
-def home(request: Request):
+async def home(request: Request):
   from base_functions import get_latest_intl_match_data
   latest_data = get_latest_intl_match_data()
   return templates.TemplateResponse("home.html",{"request": request, "latest_data":latest_data})
@@ -104,15 +104,15 @@ async def process(
     imp_pts = {}
     bow_imp_pts = {}
     try:
-      imp_pts, ptnrshp_df = batting_impact_points(series_id, match_id)  # Batting impact points
-      bat_df, bow_imp_pts = bowlers_impact_points(series_id,match_id)  #Bowlers impact points
+      imp_pts, ptnrshp_df = bat_impact_pts(series_id, match_id)  # Batting impact points
+      bat_df, bow_imp_pts = bowl_impact_pts(series_id,match_id)  #Bowlers impact points
       imp_pts = imp_pts.to_dict(orient='records')
       bow_imp_pts = bow_imp_pts.to_dict(orient='records')
     except Exception:
       imp_pts = {}
       bow_imp_pts = {}
 
-    line_plot_cumulative_team_score_graph_base64 = get_graphical_stats_from_each_ball_data(series_id=series_id, match_id=match_id)
+    line_plot_cumulative_team_score_graph_base64 = graph_cricket_innings_progression(series_id=series_id, match_id=match_id)
     i1_ptnr_df = {}
     i2_ptnr_df = {}
     ptnr_f1 = {}

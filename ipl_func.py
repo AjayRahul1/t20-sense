@@ -89,11 +89,11 @@ def get_match_info(series_id,match_id):
 ## Preprocessing Whole DataFrame
 """
 
-def preprocessing_innings_df(req_response):
+def preprocessing_innings_df(innings_json):
   # Choosing the features that we are going to need and use
   cols = ["batsman", "bowler", "title", "batsmanPlayerId", "bowlerPlayerId", "noballs", "legbyes", "byes", "wides",
           "isFour", "isSix", "isWicket", "totalRuns", "batsmanRuns", "dismissalType"]
-  main_df = pd.json_normalize(data=req_response.json()['comments'])
+  main_df = pd.json_normalize(data=innings_json['comments'])
   # Splitting the features of title to batsman and batsman
   main_df[['bowler', 'batsman']] = main_df['title'].str.split(' to ', expand=True).iloc[:, :2]
 
@@ -212,12 +212,13 @@ def batting_df_pre_operations(batsman_df):
 """## Get Innings DataFrame"""
 
 def get_innings_df(series_id, match_id, innings):
-  # get respone from API and the data and save to req_response
-  req_response = requests.get(f"https://hs-consumer-api.espncricinfo.com/v1/pages/match/comments?lang=en&seriesId={series_id}&matchId={match_id}&inningNumber={innings}&commentType=ALL&sortDirection=DESC&fromInningOver=-1")
+  # get respone from API and the data and save to innings_json
+  from base_functions import get_innings_data
+  innings_json = get_innings_data(series_id, match_id, innings)
 
   # Preprocessing the dataframe required
   # Getting Batsman and Bowling Dataframes separated
-  batsman_df, bowlers_df = preprocessing_innings_df(req_response)
+  batsman_df, bowlers_df = preprocessing_innings_df(innings_json)
 
   ''' Bowling Scorecard '''
 
@@ -262,7 +263,7 @@ def get_particular_match_whole_score(series_id, match_id):
 
 def get_request_response_API(series_id, match_id, innings_id):
   url = f'https://hs-consumer-api.espncricinfo.com/v1/pages/match/comments?lang=en&seriesId={series_id}&matchId={match_id}&inningNumber={innings_id}&commentType=ALL&sortDirection=DESC&fromInningOver=-1'
-  response = requests.get(url)
+  response = requests.get(url, headers={"User-Agent":	"Mozilla/5.0 (X11; Linux x86_64; rv:121.0) Gecko/20100101 Firefox/121.0"})
   return response
 
 def get_match_info_response_API(series_id, match_id):
@@ -275,13 +276,13 @@ def get_match_info_response_API(series_id, match_id):
 #@title Get Comments of a single innings in a match
 def get_comments_for_match_innings(series_id, match_id, innings_id):
   # Getting request response
-  response = get_request_response_API(series_id, match_id, innings_id)
+  innings_json = get_request_response_API(series_id, match_id, innings_id)
 
   # Initialized empty list
   innings_comments = []
 
   # JSON loading
-  for i in response.json()['comments']:
+  for i in innings_json['comments']:
     comment_obj = {}
     if i['commentTextItems']:
       comment_obj['comments'] = i['commentTextItems'][0]['html']
@@ -314,8 +315,8 @@ def get_one_innings_from_extracted_data(series_id, match_id, innings_id):
                       'dismissalType', 'byes', 'legbyes','wides',
                       'noballs', 'penalties','title']
 
-  req_response = get_request_response_API(series_id, match_id, innings_id)
-  main_df = pd.json_normalize(data=req_response.json()['comments'])
+  innings_json = get_request_response_API(series_id, match_id, innings_id)
+  main_df = pd.json_normalize(data=innings_json['comments'])
 
   # Getting all the comments
   innings_comments = get_comm(series_id, match_id, innings_id)

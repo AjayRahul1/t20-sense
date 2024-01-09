@@ -1,38 +1,49 @@
 import pandas as pd, requests, os, pickle
 from google.cloud import storage  # Google Cloud Storage Imports
 
-# Set the path to your service account key file
-os.environ['GOOGLE_APPLICATION_CREDENTIALS'] = os.getenv('API_KEY') # 't20-sense-main.json'
-
-# Create a client using the credentials
-storage_client = storage.Client()
-
 # Global Variables
 ipl_all_series_ids = [313494, 374163, 418064, 466304, 520932, 586733, 695871, 791129, 968923, 1078425, 1131611, 1165643, 1210595, 1249214, 1298423, 1345038]
 
-def get_series_info_response_API(series_id):
+headers={"User-Agent":	"Mozilla/5.0 (X11; Linux x86_64; rv:121.0) Gecko/20100101 Firefox/121.0"}
+
+def get_series_info_API(series_id):
+  """
+  This function is to get response JSON by giving following parameters.
+  params: series_id
+  It gives matches of entire series and other data.
+  """
   url = f"https://hs-consumer-api.espncricinfo.com/v1/pages/series/schedule?lang=en&seriesId={series_id}"
-  response = requests.get(url)
+  response = requests.get(url, headers=headers)
   return response.json()
 
-def get_match_info_response_API(series_id, match_id):
+def get_match_info_API(series_id, match_id):
+  """
+  This function is to get response JSON by giving following parameters
+  params: series_id, match_id
+  It gives entire match related data in that particular series.
+  """
   url = f"https://hs-consumer-api.espncricinfo.com/v1/pages/match/home?lang=en&seriesId={series_id}&matchId={match_id}"
-  response = requests.get(url)
+  response = requests.get(url, headers=headers)
   return response.json()
 
-def get_innings_info_response_API(series_id, match_id, innings_id):
+def get_innings_info_API(series_id, match_id, innings_id):
+  """
+  This function is to get response JSON by giving parameters
+  params: series_id, match_id, innings_no.
+  It gives ball by ball detailed information in an innings.
+  """
   url = f'https://hs-consumer-api.espncricinfo.com/v1/pages/match/comments?lang=en&seriesId={series_id}&matchId={match_id}&inningNumber={innings_id}&commentType=ALL&sortDirection=DESC&fromInningOver=-1'
-  response = requests.get(url)
+  response = requests.get(url, headers=headers)
   return response.json()
 
 def match_ids(series_id):
   url = f"https://hs-consumer-api.espncricinfo.com/v1/pages/series/schedule?lang=en&seriesId={series_id}"
-  output = requests.get(url)
+  output = requests.get(url, headers=headers)
   matches = output.json()['content']["matches"]
   df_m = pd.json_normalize(data=matches)
   return df_m['objectId']
 
-def create_series_info_bucket():
+def create_series_info_bucket(storage_client):
   # Variables
   global ipl_all_series_ids
   bucket_name = os.getenv('BUCKET_NAME')
@@ -55,7 +66,7 @@ def create_series_info_bucket():
           continue
       else:
           # File doesn't exist. So uploading
-          series_json_data = get_series_info_response_API(series_id)
+          series_json_data = get_series_info_API(series_id)
           series_json_data = pickle.dumps(series_json_data)
 
           # Upload the pickled data to the bucket
@@ -86,11 +97,20 @@ def create_match_info_bucket():
             # File Exists
             continue
         else:
-          match_json_data = get_match_info_response_API(series_id, match_id)
+          match_json_data = get_match_info_API(series_id, match_id)
           match_json_data = pickle.dumps(match_json_data)
           
           blob.upload_from_string(match_json_data, content_type='application/octet-stream')
 
 if __name__ == '__main__':
-  create_series_info_bucket()
-  create_match_info_bucket()
+  try:
+    # Set the path to your service account key file
+    os.environ['GOOGLE_APPLICATION_CREDENTIALS'] = os.getenv('API_KEY') # 't20-sense-main.json'
+
+    # Create a client using the credentials
+    storage_client = storage.Client()
+
+    create_series_info_bucket(storage_client)
+    create_match_info_bucket(storage_client)
+  except:
+    print("Unable to setup since API KEY not found. Setup through Env Variables")

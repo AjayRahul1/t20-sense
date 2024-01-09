@@ -1,7 +1,6 @@
-import pandas as pd, requests, traceback, warnings, numpy as np, base64
-from matplotlib.figure import Figure
+import pandas as pd, requests, traceback, warnings
 from datetime import datetime
-import asyncio, os, io
+import os, io
 
 # Google Cloud Storage Imports
 from google.cloud import storage
@@ -68,22 +67,22 @@ def get_matches_returns_dict(series_id, stage="FINISHED"):
 """# Match Info"""
 
 def get_match_info(series_id,match_id):
-    try:
-        url = f"https://hs-consumer-api.espncricinfo.com/v1/pages/match/home?lang=en&seriesId={series_id}&matchId={match_id}"
-        output = requests.get(url)
-        team1 = output.json()['match']["teams"][0]["team"]["longName"]
-        team1_sn = output.json()['match']["teams"][0]["team"]["abbreviation"]
+  from base_functions import get_match_data_from_bucket
+  try:
+    output = get_match_data_from_bucket(series_id, match_id)
+    team1 = output['match']["teams"][0]["team"]["longName"]
+    team1_sn = output['match']["teams"][0]["team"]["abbreviation"]
 
-        team2 = output.json()['match']["teams"][1]["team"]["longName"]
-        team2_sn = output.json()['match']["teams"][1]["team"]["abbreviation"]
+    team2 = output['match']["teams"][1]["team"]["longName"]
+    team2_sn = output['match']["teams"][1]["team"]["abbreviation"]
 
-        match_date = datetime.strptime(output.json()['match']['startDate'].split("T")[0], '%Y-%m-%d')
-        result = output.json()['match']["statusText"]
-        match_num = output.json()['match']['title']
-        title = team1_sn + " vs " + team2_sn + " " + match_num
-        return match_date.strftime('%B %d %Y'), result, title
-    except Exception as e:
-        traceback.print_exc()
+    match_date = datetime.strptime(output['match']['startDate'].split("T")[0], '%Y-%m-%d')
+    result = output['match']["statusText"]
+    match_num = output['match']['title']
+    title = team1_sn + " vs " + team2_sn + " " + match_num
+    return match_date.strftime('%B %d %Y'), result, title
+  except Exception as e:
+    traceback.print_exc()
 
 """# Get Innings
 
@@ -249,7 +248,7 @@ def get_particular_match_whole_score(series_id, match_id):
     bat1 = bat1.to_dict(orient='records')
     bowl1 = bowl1.to_dict(orient='records')
   except:
-    batt1 = {}
+    bat1 = {}
     bowl1 = {}
   
   try:
@@ -345,45 +344,6 @@ def get_one_innings_from_extracted_data(series_id, match_id, innings_id):
   # Reversing the dataframe from 20th to 1st over into 1st to 20th over
   final_df = final_df[::-1]
   return final_df
-
-def get_graphical_stats_from_each_ball_data(series_id, match_id):
-  # Ball By Ball for 1st innings
-  try:
-    req_response = get_request_response_API(series_id, match_id, 1)
-    ball_by_ball_json = pd.json_normalize(data=req_response.json()['comments'])
-    inn1_team_color = get_match_info_response_API(series_id, match_id)['content']['innings'][0]['team']['primaryColor']
-    nparr_each_ball_score_inn1 = np.array(ball_by_ball_json['totalInningRuns'])
-    nparr_over_no_where_team_score_at_inn1 = np.array(ball_by_ball_json['oversActual'])
-  except:
-    inn1_team_color = "#00FFFFFF"
-    nparr_each_ball_score_inn1 = np.array([])
-    nparr_over_no_where_team_score_at_inn1 = np.array([])
-  
-  # Ball By Ball for 2nd innings
-  try:
-    req_response = get_request_response_API(series_id, match_id, 2)
-    ball_by_ball_json = pd.json_normalize(data=req_response.json()['comments'])
-    inn2_team_color = get_match_info_response_API(series_id, match_id)['content']['innings'][1]['team']['primaryColor']
-    nparr_each_ball_score_inn2 = np.array(ball_by_ball_json['totalInningRuns'])
-    nparr_over_no_where_team_score_at_inn2 = np.array(ball_by_ball_json['oversActual'])
-  except:
-    inn2_team_color = "#00FFFFFF"
-    nparr_each_ball_score_inn2 = np.array([])
-    nparr_over_no_where_team_score_at_inn2 = np.array([])
-
-  fig = Figure()
-  ax = fig.add_subplot(1, 1, 1)
-  ax.plot(nparr_over_no_where_team_score_at_inn1, nparr_each_ball_score_inn1, color=inn1_team_color)
-  ax.plot(nparr_over_no_where_team_score_at_inn2, nparr_each_ball_score_inn2, color=inn2_team_color)
-  ax.set_xlabel("Overs")
-  ax.set_ylabel("Runs")
-
-  img_stream = io.BytesIO()
-  fig.savefig(img_stream, format="png")
-  img_stream.seek(0)
-  line_plot_cumulative_team_score_graph_base64 = base64.b64encode(img_stream.read()).decode("utf-8")
-
-  return line_plot_cumulative_team_score_graph_base64
 
 def get_matches_returns_list(series_id, stage="FINISHED"):
   try:

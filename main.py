@@ -144,4 +144,4 @@ async def process(
     return templates.TemplateResponse("index.html", context=context)
   except:
     traceback.print_exc()
-    return templates.TemplateResponse('error_pages/no_scorecard.html', {"request": request})
+    return templates.TemplateResponse('error_pages/no_scorecard.html', {"request": request}, status_code=404)

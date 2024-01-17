@@ -1,4 +1,4 @@
-import pandas as pd, traceback, os, pickle
+import os, pickle
 from google.cloud import storage
 
 try:
@@ -82,3 +82,34 @@ def get_latest_domestic_match_data():
   ld['matches'] = [it for it in ld['matches'] if it['internationalClassId'] is None]
   ld['matches'] = sorted(ld['matches'], key=custom_sort)
   return ld
+
+def get_match_players_dict(series_id: int, match_id: int):
+  """
+  @params: series_id, match_id
+  If series_id and match_id are passed, then this function gets called,
+  then retrieves JSON from API and then gets players names.
+  """
+  content = get_match_data_from_bucket(series_id, match_id)['content']
+  # Generating a dictionary of players who played in that match to map it later
+  # for who ever was out and was in the partnership using Dictionary Comprehension
+  players_dict = {
+    player['player']['id']: player['player']['longName']
+    for team in content['matchPlayers']['teamPlayers']
+    for player in team['players']
+  }
+  return players_dict
+
+def get_match_players_dict(content: dict):
+  """
+  @params: content
+  content: The second part of the match dictionary.
+  If content of API JSON are passed, then this function gets called and then loops over it to get player names.
+  """
+  # Generating a dictionary of players who played in that match to map it later
+  # for who ever was out and was in the partnership using Dictionary Comprehension
+  players_dict = {
+    player['player']['id']: player['player']['longName']
+    for team in content['matchPlayers']['teamPlayers']
+    for player in team['players']
+  }
+  return players_dict

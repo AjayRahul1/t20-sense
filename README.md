@@ -74,7 +74,7 @@ cd t20-sense/
 
 - This is an optional step that improves performance.
 - If you have a Google Cloud Platform Key, you have to set two Environment Variables.
-- `setx API_KEY="your_jsonkey_name.json"`
+- `setx API_KEY="your_gcp_key_name.json"`
 - `setx BUCKET_NAME="gcp_bucket_name"`
 - run setup_bucket_functions.py with your key to set up required files onto your `Google Cloud Storage` Buckets.
   - This takes 30 mins to 1 hour of time to setup all the required files.
@@ -93,7 +93,7 @@ cd t20-sense/
 
 Ubuntu
 
-```shell
+```sh
 # Verifying Python v3.11
 python3 --version
 # Create Virtual Environment with name 'venv'
@@ -102,8 +102,8 @@ python3 -m venv venv
 source venv/bin/activate
 # Installing Requirements
 pip install -r requirements.txt
-# setting up environment variables
-export API_KEY="your_jsonkey_name.json"
+# setting up environment variables of Google Cloud Platform
+export API_KEY="your_gcp_key_name.json"
 export BUCKET_NAME="gcp_bucket_name"
 # Run the project on LocalHost
 uvicorn main:app --reload
@@ -111,7 +111,7 @@ uvicorn main:app --reload
 
 Fedora
 
-```shell
+```sh
 # Verifying Python v3.11
 python --version
 # Create Virtual Environment with name 'venv'
@@ -120,8 +120,8 @@ python -m venv venv
 source venv/bin/activate
 # Installing Requirements
 pip install -r requirements.txt
-# setting up environment variables
-export API_KEY="your_jsonkey_name.json"
+# setting up environment variables of Google Cloud Platform
+export API_KEY="your_gcp_key_name.json"
 export BUCKET_NAME="gcp_bucket_name"
 # Run the project on LocalHost
 uvicorn main:app --reload

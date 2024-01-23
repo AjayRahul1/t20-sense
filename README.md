@@ -1,3 +1,5 @@
+![T20 Sense Thumbnail (AI Generated with prompt 'Text "Cricket" with symbols of cricket like Bat, Stumps, Red Cork Ball, White Cork Ball, LBW Pads, Stump Bails, helmet, Wicket Keeper Gloves around')](/static/t20-sense-thumbnail.jpeg)
+
 # T20 Sense
 
 > Data Analytics in the Cricket World and even more...

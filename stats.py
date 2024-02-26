@@ -1,11 +1,10 @@
-import requests, os, io, base64, pandas as pd
+import os, io, base64, pandas as pd
 from google.cloud import storage  # Google Cloud Storage Imports
 import matplotlib.pyplot as plt
 from matplotlib.figure import Figure
 import plotly.express as px
 import plotly.graph_objects as go
 import plotly.offline as pyo
-import plotly.io as pio
 
 from base_functions import get_series_data_from_bucket, get_match_data_from_bucket, get_innings_data, get_match_players_dict
 
@@ -17,19 +16,20 @@ try:
 except:
   print("API KEY not found")
 
-def conv_to_base64(fig):
+def conv_to_base64(fig: Figure) -> str:
   img_stream = io.BytesIO()
   fig.savefig(img_stream, format="png")
   img_stream.seek(0)
   img_data = base64.b64encode(img_stream.read()).decode("utf-8")
   return img_data
 
-def conv_to_html(fig):
-    # Convert the Plotly figure to HTML using plotly.io.to_html
-    fig_html = pio.to_html(fig, full_html=False)
-    return fig_html
+def conv_to_html(fig) -> str:
+  """Convert the Plotly figure to HTML using plotly.io.to_html"""
+  import plotly.io as pio
+  fig_html = pio.to_html(fig, full_html=False)
+  return fig_html
 
-def bat_impact_pts(series_id, match_id):
+def bat_impact_pts(series_id: int, match_id: int):
   content = get_match_data_from_bucket(series_id, match_id)['content']
   # players_dictionary = get_match_players_dict(content=content)
   player_dict={}
@@ -310,7 +310,7 @@ def bat_impact_pts(series_id, match_id):
     df1['SR'] = df1['SR'].round(2)
   return df1,partnership_df
 
-def bowl_impact_pts(series_id,match_id):
+def bowl_impact_pts(series_id: int,match_id: int):
   player_dict={}
   output1 = get_match_data_from_bucket(series_id, match_id)
   for i in range(0,2):
@@ -668,7 +668,7 @@ def division_of_runs(series_id, match_id):
   i2_runs = conv_to_html(fig2)
   return i1_runs, i2_runs
 
-def DNB(series_id,match_id):
+def DNB(series_id: int,match_id: int):
   innings = get_match_data_from_bucket(series_id, match_id)['content']['innings']
   DNB1=[]
   DNB2=[]
@@ -693,9 +693,9 @@ def DNB(series_id,match_id):
           DNB2.append(batsman_name)
         else:
           continue
-  return DNB1,DNB2
+  return DNB1, DNB2
 
-def team_squads(series_id, match_id):
+def team_squads(series_id: int, match_id: int) -> tuple[list, list]:
   team1_squad=[]
   team2_squad=[]
   teamplayers = get_match_data_from_bucket(series_id, match_id)['content']['matchPlayers']['teamPlayers']
@@ -719,10 +719,10 @@ def team_squads(series_id, match_id):
     if playerrole == "WK":
      player_name = player_name + " (WK)"
     team2_squad.append(player_name)
-  return team1_squad,team2_squad
+  return team1_squad, team2_squad
 
 
-def data_query(series_id, match_id):
+def data_query(series_id: int, match_id: int):
   # Your BigQuery SQL query
   q1 = f"""
       SELECT batsman, SUM(batsmanruns) AS run
@@ -745,4 +745,4 @@ def data_query(series_id, match_id):
   # Run the query
   bat = storage_client.query(q1).to_dataframe().to_dict(orient='records')# batsman data from the series
   bowl = storage_client.query(q2).to_dataframe().to_dict(orient='records')# bolwer data from the series
-  return bat,bowl
+  return bat, bowl

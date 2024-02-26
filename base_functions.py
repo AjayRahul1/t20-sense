@@ -1,4 +1,4 @@
-import os, pickle
+import os, json
 from google.cloud import storage
 
 try:
@@ -10,20 +10,24 @@ except:
   print("API KEY not found")
 
 # Base Functions
-def get_series_data_from_bucket(series_id):
+def get_series_data_from_bucket(series_id: int) -> dict:
+  """Retrieves Information about a SERIES/TOURNAMENT.
+
+  :param series_id: The ID for the tournaments.
+  :return: Return JSON data (dict) of info about entire series and other data."""
   try:
     bucket_name = os.getenv('BUCKET_NAME')
     # fp stands for File Path
-    fp = f't20_sense_series_info/s_{series_id}_data.pkl'
+    fp = f't20_sense_series_info/s_{series_id}_data.json'
     bucket = storage_client.get_bucket(bucket_name)
     # Get the blob (file) from the bucket
     blob = bucket.blob(fp)
-    # Download the pickle file data as bytes
-    pickled_data = blob.download_as_bytes()
-    # Load the pickled data
-    ld = pickle.loads(pickled_data)
+    # Download the json file data as bytes
+    json_data = blob.download_as_bytes()
+    # Load the json data
+    ld = json.loads(json_data)
     # Lets us know whether bucket is used or API
-    print("Using GCS Bucket to get Series Data")
+    print("Getting Series Data from GCS Bucket...")
   except:
     import requests
     print("GCS Bucket has some exception. So turning to ESPN Cricinfo API to get Series Data")
@@ -32,19 +36,25 @@ def get_series_data_from_bucket(series_id):
     ld = requests.get(url, headers=headers)
   return ld.json() # ld stands for the loaded data that came from JSON
 
-def get_match_data_from_bucket(series_id, match_id):
+def get_match_data_from_bucket(series_id: int, match_id: int) -> dict:
+  """Retrieves info about a MATCH of a series/tournament from GCS Bucket if key was provided else from Cricket API.
+
+  :param series_id: ID of the series/tournament.
+  :param match_id: ID of the match in the series/tournament.
+  :return: JSON Data for one match in the series/tournament.
+  """
   try:
     bucket_name = os.getenv('BUCKET_NAME')
-    fp = f't20_sense_match_info/s_{series_id}_m_{match_id}_data.pkl' # fp stands for File Path
+    fp = f't20_sense_match_info/s_{series_id}_m_{match_id}_data.json' # fp stands for File Path
     bucket = storage_client.get_bucket(bucket_name)
     # Get the blob (file) from the bucket
     blob = bucket.blob(fp)
     # Download the pickle file data as bytes
-    pickled_data = blob.download_as_bytes()
+    json_data = blob.download_as_bytes()
     # Load the pickled data
-    ld = pickle.loads(pickled_data)
+    ld = json.loads(json_data)
     # Lets us know whether bucket is used or API
-    print("Using GCS Bucket to get Match Data")
+    print("Getting Match Data from GCS Bucket...")
   except:
     import requests
     print("GCS Bucket has some exception. So turning to ESPN Cricinfo API to get Match Data")
@@ -53,7 +63,13 @@ def get_match_data_from_bucket(series_id, match_id):
     ld = requests.get(url, headers=headers)
   return ld.json() # ld stands for the loaded data that came from JSON
 
-def get_innings_data(series_id, match_id, innings):
+def get_innings_data(series_id: int, match_id: int, innings: int) -> dict:
+  """Retrieves info about an INNINGS of a match of a series/tournament from GCS Bucket if key was provided else from Cricket API.
+
+  :param series_id: ID of the tournament.
+  :param match_id: ID of the match in the tournament.
+  :param innings_no:
+  :return: JSON Data of ball by ball in each innings."""
   import requests
   url = f"https://hs-consumer-api.espncricinfo.com/v1/pages/match/comments?lang=en&seriesId={series_id}&matchId={match_id}&inningNumber={innings}&commentType=ALL&sortDirection=DESC&fromInningOver=-1"
   headers={"User-Agent":	"Mozilla/5.0 (X11; Linux x86_64; rv:121.0) Gecko/20100101 Firefox/121.0"}
@@ -83,11 +99,10 @@ def get_latest_domestic_match_data():
   ld['matches'] = sorted(ld['matches'], key=custom_sort)
   return ld
 
-def get_match_players_dict(series_id: int, match_id: int):
-  """
-  @params: series_id, match_id
-  If series_id and match_id are passed, then this function gets called,
-  then retrieves JSON from API and then gets players names.
+def get_match_players_dict(series_id: int, match_id: int) -> dict:
+  """If series_id and match_id are passed, then this function gets called, returns players names.
+  :param series_id: ID of the series/tournament.
+  :param match_id: ID of the match in the series/tournament.
   """
   content = get_match_data_from_bucket(series_id, match_id)['content']
   # Generating a dictionary of players who played in that match to map it later
@@ -99,12 +114,10 @@ def get_match_players_dict(series_id: int, match_id: int):
   }
   return players_dict
 
-def get_match_players_dict(content: dict):
-  """
-  @params: content
-  content: The second part of the match dictionary.
-  If content of API JSON are passed, then this function gets called and then loops over it to get player names.
-  """
+def get_match_players_dict(content: dict) -> dict:
+  """If content of API JSON are passed, then this function gets called and then loops over it to get player names.
+
+  :param content: The second part of the match dictionary."""
   # Generating a dictionary of players who played in that match to map it later
   # for who ever was out and was in the partnership using Dictionary Comprehension
   players_dict = {

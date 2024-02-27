@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="icon" type="image/png" href="/static/favicon-t20-sense.png">
-  <title>{{ ser_data.series.longName }} {{ser_data.series.year}} &bull; T20Sense</title>
+  <title>{{ser_data.series.longName}} {{ser_data.series.year}} &bull; T20Sense</title>
 
   <!-- HTMX Import -->
   <script src="https://unpkg.com/htmx.org@1.9.2"></script>
@@ -18,7 +18,17 @@
   {% include "layout/navbar.html" %}
 
   <div class="container-fluid">
-    <p class="fs-1 m-0">{{ ser_data.series.longName }} {{ser_data.series.year}}</p>
+    <!-- Dropdown to select the tournaments -->
+    <div class="btn-group my-2">
+      <button class="btn btn-dark btn-lg dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+        {{ ser_data.series.longName }} {{ser_data.series.year}}
+      </button>
+      <ul class="dropdown-menu">
+        {% for series in ser_data.content.recentSimilarSerieses %}
+          <li><a class="dropdown-item" href="/series/{{series.objectId}}">{{series.longName}} {{series.season}}</a></li>
+        {% endfor %}
+      </ul>
+    </div>
     <div>
       <!-- All matches links in the series div -->
       <div>

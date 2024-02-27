@@ -1,4 +1,34 @@
 {
-  "0" : "IPL",
-  "1" : "MLC"
+  "sitemap": [
+    {"slug": "/", "name": "Home", "season": null},
+    {"slug": "series/1345038", "name": "IPL", "season": "2023"},
+    {"slug": "series/1357742", "name": "MLC", "season": "2023"},
+    {"slug": "series/1367856", "name": "World Cup", "season": "2023"},
+    {"slug": "series/1345943", "name": "World Test Championship", "season": "2023/25"}
+  ],
+  "latest" : [
+    {"id": 1345038, "name": "IPL", "season": "2023"},
+    {"id": 1357742, "name": "MLC", "season": "2023"},
+    {"id": 1367856, "name": "World Cup", "season": "2023"},
+    {"id": 1345943, "name": "World Test Championship", "season": "2023/25"}
+  ],
+  "series": {
+    "ipl": {
+      "id" : 0, "name" : "IPL", "full_name" : "Indian Premier League", "slug": "ipl",
+      "series_ids" : [313494, 374163, 418064, 466304, 520932, 586733, 695871, 791129, 968923, 1078425, 1131611, 1165643, 1210595, 1249214, 1298423, 1345038]
+    },
+    "mlc": {
+      "id" : 1, "name" : "MLC", "full_name" : "Major League Cricket", "slug": "mlc",
+      "series_ids" : [1357742]
+    },
+    "cwc": {
+      "id" : 2, "name" : "CWC", "full_name" : "Cricket World Cup", "slug": "cwc",
+      "series_ids" : [60793, 60806, 60832, 60876, 60924, 60981, 61046, 61124, 125929, 381449, 509587, 1144415, 1367856]
+    },
+    "wtc": {
+      "id" : 3, "name" : "WTC", "full_name" : "World Test Championship", "slug": "wtc",
+      "series_ids" : [1195334, 1268315, 1345943]
+    }
+  },
+  "lastUpdated" : "2024-02-27"
 }

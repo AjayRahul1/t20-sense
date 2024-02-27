@@ -67,7 +67,7 @@ def get_matches_returns_dict(series_id, stage="FINISHED"):
 """# Match Info"""
 
 def get_match_info(series_id,match_id):
-  from base_functions import get_match_data_from_bucket
+  from base_fns import get_match_data_from_bucket
   try:
     output = get_match_data_from_bucket(series_id, match_id)
     team1 = output['match']["teams"][0]["team"]["longName"]
@@ -213,7 +213,7 @@ def batting_df_pre_operations(batsman_df):
 
 def get_innings_df(series_id, match_id, innings):
   # get respone from API and the data and save to innings_json
-  from base_functions import get_innings_data
+  from base_fns import get_innings_data
   innings_json = get_innings_data(series_id, match_id, innings)
 
   # Preprocessing the dataframe required

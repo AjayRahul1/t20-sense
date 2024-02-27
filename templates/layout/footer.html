@@ -89,16 +89,16 @@
       <div class="col-md-4 col-12">
         <p class="mb-0 text-dark">Contact Us</p>
         <ul class="list-unstyled">
-          <li><a class="link-primary link-offset-1-hover link-underline link-underline-opacity-0 link-underline-opacity-100-hover" href="mailto:admin@cloudkarya.com">admin@cloudkarya.com</a></li>
-          <li><a class="link-primary link-offset-1-hover link-underline link-underline-opacity-0 link-underline-opacity-100-hover" href="tel:+1 4084217409">+1 408-421-7409</a></li>
+          <li><a class="link-primary link-offset-1-hover link-underline link-underline-opacity-0 link-underline-opacity-100-hover" href="mailto:p.ajayrahul02@gmail.com">p.ajayrahul02@gmail.com</a></li>
+          <li><a class="link-primary link-offset-1-hover link-underline link-underline-opacity-0 link-underline-opacity-100-hover" href="tel:+91 8008337433">+91 800-833-7433</a></li>
         </ul>
       </div>
       <div class="col-md-4 col-12 text-center">
         <p class="mb-0 text-dark">Site Map</p>
         <ul class="list-unstyled">
-          <li><a class="link-primary link-offset-1-hover link-underline link-underline-opacity-0 link-underline-opacity-100-hover" href="/">Home</a></li>
-          <li><a class="link-primary link-offset-1-hover link-underline link-underline-opacity-0 link-underline-opacity-100-hover" href="/ipl">IPL</a></li>
-          <li><a class="link-primary link-offset-1-hover link-underline link-underline-opacity-0 link-underline-opacity-100-hover" href="/mlc">MLC</a></li>
+          {% for site in page_indices_json.sitemap %}
+          <li><a class="link-primary link-offset-1-hover link-underline link-underline-opacity-0 link-underline-opacity-100-hover" href="{{site.slug}}">{{site.name}}</a></li>
+          {% endfor %}
         </ul>
       </div>
       <div class="col-md-4 col-12 text-end">

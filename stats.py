@@ -6,7 +6,7 @@ import plotly.express as px
 import plotly.graph_objects as go
 import plotly.offline as pyo
 
-from base_functions import get_series_data_from_bucket, get_match_data_from_bucket, get_innings_data, get_match_players_dict
+from base_fns import get_series_data_from_bucket, get_match_data_from_bucket, get_innings_data, get_match_players_dict
 
 try:
   # Set the path to your service account key file

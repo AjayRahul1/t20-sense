@@ -1,4 +1,4 @@
-import os, io, base64, pandas as pd
+import os, io, base64, pandas as pd, base_fns
 from google.cloud import storage  # Google Cloud Storage Imports
 import matplotlib.pyplot as plt
 from matplotlib.figure import Figure
@@ -6,8 +6,7 @@ import plotly.express as px
 import plotly.graph_objects as go
 import plotly.offline as pyo
 
-from base_fns import get_series_data_from_bucket, get_match_data_from_bucket, get_innings_data, get_match_players_dict
-
+from base_fns import get_series_data_from_bucket, get_match_data_from_bucket, get_innings_data, get_match_players_dict, conv_to_base64, conv_to_html
 try:
   # Set the path to your service account key file
   os.environ['GOOGLE_APPLICATION_CREDENTIALS'] = os.getenv('API_KEY') # 't20-sense-main.json'
@@ -16,26 +15,103 @@ try:
 except:
   print("API KEY not found")
 
-def conv_to_base64(fig: Figure) -> str:
-  img_stream = io.BytesIO()
-  fig.savefig(img_stream, format="png")
-  img_stream.seek(0)
-  img_data = base64.b64encode(img_stream.read()).decode("utf-8")
-  return img_data
+class CricketData:
+  def __init__(self, series_id: int, match_id: int):
+    self.series_id: int = series_id
+    self.match_id: int = match_id
+    self.series_data: dict = base_fns.get_series_data_from_bucket(series_id)
+    self.match_data: dict = base_fns.get_match_data_from_bucket(series_id, match_id)
+    innings_count = self.match_data["match"]["liveInning"]
+    self.all_innings_data: list[dict] = [
+      base_fns.get_innings_data(series_id, match_id, innings_no) for innings_no in range(1, innings_count+1)
+    ]
+  
+  def runs_in_ovs_fig(self):
+    matchInningsContent = self.match_data['content']['innings']
+    for k in range(0, len(matchInningsContent)):
+      inningovers = matchInningsContent[k]['inningOvers']
+      if k==0:
+        try:
+          # for i in range(0, len(inningovers)):
+          #   ov_no_1.append(inningovers[i]['overNumber'])
+          #   ov_runs_1.append(inningovers[i]['overRuns'])
+          #   ov_wkts_1.append(inningovers[i]['overWickets'])
+          ov_no_1, ov_runs_1, ov_wkts_1 = zip(*[(inningovers[i]['overNumber'], inningovers[i]['overRuns'], inningovers[i]['overWickets']) for i in range(0, len(inningovers))])
+        except:
+          ov_no_1, ov_runs_1, ov_wkts_1 = [0] * len(inningovers), [0] * len(inningovers), [0] * len(inningovers)
+      elif k==1:
+        try:
+          # for i in range(0,len(inningovers)):
+          #   ov_no_2.append(inningovers[i]['overNumber'])
+          #   ov_runs_2.append(inningovers[i]['overRuns'])
+          #   ov_wkts_2.append(inningovers[i]['overWickets'])
+          ov_no_2, ov_runs_2, ov_wkts_2 = zip(*[(inningovers[i]['overNumber'], inningovers[i]['overRuns'], inningovers[i]['overWickets']) for i in range(0, len(inningovers))])
+        except:
+          ov_no_2, ov_runs_2, ov_wkts_2 = [0] * len(inningovers), [0] * len(inningovers), [0] * len(inningovers)
+    
+    fig1 = Figure(figsize=(8, 6))
+    fig2 = Figure(figsize=(8, 6))
 
-def conv_to_html(fig) -> str:
-  """Convert the Plotly figure to HTML using plotly.io.to_html"""
-  import plotly.io as pio
-  fig_html = pio.to_html(fig, full_html=False)
-  return fig_html
+    ax = fig1.add_subplot(1, 1, 1)
+    ax.set_ylabel('Runs')
+    ax.set_xlabel('Overs')
+    ax.set_title('Runs Per Over - Innings 1')
+    ax.bar(ov_no_1, ov_runs_1)
+    inn1_ovs_runs = base_fns.conv_to_base64(fig1)
+    
+    ax = fig2.add_subplot(1, 1, 1)
+    ax.set_ylabel('Runs')
+    ax.set_xlabel('Overs')
+    ax.set_title('Runs Per Over - Innings 2')
+    ax.bar(ov_no_2, ov_runs_2)
+    inn2_ovs_runs = base_fns.conv_to_base64(fig2)
+    
+    return inn1_ovs_runs, inn2_ovs_runs
+  
+  def division_of_runs(self):
+    inn1_runs = [0, 0, 0, 0, 0, 0]
+    inn2_runs = [0, 0, 0, 0, 0, 0]
+
+    for innings in [1, 2]:
+      try:
+        comments = self.all_innings_data[innings-1]['comments']
+        for i in range(0, len(comments)):
+          runs, wides, four, six = comments[i]['batsmanRuns'], comments[i]['wides'], comments[i]['isFour'], comments[i]['isSix']
+          if runs == 1:
+            inn_runs = inn1_runs if innings == 1 else inn2_runs
+            inn_runs[1] += 1
+          elif runs == 2:
+            inn_runs = inn1_runs if innings == 1 else inn2_runs
+            inn_runs[2] += 1
+          elif runs == 3:
+            inn_runs = inn1_runs if innings == 1 else inn2_runs
+            inn_runs[3] += 1
+          if runs == 0 and wides == 0:
+            inn_runs = inn1_runs if innings == 1 else inn2_runs
+            inn_runs[0] += 1
+          if four:
+            inn_runs = inn1_runs if innings == 1 else inn2_runs
+            inn_runs[4] += 1
+          if six:
+            inn_runs = inn1_runs if innings == 1 else inn2_runs
+            inn_runs[5] += 1
+      except:
+        print(f"Exception in Division of Runs for s{self.series_id}, m{self.match_id}, i{innings}")
+        continue
+    fig_labels=["dots", "1s", "2s", "3s", "4s", "6s"]
+    fig1 = go.Figure(data=[go.Pie(labels=fig_labels, values=inn1_runs, textinfo='value')])
+    fig2 = go.Figure(data=[go.Pie(labels=fig_labels, values=inn2_runs, textinfo='value')])
+    i1_runs = base_fns.conv_to_html(fig1)
+    i2_runs = base_fns.conv_to_html(fig2)
+    return i1_runs, i2_runs
 
 def bat_impact_pts(series_id: int, match_id: int):
-  content = get_match_data_from_bucket(series_id, match_id)['content']
   # players_dictionary = get_match_players_dict(content=content)
   player_dict={}
-  # matches_ids=match_ids(series_id)
+  # matches_ids = match_ids(series_id)
   # for match_id in matches_ids:
   output1=get_match_data_from_bucket(series_id, match_id)
+  content = output1['content']
   for i in range(0,2):
     try:
       matches1 = output1['content']['matchPlayers']['teamPlayers'][i]['players']
@@ -308,7 +384,7 @@ def bat_impact_pts(series_id: int, match_id: int):
     # b_df1 = b_df[b_df['Performance_score'] != 0]
     df1=df1.sort_values(by='impact_points', ascending=False)
     df1['SR'] = df1['SR'].round(2)
-  return df1,partnership_df
+  return df1, partnership_df
 
 def bowl_impact_pts(series_id: int,match_id: int):
   player_dict={}
@@ -416,7 +492,7 @@ def bowl_impact_pts(series_id: int,match_id: int):
   b_df=b_df.sort_values(by='impact_points', ascending=False)
   return df,b_df
 
-def get_ptnship(series_id,match_id):
+def get_ptnship(series_id, match_id):
   content = get_match_data_from_bucket(series_id, match_id)['content']
   # Generating a dictionary of players who played in that match to map it later
   # for who ever was out and was in the partnership using Dictionary Comprehension
@@ -661,18 +737,26 @@ def division_of_runs(series_id, match_id):
     except:
       print("Exception in Division of Runs for s", series_id," m", match_id," i", innings)
       continue
-  lab=["dots","1s","2s","3s","4s","6s"]
-  fig1 = go.Figure(data=[go.Pie(labels=lab, values=inn1_runs, textinfo='value')])
-  fig2 = go.Figure(data=[go.Pie(labels=lab, values=inn2_runs, textinfo='value')])
+  fig_labels=["dots", "1s", "2s", "3s", "4s", "6s"]
+  fig1 = go.Figure(data=[go.Pie(labels=fig_labels, values=inn1_runs, textinfo='value')])
+  fig2 = go.Figure(data=[go.Pie(labels=fig_labels, values=inn2_runs, textinfo='value')])
   i1_runs = conv_to_html(fig1)
   i2_runs = conv_to_html(fig2)
   return i1_runs, i2_runs
 
-def DNB(series_id: int,match_id: int):
+def DNB(series_id: int, match_id: int) -> tuple[list]:
+  """
+  Players who did not bat.
+
+  Returns
+  ---
+    tuple[list]: (DNB1, DNB2)
+      tuple of list of players who did not bat in 1st innings & 2nd innings.
+  """
   innings = get_match_data_from_bucket(series_id, match_id)['content']['innings']
   DNB1=[]
   DNB2=[]
-  for k in range(0,len(innings)):
+  for k in range(0, len(innings)):
     if(k==0):
       inningBatsmen=innings[k]['inningBatsmen']
       for i in range(0,len(inningBatsmen)):
@@ -694,33 +778,6 @@ def DNB(series_id: int,match_id: int):
         else:
           continue
   return DNB1, DNB2
-
-def team_squads(series_id: int, match_id: int) -> tuple[list, list]:
-  team1_squad=[]
-  team2_squad=[]
-  teamplayers = get_match_data_from_bucket(series_id, match_id)['content']['matchPlayers']['teamPlayers']
-  inn1_players=teamplayers[0]['players']
-  inn2_players=teamplayers[1]['players']
-  for i in range(0,len(inn1_players)):
-    player_id=inn1_players[i]['player']['id']
-    player_name=inn1_players[i]['player']['longName']
-    playerrole=inn1_players[i]['playerRoleType']
-    if playerrole == "C":
-     player_name = player_name + " (C)"
-    if playerrole == "WK":
-     player_name = player_name + " (WK)"
-    team1_squad.append(player_name)
-  for j in range(0,len(inn2_players)):
-    player_id=inn2_players[j]['player']['id']
-    player_name=inn2_players[j]['player']['longName']
-    playerrole=inn2_players[j]['playerRoleType']
-    if playerrole == "C":
-     player_name = player_name + " (C)"
-    if playerrole == "WK":
-     player_name = player_name + " (WK)"
-    team2_squad.append(player_name)
-  return team1_squad, team2_squad
-
 
 def data_query(series_id: int, match_id: int):
   # Your BigQuery SQL query

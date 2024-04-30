@@ -1,13 +1,13 @@
 {
   "sitemap": [
     {"slug": "/", "name": "Home", "season": null},
-    {"slug": "series/1345038", "name": "IPL", "season": "2023"},
+    {"slug": "series/1410320", "name": "IPL", "season": "2024"},
     {"slug": "series/1357742", "name": "MLC", "season": "2023"},
     {"slug": "series/1367856", "name": "World Cup", "season": "2023"},
     {"slug": "series/1345943", "name": "World Test Championship", "season": "2023/25"}
   ],
   "latest" : [
-    {"id": 1345038, "name": "IPL", "season": "2023"},
+    {"id": 1410320, "name": "IPL", "season": "2024"},
     {"id": 1357742, "name": "MLC", "season": "2023"},
     {"id": 1367856, "name": "World Cup", "season": "2023"},
     {"id": 1345943, "name": "World Test Championship", "season": "2023/25"}

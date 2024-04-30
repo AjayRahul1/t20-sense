@@ -1,4 +1,4 @@
-import pandas as pd, requests, os, json
+import pandas as pd, httpx, os, json
 from google.cloud import storage  # Google Cloud Storage Imports
 
 # Global Variables
@@ -12,7 +12,7 @@ def get_series_info_API(series_id: int) -> dict:
   :param series_id: The ID for the tournaments.
   :return: Return JSON data of info about entire series and other data."""
   url = f"https://hs-consumer-api.espncricinfo.com/v1/pages/series/schedule?lang=en&seriesId={series_id}"
-  response = requests.get(url, headers=headers)
+  response = httpx.get(url, headers=headers)
   return response.json()
 
 def get_match_info_API(series_id:int, match_id: int):
@@ -23,7 +23,7 @@ def get_match_info_API(series_id:int, match_id: int):
   :return: JSON Data for one match in the series/tournament.
   """
   url = f"https://hs-consumer-api.espncricinfo.com/v1/pages/match/home?lang=en&seriesId={series_id}&matchId={match_id}"
-  response = requests.get(url, headers=headers)
+  response = httpx.get(url, headers=headers)
   return response.json()
 
 def get_innings_info_API(series_id: int, match_id: int, innings_id: int):
@@ -34,7 +34,7 @@ def get_innings_info_API(series_id: int, match_id: int, innings_id: int):
   :param innings_no:
   :return: JSON Data of ball by ball in each innings."""
   url = f'https://hs-consumer-api.espncricinfo.com/v1/pages/match/comments?lang=en&seriesId={series_id}&matchId={match_id}&inningNumber={innings_id}&commentType=ALL&sortDirection=DESC&fromInningOver=-1'
-  response = requests.get(url, headers=headers)
+  response = httpx.get(url, headers=headers)
   return response.json()
 
 def match_ids(series_id: int):

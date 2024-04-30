@@ -1,7 +1,12 @@
 <!DOCTYPE html>
 <html lang="en">
+  {% set match_title = match_data_json["match"]["teams"][0]["team"]["abbreviation"] + " vs " + match_data_json["match"]["teams"][1]["team"]["abbreviation"] + " " + match_data_json["match"]["title"] %}
   <head>
-    <title>{{match_title}}, {{match_data_json.match.daysInfo}}, {{match_data_json.match.ground.name}}</title>
+    <title>
+      {{ match_title }},
+      {{ match_data_json.match.daysInfo }},
+      {{ match_data_json.match.ground.name }}
+    </title>
     <link rel="stylesheet" href="/static/styles_index.css">
     <link rel="icon" type="image/png" href="/static/favicon-t20-sense.png">
     <!-- Google tag (gtag.js) -->
@@ -84,7 +89,15 @@
           {% endif %}
 
           <div class="p-2 my-1 border rounded text-wrap bg-light">
-            <p class="my-0">{{match_title}}, {{match_data_json.match.daysInfo}}, {{match_data_json.match.ground.name}}, <a class="link-dark my-1" href="/series/{{match_data_json.match.series.objectId}}">{{match_data_json.match.series.longName}} {{match_data_json.match.series.season}}</a></p>
+            <p class="my-0">
+              <!-- Format: [Team 1 Name (Home Team)] vs [Team 2 Name (Away Team)] [Match Title] -->
+              {{ match_title }},
+              {{match_data_json.match.daysInfo}},
+              {{match_data_json.match.ground.name}},
+              <a class="link-dark my-1" href="/series/{{match_data_json.match.series.objectId}}">
+                {{match_data_json.match.series.longName}} {{match_data_json.match.series.season}}
+              </a>
+            </p>
             {% if match_data_json.content.matchPlayerAwards | length != 0 %}
             <p class="my-0 fw-bold">Man of the Match - {{ match_data_json.content.matchPlayerAwards[0].player.longName }}</p>  <!-- Man of the match -->
             {% endif %}
@@ -98,7 +111,7 @@
               {% endfor %}
             </p>
             <!-- Result <-> Status Text - Result at the end of the match, Target while 2nd inn, toss while 1st inn -->
-            <p class="my-0 fw-bold">{{result}}</p>
+            <p class="my-0 fw-bold">{{ match_data_json.match.statusText }}</p>
           </div>
 
           <div class="p-2 my-1 border rounded text-wrap bg-light">
@@ -118,7 +131,7 @@
               {% endif %}
               <p class="my-0 fw-bold d-inline-block" {% if match_data_json.match.teams[1].team.primaryColor is not none %} style="color: {{ match_data_json.match.teams[1].team.primaryColor }};" {% endif %}>{{ match_data_json.match.teams[1].team.longName }}</p>
               <p class="my-0 ms-2 fw-bold d-inline-block">
-                {% if match_data_json.match.teams[1].score is not none %}
+                {% if match_data_json.match.teams[1].score %}
                   {{ match_data_json.match.teams[1].score }}
                 {% else %}-{% endif %}
               </p>
@@ -127,7 +140,7 @@
 
           <div class="my-1 p-2 border rounded bg-light">
             <p class="fw-bold my-1">Best Performances in Batting</p>
-            {% if match_data_json.content.bestPerformance is not none %}
+            {% if match_data_json.content.bestPerformance %}
             <p class="my-1">{{match_data_json.content.bestPerformance.batsmen[0].teamAbbreviation}} - {{match_data_json.content.bestPerformance.batsmen[0]['player']['longName']}} with {{match_data_json.content.bestPerformance.batsmen[0]['shot']}} shot scoring {{match_data_json.content.bestPerformance.batsmen[0]['shotRuns']}} out of {{match_data_json.content.bestPerformance.batsmen[0]['runs']}} runs</p>
             <p class="my-1">{{match_data_json.content.bestPerformance.batsmen[1].teamAbbreviation}} - {{match_data_json.content.bestPerformance.batsmen[1]['player']['longName']}} with {{match_data_json.content.bestPerformance.batsmen[1]['shot']}} shot scoring {{match_data_json.content.bestPerformance.batsmen[1]['shotRuns']}} out of {{match_data_json.content.bestPerformance.batsmen[1]['runs']}} runs</p>
             {% else %}
@@ -137,7 +150,7 @@
           
           <div class="my-1 p-2 border rounded bg-light">
             <p class="fw-bold my-1">Best Performances in Bowling</p>
-            {% if match_data_json.content.bestPerformance is not none %}
+            {% if match_data_json.content.bestPerformance %}
             <p class="my-1">{{match_data_json.content.bestPerformance.bowlers[0].teamAbbreviation}} - {{match_data_json.content.bestPerformance.bowlers[0].player.longName}} - [{{match_data_json.content.bestPerformance.bowlers[0].overs}}-{{match_data_json.content.bestPerformance.bowlers[0].maidens}}-{{match_data_json.content.bestPerformance.bowlers[0].conceded}}-{{match_data_json.content.bestPerformance.bowlers[0].wickets}}] conceding {{match_data_json.content.bestPerformance.bowlers[0].dots}} dots and Econ. {{match_data_json.content.bestPerformance.bowlers[0].economy}}</p>
             <p class="my-1">{{match_data_json.content.bestPerformance.bowlers[1].teamAbbreviation}} - {{match_data_json.content.bestPerformance.bowlers[1].player.longName}} - [{{match_data_json.content.bestPerformance.bowlers[1].overs}}-{{match_data_json.content.bestPerformance.bowlers[1].maidens}}-{{match_data_json.content.bestPerformance.bowlers[1].conceded}}-{{match_data_json.content.bestPerformance.bowlers[1].wickets}}] conceding {{match_data_json.content.bestPerformance.bowlers[1].dots}} dots and Econ. {{match_data_json.content.bestPerformance.bowlers[1].economy}}</p>
             {% else %}
@@ -147,8 +160,18 @@
 
           <div class="my-1 p-2 border rounded bg-light">
             <p class="fw-bold my-1">Team Squads</p>
-            <p class="mb-0"><strong> {{ match_data_json.match.teams[0].team.longName }}: </strong>{% for i in squad1 %} {{i}}, {% endfor %}</p>
-            <p class="mb-0"><strong> {{ match_data_json.match.teams[1].team.longName }}: </strong>{% for i in squad2 %} {{i}}, {% endfor %}</p>
+            <p class="mb-0">
+              <strong>{{ match_data_json.match.teams[0].team.longName }}:</strong>
+              {% for player_data in match_data_json.content.matchPlayers.teamPlayers[0].players %}
+                {{ player_data.player.longName }}{% if player_data.playerRoleType != "P" %} ({{ player_data.playerRoleType }}){% endif %},
+              {% endfor %}
+            </p>
+            <p class="mb-0">
+              <strong>{{ match_data_json.match.teams[1].team.longName }}:</strong>
+              {% for player_data in match_data_json.content.matchPlayers.teamPlayers[1].players %}
+                {{ player_data.player.longName }}{% if player_data.playerRoleType != "P" %} ({{ player_data.playerRoleType }}){% endif %},
+              {% endfor %}
+            </p>
           </div>
           
           <!-- 1st Innings -->

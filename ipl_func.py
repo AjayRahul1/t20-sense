@@ -1,4 +1,4 @@
-import pandas as pd, requests, traceback, warnings
+import pandas as pd, httpx, traceback, warnings
 from datetime import datetime
 import os, io
 
@@ -51,7 +51,7 @@ def get_all_csv_files_from_cloud():
 def get_matches_returns_dict(series_id, stage="FINISHED"):
     try:
         url = f"https://hs-consumer-api.espncricinfo.com/v1/pages/series/schedule?lang=en&seriesId={series_id}"
-        output = requests.get(url)
+        output = httpx.get(url)
         print(url)
         matches = output.json()['content']["matches"]
         df = pd.json_normalize(data=matches)
@@ -243,7 +243,7 @@ def scorecard_to_csv_gen(series_id, match_id):
     batting.to_csv(f'ser{series_id}_mat{match_id}_inn{match_innings}_batting.csv', index=False)
     bowling.to_csv(f'ser{series_id}_mat{match_id}_inn{match_innings}_bowling.csv', index=False)
 
-def get_particular_match_whole_score(series_id, match_id):
+def get_particular_match_whole_score(series_id: int, match_id: int) -> tuple[dict]:
   try:
     bat1, bowl1 = get_innings_df(series_id, match_id, 1)
     bat1 = bat1.to_dict(orient='records')
@@ -263,12 +263,12 @@ def get_particular_match_whole_score(series_id, match_id):
 
 def get_request_response_API(series_id, match_id, innings_id):
   url = f'https://hs-consumer-api.espncricinfo.com/v1/pages/match/comments?lang=en&seriesId={series_id}&matchId={match_id}&inningNumber={innings_id}&commentType=ALL&sortDirection=DESC&fromInningOver=-1'
-  response = requests.get(url, headers={"User-Agent":	"Mozilla/5.0 (X11; Linux x86_64; rv:121.0) Gecko/20100101 Firefox/121.0"})
+  response = httpx.get(url, headers={"User-Agent":	"Mozilla/5.0 (X11; Linux x86_64; rv:121.0) Gecko/20100101 Firefox/121.0"})
   return response
 
 def get_match_info_response_API(series_id, match_id):
   url = f"https://hs-consumer-api.espncricinfo.com/v1/pages/match/home?lang=en&seriesId={series_id}&matchId={match_id}"
-  response = requests.get(url)
+  response = httpx.get(url)
   return response.json()
 
 """## Comments Extraction"""
@@ -349,7 +349,7 @@ def get_one_innings_from_extracted_data(series_id, match_id, innings_id):
 def get_matches_returns_list(series_id, stage="FINISHED"):
   try:
     url = f"https://hs-consumer-api.espncricinfo.com/v1/pages/series/schedule?lang=en&seriesId={series_id}"
-    output = requests.get(url)
+    output = httpx.get(url)
     matches = output.json()['content']["matches"]
     df = pd.json_normalize(data=matches)
     if stage:

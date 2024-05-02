@@ -21,7 +21,7 @@ class CricketData:
     self.match_id: int = match_id
     self.series_data: dict = base_fns.get_series_data_from_bucket(series_id)
     self.match_data: dict = base_fns.get_match_data_from_bucket(series_id, match_id)
-    innings_count = self.match_data["match"]["liveInning"]
+    innings_count = self.match_data["match"]["scheduledInnings"]
     self.all_innings_data: list[dict] = [
       base_fns.get_innings_data(series_id, match_id, innings_no) for innings_no in range(1, innings_count+1)
     ]
@@ -56,14 +56,20 @@ class CricketData:
     ax.set_ylabel('Runs')
     ax.set_xlabel('Overs')
     ax.set_title('Runs Per Over - Innings 1')
-    ax.bar(ov_no_1, ov_runs_1)
+    try:
+      ax.bar(ov_no_1, ov_runs_1)
+    except UnboundLocalError:
+      return (None, None)
     inn1_ovs_runs = base_fns.conv_to_base64(fig1)
     
     ax = fig2.add_subplot(1, 1, 1)
     ax.set_ylabel('Runs')
     ax.set_xlabel('Overs')
     ax.set_title('Runs Per Over - Innings 2')
-    ax.bar(ov_no_2, ov_runs_2)
+    try:
+      ax.bar(ov_no_2, ov_runs_2)
+    except UnboundLocalError:
+      return inn1_ovs_runs, None
     inn2_ovs_runs = base_fns.conv_to_base64(fig2)
     
     return inn1_ovs_runs, inn2_ovs_runs
@@ -108,8 +114,6 @@ class CricketData:
 def bat_impact_pts(series_id: int, match_id: int):
   # players_dictionary = get_match_players_dict(content=content)
   player_dict={}
-  # matches_ids = match_ids(series_id)
-  # for match_id in matches_ids:
   output1=get_match_data_from_bucket(series_id, match_id)
   content = output1['content']
   for i in range(0,2):
@@ -151,19 +155,9 @@ def bat_impact_pts(series_id: int, match_id: int):
     partnership_df.at[index, 'player2_SR'] = (row['player2_runs'] * 100 / row['player2_balls']) if row['player2_balls'] != 0 else 0
 
   df = pd.DataFrame(list(player_dict.items()), columns=['player id', 'player name'])
-  df['runs']=0
-  df['balls']=0
-  df['impact_points']=0
-  df['runs_imp']=0
-  df['fours_imp']=0
-  df['sixes_imp']=0
+  df['runs'], df['balls'], df['impact_points'], df['runs_imp'], df['fours_imp'], df['sixes_imp'] = [0] * 6
   df['team']=None
-  team_1_total = 0
-  team_2_total = 0
-  team1_balls = 0
-  team2_balls = 0
-  wkts1=0
-  wkts2=0
+  team_1_total, team_2_total, team1_balls, team2_balls, wkts1, wkts2 = [0] * 6
 
   for innings in range(1,3):
     try:
@@ -212,27 +206,19 @@ def bat_impact_pts(series_id: int, match_id: int):
           CRR2=team_2_total*6/team2_balls
 
         ##Impact points
-        if(batsman_runs==0):
-          impact_points=0
-          runs_imp=0
-          four_imp=0
-          sixes_imp=0
-        elif(batsman_runs==1):
-          impact_points=1
-          runs_imp=1
-        elif(batsman_runs==2):
-          impact_points=2
-          runs_imp=2
-        elif(batsman_runs==3):
-          impact_points=3
-          runs_imp=3
-        elif(batsman_runs==4):
-          impact_points=4.5
-          four_imp=4.5
-        elif(batsman_runs==6):
-          impact_points=7
-          sixes_imp=7
-
+        match (batsman_runs):
+          case 0:
+            impact_points, runs_imp, four_imp, sixes_imp = [0] * 4
+          case 1:
+            impact_points, runs_imp = [1] * 2
+          case 2:
+            impact_points, runs_imp= [2] * 2
+          case 3:
+            impact_points, runs_imp = [3] * 2
+          case 4:
+            impact_points, four_imp = [4.5] * 2
+          case 6:
+            impact_points, sixes_imp = [7] * 2
 
         # k = i + 1
         batsman2_id = None

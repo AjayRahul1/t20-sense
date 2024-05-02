@@ -112,17 +112,17 @@ def custom_sort(item):
   order = {"RUNNING": 0, "SCHEDULED": 1, "FINISHED": 2}
   return order.get(item['stage'], float('inf'))
 
-def get_latest_match_data():
+def get_latest_match_data() -> dict:
   headers = {"User-Agent":	"Mozilla/5.0 (X11; Linux x86_64; rv:121.0) Gecko/20100101 Firefox/121.0"}
-  ld = httpx.get("https://hs-consumer-api.espncricinfo.com/v1/pages/matches/current?lang=en&latest=true", headers=headers).json()
+  ld: dict = httpx.get("https://hs-consumer-api.espncricinfo.com/v1/pages/matches/current?lang=en&latest=true", headers=headers).json()
   ld['matches'] = sorted(ld['matches'], key=lambda x: x['objectId'])
   ld['matches'] = [it for it in ld['matches'] if it["statusText"] and it["coverage"] != "N"]
   ld['matches'] = sorted(ld['matches'], key=custom_sort)
   return ld
 
-def get_latest_domestic_match_data():
+def get_latest_domestic_match_data() -> dict:
   headers = {"User-Agent":	"Mozilla/5.0 (X11; Linux x86_64; rv:121.0) Gecko/20100101 Firefox/121.0"}
-  ld = httpx.get("https://hs-consumer-api.espncricinfo.com/v1/pages/matches/current?lang=en&latest=true", headers=headers).json()
+  ld: dict = httpx.get("https://hs-consumer-api.espncricinfo.com/v1/pages/matches/current?lang=en&latest=true", headers=headers).json()
   ld['matches'] = sorted(ld['matches'], key=lambda x: x['objectId'])
   ld['matches'] = [it for it in ld['matches'] if it['internationalClassId'] is None]
   ld['matches'] = sorted(ld['matches'], key=custom_sort)
@@ -155,7 +155,8 @@ def get_match_players_dict(content: dict) -> dict:
     
   Returns
   ---
-    Dictionary with information about players"""
+    Dictionary with information about players
+  """
   # Generating a dictionary of players who played in that match to map it later
   # for who ever was out and was in the partnership using Dictionary Comprehension
   players_dict = {

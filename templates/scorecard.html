@@ -529,9 +529,11 @@
             <img src="data:image/png;base64,{{ each_team_cumulative_score_per_over }}" alt="Cumulative Runs Graph" style="width: 100%; max-height: min-content;">
           </div>
           {% endif %}
+          {% if match_data_json.match.teams[0].score is not none %}
           <div class="border rounded mb-2 overflow-hidden">
             <img src="data:image/png;base64,{{ i1_ov_runs }}" alt="Innings 1 Overs-Runs" style="width: 100%; max-height: min-content;">
           </div>
+          {% endif %}
           {% if match_data_json.match.teams[1].score is not none %}
           <div class="border rounded mb-2 overflow-hidden">
             <img src="data:image/png;base64,{{ i2_ov_runs }}" alt="Innings 2 Overs-Runs" style="width: 100%; max-height: min-content;">

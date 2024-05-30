@@ -1,4 +1,4 @@
-import os, json, io, base64, httpx
+import os, json, io, base64, requests
 from google.cloud import storage
 from matplotlib.figure import Figure
 
@@ -52,7 +52,7 @@ def get_series_data_from_bucket(series_id: int) -> dict:
     print("GCS Bucket has some exception. So turning to ESPN Cricinfo API to get Series Data")
     url = f"https://hs-consumer-api.espncricinfo.com/v1/pages/series/schedule?lang=en&seriesId={series_id}"
     headers={"User-Agent":	"Mozilla/5.0 (X11; Linux x86_64; rv:121.0) Gecko/20100101 Firefox/121.0"}
-    ld = httpx.get(url, headers=headers)
+    ld = requests.get(url, headers=headers)
   return ld.json() # ld stands for the loaded data that came from JSON
 
 def get_match_data_from_bucket(series_id: int, match_id: int) -> dict:
@@ -82,7 +82,7 @@ def get_match_data_from_bucket(series_id: int, match_id: int) -> dict:
     print("GCS Bucket has some exception. So turning to ESPN Cricinfo API to get Match Data")
     url = f"https://hs-consumer-api.espncricinfo.com/v1/pages/match/home?lang=en&seriesId={series_id}&matchId={match_id}"
     headers={"User-Agent":	"Mozilla/5.0 (X11; Linux x86_64; rv:121.0) Gecko/20100101 Firefox/121.0"}
-    ld = httpx.get(url, headers=headers)
+    ld = requests.get(url, headers=headers)
   return ld.json() # ld stands for the loaded data that came from JSON
 
 def get_innings_data(series_id: int, match_id: int, innings: int) -> dict:
@@ -102,9 +102,10 @@ def get_innings_data(series_id: int, match_id: int, innings: int) -> dict:
   dict
     JSON Data of ball by ball in each innings
   """
+  print("Turning to ESPN Cricinfo API to get Match Data")
   url = f"https://hs-consumer-api.espncricinfo.com/v1/pages/match/comments?lang=en&seriesId={series_id}&matchId={match_id}&inningNumber={innings}&commentType=ALL&sortDirection=DESC&fromInningOver=-1"
   headers={"User-Agent":	"Mozilla/5.0 (X11; Linux x86_64; rv:121.0) Gecko/20100101 Firefox/121.0"}
-  ld = httpx.get(url, headers=headers)
+  ld = requests.get(url, headers=headers)
   return ld.json()
 
 # Define a custom sorting key to order the latest matches in the order of RUNNING, SCHEDULED, FINISHED
@@ -114,7 +115,7 @@ def custom_sort(item):
 
 def get_latest_match_data() -> dict:
   headers = {"User-Agent":	"Mozilla/5.0 (X11; Linux x86_64; rv:121.0) Gecko/20100101 Firefox/121.0"}
-  ld: dict = httpx.get("https://hs-consumer-api.espncricinfo.com/v1/pages/matches/current?lang=en&latest=true", headers=headers).json()
+  ld: dict = requests.get("https://hs-consumer-api.espncricinfo.com/v1/pages/matches/current?lang=en&latest=true", headers=headers).json()
   ld['matches'] = sorted(ld['matches'], key=lambda x: x['objectId'])
   ld['matches'] = [it for it in ld['matches'] if it["statusText"] and it["coverage"] != "N"]
   ld['matches'] = sorted(ld['matches'], key=custom_sort)
@@ -122,7 +123,7 @@ def get_latest_match_data() -> dict:
 
 def get_latest_domestic_match_data() -> dict:
   headers = {"User-Agent":	"Mozilla/5.0 (X11; Linux x86_64; rv:121.0) Gecko/20100101 Firefox/121.0"}
-  ld: dict = httpx.get("https://hs-consumer-api.espncricinfo.com/v1/pages/matches/current?lang=en&latest=true", headers=headers).json()
+  ld: dict = requests.get("https://hs-consumer-api.espncricinfo.com/v1/pages/matches/current?lang=en&latest=true", headers=headers).json()
   ld['matches'] = sorted(ld['matches'], key=lambda x: x['objectId'])
   ld['matches'] = [it for it in ld['matches'] if it['internationalClassId'] is None]
   ld['matches'] = sorted(ld['matches'], key=custom_sort)

@@ -1,4 +1,4 @@
-import pandas as pd, httpx, traceback, warnings
+import pandas as pd, requests, traceback, warnings
 from datetime import datetime
 import os, io
 
@@ -51,7 +51,7 @@ def get_all_csv_files_from_cloud():
 def get_matches_returns_dict(series_id, stage="FINISHED"):
     try:
         url = f"https://hs-consumer-api.espncricinfo.com/v1/pages/series/schedule?lang=en&seriesId={series_id}"
-        output = httpx.get(url)
+        output = requests.get(url)
         print(url)
         matches = output.json()['content']["matches"]
         df = pd.json_normalize(data=matches)
@@ -263,12 +263,12 @@ def get_particular_match_whole_score(series_id: int, match_id: int) -> tuple[dic
 
 def get_request_response_API(series_id, match_id, innings_id):
   url = f'https://hs-consumer-api.espncricinfo.com/v1/pages/match/comments?lang=en&seriesId={series_id}&matchId={match_id}&inningNumber={innings_id}&commentType=ALL&sortDirection=DESC&fromInningOver=-1'
-  response = httpx.get(url, headers={"User-Agent":	"Mozilla/5.0 (X11; Linux x86_64; rv:121.0) Gecko/20100101 Firefox/121.0"})
+  response = requests.get(url, headers={"User-Agent":	"Mozilla/5.0 (X11; Linux x86_64; rv:121.0) Gecko/20100101 Firefox/121.0"})
   return response
 
 def get_match_info_response_API(series_id, match_id):
   url = f"https://hs-consumer-api.espncricinfo.com/v1/pages/match/home?lang=en&seriesId={series_id}&matchId={match_id}"
-  response = httpx.get(url)
+  response = requests.get(url)
   return response.json()
 
 """## Comments Extraction"""
@@ -349,7 +349,7 @@ def get_one_innings_from_extracted_data(series_id, match_id, innings_id):
 def get_matches_returns_list(series_id, stage="FINISHED"):
   try:
     url = f"https://hs-consumer-api.espncricinfo.com/v1/pages/series/schedule?lang=en&seriesId={series_id}"
-    output = httpx.get(url)
+    output = requests.get(url)
     matches = output.json()['content']["matches"]
     df = pd.json_normalize(data=matches)
     if stage:

@@ -6,7 +6,7 @@ import plotly.express as px
 import plotly.graph_objects as go
 import plotly.offline as pyo
 
-from base_fns import get_series_data_from_bucket, get_match_data_from_bucket, get_innings_data, get_match_players_dict, conv_to_base64, conv_to_html
+from base_fns import get_match_data_from_bucket, get_innings_data, get_match_players_dict, conv_to_base64
 try:
   # Set the path to your service account key file
   os.environ['GOOGLE_APPLICATION_CREDENTIALS'] = os.getenv('API_KEY') # 't20-sense-main.json'
@@ -23,7 +23,7 @@ class CricketData:
     self.match_data: dict = base_fns.get_match_data_from_bucket(series_id, match_id)
     innings_count = self.match_data["match"]["scheduledInnings"]
     self.all_innings_data: list[dict] = [
-      base_fns.get_innings_data(series_id, match_id, innings_no) for innings_no in range(1, innings_count+1)
+      base_fns.get_innings_data(series_id, match_id, innings_no) for innings_no in range(1, innings_count + 2)
     ]
   
   def runs_in_ovs_fig(self):
@@ -74,13 +74,12 @@ class CricketData:
     
     return inn1_ovs_runs, inn2_ovs_runs
   
-  def division_of_runs(self):
-    inn1_runs = [0, 0, 0, 0, 0, 0]
-    inn2_runs = [0, 0, 0, 0, 0, 0]
+  def division_of_runs(self) -> tuple[str]:
+    inn1_runs, inn2_runs = [0] * 6, [0] * 6
 
     for innings in [1, 2]:
       try:
-        comments = self.all_innings_data[innings-1]['comments']
+        comments = self.all_innings_data[(innings - 1)]['comments']
         for i in range(0, len(comments)):
           runs, wides, four, six = comments[i]['batsmanRuns'], comments[i]['wides'], comments[i]['isFour'], comments[i]['isSix']
           if runs == 1:
@@ -101,15 +100,13 @@ class CricketData:
           if six:
             inn_runs = inn1_runs if innings == 1 else inn2_runs
             inn_runs[5] += 1
-      except:
-        print(f"Exception in Division of Runs for s{self.series_id}, m{self.match_id}, i{innings}")
+      except Exception as e:
+        print(f"Exception in Division of Runs for s{self.series_id}, m{self.match_id}, i{innings}\nException is:\n{e}")
         continue
     fig_labels=["dots", "1s", "2s", "3s", "4s", "6s"]
-    fig1 = go.Figure(data=[go.Pie(labels=fig_labels, values=inn1_runs, textinfo='value')])
-    fig2 = go.Figure(data=[go.Pie(labels=fig_labels, values=inn2_runs, textinfo='value')])
-    i1_runs = base_fns.conv_to_html(fig1)
-    i2_runs = base_fns.conv_to_html(fig2)
-    return i1_runs, i2_runs
+    fig1, fig2 = go.Figure(data=[go.Pie(labels=fig_labels, values=inn1_runs, textinfo='value')]), go.Figure(data=[go.Pie(labels=fig_labels, values=inn2_runs, textinfo='value')])
+    i1_runs, i2_runs = base_fns.conv_to_html(fig1), base_fns.conv_to_html(fig2)
+    return (i1_runs, i2_runs)
 
 def bat_impact_pts(series_id: int, match_id: int):
   # players_dictionary = get_match_players_dict(content=content)
@@ -688,47 +685,6 @@ def runs_in_ovs_fig(series_id, match_id):
   inn2_ovs_runs = conv_to_base64(fig2)
   
   return inn1_ovs_runs, inn2_ovs_runs
-
-def division_of_runs(series_id, match_id):
-  inn1_runs = [0, 0, 0, 0, 0, 0]
-  inn2_runs = [0, 0, 0, 0, 0, 0]
-
-  for innings in [1, 2]:
-    try:
-      comments = get_innings_data(series_id, match_id, innings)['comments']
-      for i in range(0, len(comments)):
-        runs = comments[i]['batsmanRuns']
-        wides = comments[i]['wides']
-        four = comments[i]['isFour']
-        six = comments[i]['isSix']
-
-        if runs == 1:
-          inn_runs = inn1_runs if innings == 1 else inn2_runs
-          inn_runs[1] += 1
-        elif runs == 2:
-          inn_runs = inn1_runs if innings == 1 else inn2_runs
-          inn_runs[2] += 1
-        elif runs == 3:
-          inn_runs = inn1_runs if innings == 1 else inn2_runs
-          inn_runs[3] += 1
-        if runs == 0 and wides == 0:
-          inn_runs = inn1_runs if innings == 1 else inn2_runs
-          inn_runs[0] += 1
-        if four:
-          inn_runs = inn1_runs if innings == 1 else inn2_runs
-          inn_runs[4] += 1
-        if six:
-          inn_runs = inn1_runs if innings == 1 else inn2_runs
-          inn_runs[5] += 1
-    except:
-      print("Exception in Division of Runs for s", series_id," m", match_id," i", innings)
-      continue
-  fig_labels=["dots", "1s", "2s", "3s", "4s", "6s"]
-  fig1 = go.Figure(data=[go.Pie(labels=fig_labels, values=inn1_runs, textinfo='value')])
-  fig2 = go.Figure(data=[go.Pie(labels=fig_labels, values=inn2_runs, textinfo='value')])
-  i1_runs = conv_to_html(fig1)
-  i2_runs = conv_to_html(fig2)
-  return i1_runs, i2_runs
 
 def DNB(series_id: int, match_id: int) -> tuple[list]:
   """

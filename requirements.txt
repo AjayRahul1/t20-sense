@@ -4,7 +4,7 @@ google-cloud-bigquery
 numpy
 pandas
 matplotlib
-httpx
+requests
 ipython
 python-dotenv
 plotly

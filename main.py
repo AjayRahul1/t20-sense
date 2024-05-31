@@ -2,11 +2,11 @@ from fastapi import FastAPI, Request, Form
 from fastapi.responses import HTMLResponse
 from fastapi.templating import Jinja2Templates
 from fastapi.staticfiles import StaticFiles
-import traceback, dotenv, json
+import traceback, dotenv, json, time
 
 from ipl_func import get_particular_match_whole_score
 from base_fns import get_series_data_from_bucket, get_latest_match_data
-from stats import CricketData, bat_impact_pts, bowl_impact_pts, get_ptnship, DNB, graph_cricket_innings_progression
+from stats import CricketData, bat_impact_pts, bowl_impact_pts
 
 app = FastAPI()
 templates = Jinja2Templates(directory="templates")
@@ -40,47 +40,50 @@ async def seriesPage(request: Request, series_id: int):
 async def scoreacard(request: Request, series_id: int, match_id: int):
   try:
     print("Match ID: ", match_id, "\nSeries ID: ", series_id)
+    start = time.perf_counter()
 
     cricket_data = CricketData(series_id, match_id)
     match_data: dict = cricket_data.match_data
 
     batting1, bowling1, batting2, bowling2 = get_particular_match_whole_score(series_id, match_id)
     
-    bat_imp_pts, bow_imp_pts= {}, {}
+    bat_imp_pts, bow_imp_pts = {}, {}
     try:
       bat_imp_pts, ptnrshp_df = bat_impact_pts(series_id, match_id)  # Batting impact points
       bat_df, bow_imp_pts = bowl_impact_pts(series_id, match_id)  # Bowlers impact points
-      bat_imp_pts = bat_imp_pts.to_dict(orient='records')
-      bow_imp_pts = bow_imp_pts.to_dict(orient='records')
-    except Exception:
+      bat_imp_pts, bow_imp_pts = bat_imp_pts.to_dict(orient='records'), bow_imp_pts.to_dict(orient='records')
+    except Exception as e:
+      print("Exception:\n", e)
       bat_imp_pts, bow_imp_pts= {}, {}
 
-    line_plot_cumulative_team_score_graph_base64 = graph_cricket_innings_progression(series_id=series_id, match_id=match_id)
-    i1_ptnr_df, i2_ptnr_df, ptnr_fig1, ptnr_fig2= {}, {}, "", ""
+    # Base64 Image encoded in a string for Line Plot for each innings runs progression
+    lineplot_inn_runs_progress: str = cricket_data.graph_cricket_innings_progression()
+
+    i1_ptnr_df, i2_ptnr_df, ptnr_fig1, ptnr_fig2 = {}, {}, "", ""
     try:
-      i1_ptnr_df, i2_ptnr_df, ptnr_fig1, ptnr_fig2 = get_ptnship(series_id, match_id)
+      i1_ptnr_df, i2_ptnr_df, ptnr_fig1, ptnr_fig2 = cricket_data.get_ptnship()
       i1_ptnr_df = i1_ptnr_df.to_dict(orient='records')
       i2_ptnr_df = i2_ptnr_df.to_dict(orient='records')
     except:
-      i1_ptnr_df, i2_ptnr_df, ptnr_fig1, ptnr_fig2= {}, {}, "", ""
+      i1_ptnr_df, i2_ptnr_df, ptnr_fig1, ptnr_fig2 = {}, {}, "", ""
 
     i1_ovs_runs, i2_ovs_runs = cricket_data.runs_in_ovs_fig()
     i1_runs, i2_runs = cricket_data.division_of_runs()
 
-    dnb1, dnb2 = DNB(series_id, match_id)
+    dnb = cricket_data.DNB()
 
     context = {
       "request": request, "series_id": series_id, "match_id": match_id, "match_data_json": match_data,
       "batting1": batting1, "bowling1": bowling1, "batting2": batting2, "bowling2": bowling2,
       "imp_pts": bat_imp_pts, "bow_imp_pts": bow_imp_pts,
       "ptnr_df1": i1_ptnr_df, "ptnr_df2": i2_ptnr_df, "ptnr_f1" : ptnr_fig1, "ptnr_f2" : ptnr_fig2,
-      "i1_runs": i1_runs, "i2_runs": i2_runs, "dnb1" : dnb1, "dnb2" : dnb2,
+      "i1_runs": i1_runs, "i2_runs": i2_runs, "dnb" : dnb,
       "i1_ov_runs": i1_ovs_runs,  "i2_ov_runs": i2_ovs_runs,
-      "each_team_cumulative_score_per_over": line_plot_cumulative_team_score_graph_base64,
+      "each_team_cumulative_score_per_over": lineplot_inn_runs_progress,
       "page_indices_json": page_indices
     }
-
-    return templates.TemplateResponse("scorecard.html", context=context)
+    print(f"Time Taken is: {time.perf_counter() - start} seconds")
+    return templates.TemplateResponse("scorecard.html", context = context)
   except:
     traceback.print_exc()
-    return templates.TemplateResponse('error_pages/no_scorecard.html', {"request": request}, status_code=404)
+    return templates.TemplateResponse('error_pages/no_scorecard.html', {"request": request}, status_code=500)

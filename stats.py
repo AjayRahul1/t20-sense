@@ -1,4 +1,4 @@
-import os, io, base64, pandas as pd, base_fns
+import os, io, base64, pandas as pd, numpy as np, base_fns
 from google.cloud import storage  # Google Cloud Storage Imports
 import matplotlib.pyplot as plt
 from matplotlib.figure import Figure
@@ -6,7 +6,7 @@ import plotly.express as px
 import plotly.graph_objects as go
 import plotly.offline as pyo
 
-from base_fns import get_match_data_from_bucket, get_innings_data, get_match_players_dict, conv_to_base64
+from base_fns import get_match_data_from_bucket, get_innings_data, conv_to_base64
 try:
   # Set the path to your service account key file
   os.environ['GOOGLE_APPLICATION_CREDENTIALS'] = os.getenv('API_KEY') # 't20-sense-main.json'
@@ -103,15 +103,218 @@ class CricketData:
       except Exception as e:
         print(f"Exception in Division of Runs for s{self.series_id}, m{self.match_id}, i{innings}\nException is:\n{e}")
         continue
-    fig_labels=["dots", "1s", "2s", "3s", "4s", "6s"]
+    fig_labels=["Dots", "1s", "2s", "3s", "4s", "6s"]
     fig1, fig2 = go.Figure(data=[go.Pie(labels=fig_labels, values=inn1_runs, textinfo='value')]), go.Figure(data=[go.Pie(labels=fig_labels, values=inn2_runs, textinfo='value')])
     i1_runs, i2_runs = base_fns.conv_to_html(fig1), base_fns.conv_to_html(fig2)
     return (i1_runs, i2_runs)
+  
+  def graph_cricket_innings_progression(self) -> str:
+    """
+    Line Graph for Runs Progression in each innings
+
+    This is a line graph in one figure for runs of both teams at each over in the game.
+    This graph consists of 2 line graphs by calculating score in that over and plotting points.
+    Then those lines are joined with line plot.
+    """
+    # Ball By Ball for 1st innings
+    try:
+      inn_data = self.all_innings_data[0]
+      ball_by_ball_json = pd.json_normalize(data = inn_data['comments'])
+      inn1_team_color = self.match_data['content']['innings'][0]['team']['primaryColor']
+      nparr_each_ball_score_inn1 = np.array(ball_by_ball_json['totalInningRuns'])
+      nparr_over_no_where_team_score_at_inn1 = np.array(ball_by_ball_json['oversActual'])
+    except:
+      inn1_team_color = "#00FFFFFF"
+      nparr_each_ball_score_inn1, nparr_over_no_where_team_score_at_inn1 = np.array([]), np.array([])
+    
+    # Ball By Ball for 2nd innings
+    try:
+      inn_data = self.all_innings_data[1]
+      ball_by_ball_json = pd.json_normalize(data = inn_data['comments'])
+      inn2_team_color = self.match_data['content']['innings'][1]['team']['primaryColor']
+      nparr_each_ball_score_inn2 = np.array(ball_by_ball_json['totalInningRuns'])
+      nparr_over_no_where_team_score_at_inn2 = np.array(ball_by_ball_json['oversActual'])
+    except:
+      inn2_team_color = "#00FFFFFF"
+      nparr_each_ball_score_inn2 = np.array([])
+      nparr_over_no_where_team_score_at_inn2 = np.array([])
+
+    fig = Figure()
+    ax = fig.add_subplot(1, 1, 1)
+    ax.plot(
+      nparr_over_no_where_team_score_at_inn1,
+      nparr_each_ball_score_inn1,
+      color=inn1_team_color,
+      label=self.match_data["match"]["teams"][0]["team"]["name"]
+    )
+    ax.plot(
+      nparr_over_no_where_team_score_at_inn2,
+      nparr_each_ball_score_inn2,
+      color=inn2_team_color,
+      label=self.match_data["match"]["teams"][1]["team"]["name"]
+    )
+    ax.set_xlabel("Overs")
+    ax.set_ylabel("Runs")
+    ax.legend()
+    line_graph = conv_to_base64(fig)
+    return line_graph
+
+  # def DNB(self) -> list[list]:
+  #   """
+  #   List of Players who did not bat.
+
+  #   Returns
+  #   ---
+  #     list[list]: (DNB1, DNB2)
+  #       tuple of list of players who did not bat in 1st innings & 2nd innings.
+  #   """
+  #   DNB: list[list] = [
+  #     [batsman['player']['longName'] for batsman in inning['inningBatsmen'] if batsman['battedType'] == "DNB"]
+  #     for inning in self.match_data['content']['innings']
+  #   ]
+
+  #   return DNB
+  
+  DNB = lambda self: [
+      [{"id": batsman['player']['id'], "longName": batsman['player']['longName']} for batsman in inning['inningBatsmen'] if batsman['battedType'] == "DNB"]
+      for inning in self.match_data['content']['innings']
+    ]
+  """
+  Returns list of Players who did not bat in each innings.
+
+  Returns
+  ---
+  list[list[dict]]
+    Each index of this list contains a dict of DNB players IDs and Names each innings.
+    
+    Key to access
+    - IDs is "id"
+    - Names is "longName"
+  """
+
+  def get_ptnship(self):
+    # Generating a dictionary of players who played in that match to map it later
+    # for who ever was out and was in the partnership using Dictionary Comprehension
+    content = self.match_data['content']
+    players_dictionary = base_fns.get_match_players_dict(content=content)
+    partnership_df = pd.DataFrame(columns=['innings', 'player1ID', 'player1', 'player2ID', 'player2','player_out_id', 'player1_runs', 'player1_balls','player2_runs', 'player2_balls', 'partnershipRuns', 'partnershipBalls'])
+    f = 0
+    for k in range(0, 2):
+      partnerships = content['innings'][k]['inningPartnerships']
+      for p in range(0, len(partnerships)):
+          partnership_df.loc[f, 'innings'] = k + 1
+          partnership_df.loc[f, 'player1ID'] = partnerships[p]['player1']['id']
+          partnership_df.loc[f, 'player1'] = partnerships[p]['player1']['longName']
+          partnership_df.loc[f, 'player2ID'] = partnerships[p]['player2']['id']
+          partnership_df.loc[f, 'player2'] = partnerships[p]['player2']['longName']
+          partnership_df.loc[f, 'player_out_id'] = partnerships[p]['outPlayerId']
+          partnership_df.loc[f, 'player1_runs'] = partnerships[p]['player1Runs']
+          partnership_df.loc[f, 'player1_balls'] = partnerships[p]['player1Balls']
+          partnership_df.loc[f, 'player2_runs'] = partnerships[p]['player2Runs']
+          partnership_df.loc[f, 'player2_balls'] = partnerships[p]['player2Balls']
+          partnership_df.loc[f, 'partnershipRuns'] = partnerships[p]['runs']
+          partnership_df.loc[f, 'partnershipBalls'] = partnerships[p]['balls']
+          f += 1
+    partnership_df['player_out'] = partnership_df['player_out_id'].map(players_dictionary).fillna("not out")
+    for index, row in partnership_df.iterrows():
+      partnership_df.at[index, 'p1_contrib'] = (row['player1_runs'] * 100 / row['partnershipRuns']) if row['partnershipRuns'] != 0 else 0
+      partnership_df.at[index, 'p2_contrib'] = (row['player2_runs'] * 100 / row['partnershipRuns']) if row['partnershipRuns'] != 0 else 0
+      partnership_df.at[index, 'player1_SR'] = (row['player1_runs'] * 100 / row['player1_balls']) if row['player1_balls'] != 0 else 0
+      partnership_df.at[index, 'player2_SR'] = (row['player2_runs'] * 100 / row['player2_balls']) if row['player2_balls'] != 0 else 0
+
+    dff = pd.DataFrame(columns=['Innings','Wicket', 'Player 1', 'Player 2', 'Partnership'])
+    for index, row in partnership_df.iterrows():
+      inn = row["innings"]
+      wicket = index+1
+      player1 = f'{row["player1"]} {row["player1_runs"]}({row["player1_balls"]})'
+      player2 = f'{row["player2"]} {row["player2_runs"]}({row["player2_balls"]})'
+      partnership = f'{row["partnershipRuns"]}({row["partnershipBalls"]})'
+
+      # Add the formatted data to dff DataFrame
+      dff.loc[index] = [inn,wicket, player1, player2, partnership]
+
+    dff1 = dff[dff['Innings'] == 1].reset_index(drop=True)
+    dff2 = dff[dff['Innings'] == 2].reset_index(drop=True)
+    dff1 = dff1[::-1]
+    dff2 = dff2[::-1]
+
+    innings_1_partnership = partnership_df[partnership_df['innings'] == 1].reset_index(drop=True)
+    innings_2_partnership = partnership_df[partnership_df['innings'] == 2].reset_index(drop=True)
+    # Create the plots for both innings
+
+
+    fig_1, ax_1 = plt.subplots(figsize=(7, 6))
+    fig_2, ax_2 = plt.subplots(figsize=(7, 6))
+    max_runs = max(innings_1_partnership['player1_runs'].max(), innings_1_partnership['player2_runs'].max())
+
+    ax_1.set_ylabel('Partnerships')
+    ax_1.set_xlabel('Runs')
+    ax_1.set_title('Partnerships Runs - Innings 1')
+    ax_1.set_yticks(range(len(innings_1_partnership)))
+    ax_1.set_yticklabels(innings_1_partnership['player2'] + ' & ' + innings_1_partnership['player1'])
+    # ax_1.legend()
+
+    ax_1.barh(range(len(innings_1_partnership)), innings_1_partnership['player1_runs'], color='tab:blue', label='Player 1 Runs')
+    ax_1.barh(range(len(innings_1_partnership)), -innings_1_partnership['player2_runs'], color='tab:orange', label='Player 2 Runs')
+    ax_1.set_xlim(-max_runs, max_runs)
+
+    xticks = [-max_runs, -max_runs//2, 0, max_runs//2, max_runs]
+    ax_1.set_xticks(xticks)
+    ax_1.set_xticklabels([abs(x) for x in xticks])
+
+    ax_2.set_ylabel('Partnerships')
+    ax_2.set_xlabel('Runs')
+    ax_2.set_title('Partnerships Runs - Innings 2')
+    ax_2.set_yticks(range(len(innings_2_partnership)))
+    ax_2.set_yticklabels(innings_2_partnership['player2'] + ' & ' + innings_2_partnership['player1'])
+    # ax_2.legend()
+
+    ax_2.barh(range(len(innings_2_partnership)), innings_2_partnership['player1_runs'], color='tab:blue', label='Player 1 Runs')
+    ax_2.barh(range(len(innings_2_partnership)), -innings_2_partnership['player2_runs'], color='tab:orange', label='Player 2 Runs')
+    ax_2.set_xlim(-max_runs, max_runs)
+
+    ax_2.set_xticks(xticks)
+    ax_2.set_xticklabels([abs(x) for x in xticks])
+
+    # plt.tight_layout()
+    i1_partnership = pd.DataFrame(columns=['Wicket', 'Player_1', 'Player_2', 'Partnership', 'player_out'])
+    i2_partnership = pd.DataFrame(columns=['Wicket', 'Player_1', 'Player_2', 'Partnership', 'player_out'])
+
+    for index, row in innings_1_partnership.iterrows():
+      wicket = index+1
+      player1 = f'{row["player1"]} {row["player1_runs"]}({row["player1_balls"]})'
+      player2 = f'{row["player2"]} {row["player2_runs"]}({row["player2_balls"]})'
+      partnership = f'{row["partnershipRuns"]}({row["partnershipBalls"]})'
+      player_out = row["player_out"]
+      # Add the formatted data to dff DataFrame
+      i1_partnership.loc[index] = [wicket, player1, player2, partnership, player_out]
+
+    for index, row in innings_2_partnership.iterrows():
+      wicket = index+1
+      player1 = f'{row["player1"]} {row["player1_runs"]}({row["player1_balls"]})'
+      player2 = f'{row["player2"]} {row["player2_runs"]}({row["player2_balls"]})'
+      partnership = f'{row["partnershipRuns"]}({row["partnershipBalls"]})'
+      player_out = row["player_out"]
+      # Add the formatted data to dff DataFrame
+      i2_partnership.loc[index] = [wicket, player1, player2, partnership, player_out]
+
+    buf1 = io.BytesIO()
+    fig_1.savefig(buf1, format='png')
+    buf1.seek(0)
+    figdata1 = base64.b64encode(buf1.getvalue()).decode('utf-8')
+
+    buf2 = io.BytesIO()
+    fig_2.savefig(buf2, format='png')
+    buf2.seek(0)
+    figdata2 = base64.b64encode(buf2.getvalue()).decode('utf-8')
+
+    # Return the DataFrames and the figures
+    return i1_partnership, i2_partnership, figdata1, figdata2
 
 def bat_impact_pts(series_id: int, match_id: int):
   # players_dictionary = get_match_players_dict(content=content)
   player_dict={}
-  output1=get_match_data_from_bucket(series_id, match_id)
+  output1 = get_match_data_from_bucket(series_id, match_id)
   content = output1['content']
   for i in range(0,2):
     try:
@@ -240,7 +443,7 @@ def bat_impact_pts(series_id: int, match_id: int):
               b_id = matches[p]['batsmanPlayerId']
               if(b_id != batsman2_id or batsman_id):
                 next_batsman_id = b_id
-                check=1
+                check = 1
                 break
               p += 1
           if(innings==1):
@@ -249,11 +452,11 @@ def bat_impact_pts(series_id: int, match_id: int):
               df.loc[df['player id'] == outplayer_id, 'CRR_when_came'] = 0
               df.loc[df['player id'] == batsman2_id, 'CRR_when_came'] = 0
             else:
-              df.loc[df['player id'] == outplayer_id, 'CRR_when_out']= CRR1
-              df.loc[df['player id'] == outplayer_id, 'team_score']= team_1_total
-              df.loc[df['player id'] == outplayer_id, 'team_balls']= team1_balls
-              df.loc[df['player id'] == next_batsman_id, 'CRR_when_came']= CRR1
-            CRR1_arrived=CRR1
+              df.loc[df['player id'] == outplayer_id, 'CRR_when_out'] = CRR1
+              df.loc[df['player id'] == outplayer_id, 'team_score'] = team_1_total
+              df.loc[df['player id'] == outplayer_id, 'team_balls'] = team1_balls
+              df.loc[df['player id'] == next_batsman_id, 'CRR_when_came'] = CRR1
+            CRR1_arrived = CRR1
 
           if(innings==2):
             wkts2 += 1
@@ -268,69 +471,67 @@ def bat_impact_pts(series_id: int, match_id: int):
                   check=1
                   break
                 p += 1
-            df.loc[df['player id'] == outplayer_id, 'team_score']= team_2_total
-            df.loc[df['player id'] == outplayer_id, 'team_balls']= team2_balls
-            if(wkts2!=1):
-              df.loc[df['player id'] == outplayer_id, 'RRR_when_came']=req_rr
-            if(wkts2==1):
-              df.loc[df['player id'] == outplayer_id, 'RRR_when_came']=CRR1
-              df.loc[df['player id'] == batsman2_id, 'RRR_when_came']=CRR1
-              df.loc[df['player id'] == outplayer_id, 'CRR_when_came']=0
-              df.loc[df['player id'] == batsman2_id, 'CRR_when_came']=0
-            df.loc[df['player id'] == outplayer_id, 'CRR_when_out']= CRR2
-            df.loc[df['player id'] == next_batsman_id, 'CRR_when_came']= CRR2
-            df.loc[df['player id'] == outplayer_id, 'RRR_when_out']= required_rr
+            df.loc[df['player id'] == outplayer_id, 'team_score'] = team_2_total
+            df.loc[df['player id'] == outplayer_id, 'team_balls'] = team2_balls
+            if(wkts2 != 1):
+              df.loc[df['player id'] == outplayer_id, 'RRR_when_came'] = req_rr
+            if(wkts2 == 1):
+              df.loc[df['player id'] == outplayer_id, 'RRR_when_came'] = CRR1
+              df.loc[df['player id'] == batsman2_id, 'RRR_when_came'] = CRR1
+              df.loc[df['player id'] == outplayer_id, 'CRR_when_came'] = 0
+              df.loc[df['player id'] == batsman2_id, 'CRR_when_came'] = 0
+            df.loc[df['player id'] == outplayer_id, 'CRR_when_out'] = CRR2
+            df.loc[df['player id'] == next_batsman_id, 'CRR_when_came'] = CRR2
+            df.loc[df['player id'] == outplayer_id, 'RRR_when_out'] = required_rr
             req_rr=required_rr
 
-        if(innings==2):
-          if(oversActual==0.1):
-            df.loc[df['player id'] == batsman_id, 'RRR_when_came']=CRR1
+        if(innings == 2):
+          if(oversActual == 0.1):
+            df.loc[df['player id'] == batsman_id, 'RRR_when_came'] = CRR1
             # df.loc[df['player id'] == batsman2_id, 'RRR_when_came']=CRR1
 
 
-        df.loc[df['player id']==batsman_id,'innings']=innings
+        df.loc[df['player id'] == batsman_id,'innings'] = innings
         if(innings==1):
-          df.loc[df['player id']==batsman_id,'team']=team1_name
+          df.loc[df['player id'] == batsman_id,'team'] = team1_name
         else:
-          df.loc[df['player id']==batsman_id,'team']=team2_name
+          df.loc[df['player id'] == batsman_id,'team'] = team2_name
         df.loc[df['player id'] == batsman_id, 'runs'] = df.loc[df['player id'] == batsman_id,'runs'] + batsman_runs
         df.loc[df['player id'] == batsman_id, 'balls'] = df.loc[df['player id'] == batsman_id,'balls'] + ball
-        r=0
-        dp=0
+        r, dp = [0] * 2
         if(over<7):
-          r=0.5
-        elif(over>16 and over<19):
+          r = 0.5
+        elif(over > 16 and over < 19):
           r=1
-          if(dot==1):
-            dp=-0.5
-        elif(over>18):
-          r=2
-          if(dot==1):
-            dp=-1
+          if(dot == 1):
+            dp =- 0.5
+        elif(over > 18):
+          r = 2
+          if(dot == 1):
+            dp =- 1
         else:
           r=0
-        df.loc[df['player id'] == batsman_id, 'runs_imp']+= runs_imp
+        df.loc[df['player id'] == batsman_id, 'runs_imp'] += runs_imp
         # if(totalruns!=0):
         #   df.loc[df['player id'] == batsman_id, 'impact_points']+= impact_points + r
         # elif (batsman_runs==0 and wides==0):
         #   df.loc[df['player id'] == batsman_id, 'impact_points']+= impact_points + dp
-        if(four_imp!=0):
-          df.loc[df['player id'] == batsman_id, 'fours_imp']+= four_imp + r
+        if(four_imp != 0):
+          df.loc[df['player id'] == batsman_id, 'fours_imp'] += four_imp + r
         else:
-          df.loc[df['player id'] == batsman_id, 'fours_imp']+= four_imp
+          df.loc[df['player id'] == batsman_id, 'fours_imp'] += four_imp
         if(sixes_imp!=0):
-          df.loc[df['player id'] == batsman_id, 'sixes_imp']+= sixes_imp + r
+          df.loc[df['player id'] == batsman_id, 'sixes_imp'] += sixes_imp + r
         else:
-          df.loc[df['player id'] == batsman_id, 'sixes_imp']+= sixes_imp
-      df['impact_points']=df['runs_imp'] + df['fours_imp'] + df['sixes_imp']
+          df.loc[df['player id'] == batsman_id, 'sixes_imp'] += sixes_imp
+      df['impact_points'] = df['runs_imp'] + df['fours_imp'] + df['sixes_imp']
       df['SR'] = (df['runs']*100/df['balls']).round(2)
 
       for i in range(len(df)):
-        p=0
-        p=df['runs'][i]/10
-        df['impact_points'][i]+=p*2
+        p = df['runs'][i] / 10
+        df['impact_points'][i] += p * 2
       target=df.loc[df['innings'] == 1, 'runs'].sum()
-      target_sr=target/1.2
+      target_sr=target / 1.2
     except:
       continue
 
@@ -475,166 +676,6 @@ def bowl_impact_pts(series_id: int,match_id: int):
   b_df=b_df.sort_values(by='impact_points', ascending=False)
   return df,b_df
 
-def get_ptnship(series_id, match_id):
-  content = get_match_data_from_bucket(series_id, match_id)['content']
-  # Generating a dictionary of players who played in that match to map it later
-  # for who ever was out and was in the partnership using Dictionary Comprehension
-  players_dictionary = get_match_players_dict(content=content)
-  partnership_df = pd.DataFrame(columns=['innings', 'player1ID', 'player1', 'player2ID', 'player2','player_out_id', 'player1_runs', 'player1_balls','player2_runs', 'player2_balls', 'partnershipRuns', 'partnershipBalls'])
-  f = 0
-  for k in range(0, 2):
-    partnerships = content['innings'][k]['inningPartnerships']
-    for p in range(0, len(partnerships)):
-        partnership_df.loc[f, 'innings'] = k + 1
-        partnership_df.loc[f, 'player1ID'] = partnerships[p]['player1']['id']
-        partnership_df.loc[f, 'player1'] = partnerships[p]['player1']['longName']
-        partnership_df.loc[f, 'player2ID'] = partnerships[p]['player2']['id']
-        partnership_df.loc[f, 'player2'] = partnerships[p]['player2']['longName']
-        partnership_df.loc[f, 'player_out_id'] = partnerships[p]['outPlayerId']
-        partnership_df.loc[f, 'player1_runs'] = partnerships[p]['player1Runs']
-        partnership_df.loc[f, 'player1_balls'] = partnerships[p]['player1Balls']
-        partnership_df.loc[f, 'player2_runs'] = partnerships[p]['player2Runs']
-        partnership_df.loc[f, 'player2_balls'] = partnerships[p]['player2Balls']
-        partnership_df.loc[f, 'partnershipRuns'] = partnerships[p]['runs']
-        partnership_df.loc[f, 'partnershipBalls'] = partnerships[p]['balls']
-        f += 1
-  partnership_df['player_out'] = partnership_df['player_out_id'].map(players_dictionary).fillna("not out")
-  for index, row in partnership_df.iterrows():
-    partnership_df.at[index, 'p1_contrib'] = (row['player1_runs'] * 100 / row['partnershipRuns']) if row['partnershipRuns'] != 0 else 0
-    partnership_df.at[index, 'p2_contrib'] = (row['player2_runs'] * 100 / row['partnershipRuns']) if row['partnershipRuns'] != 0 else 0
-    partnership_df.at[index, 'player1_SR'] = (row['player1_runs'] * 100 / row['player1_balls']) if row['player1_balls'] != 0 else 0
-    partnership_df.at[index, 'player2_SR'] = (row['player2_runs'] * 100 / row['player2_balls']) if row['player2_balls'] != 0 else 0
-
-  dff = pd.DataFrame(columns=['Innings','Wicket', 'Player 1', 'Player 2', 'Partnership'])
-  for index, row in partnership_df.iterrows():
-    inn = row["innings"]
-    wicket = index+1
-    player1 = f'{row["player1"]} {row["player1_runs"]}({row["player1_balls"]})'
-    player2 = f'{row["player2"]} {row["player2_runs"]}({row["player2_balls"]})'
-    partnership = f'{row["partnershipRuns"]}({row["partnershipBalls"]})'
-
-    # Add the formatted data to dff DataFrame
-    dff.loc[index] = [inn,wicket, player1, player2, partnership]
-
-  dff1 = dff[dff['Innings'] == 1].reset_index(drop=True)
-  dff2 = dff[dff['Innings'] == 2].reset_index(drop=True)
-  dff1 = dff1[::-1]
-  dff2 = dff2[::-1]
-
-  innings_1_partnership = partnership_df[partnership_df['innings'] == 1].reset_index(drop=True)
-  innings_2_partnership = partnership_df[partnership_df['innings'] == 2].reset_index(drop=True)
-  # Create the plots for both innings
-
-
-  fig_1, ax_1 = plt.subplots(figsize=(7, 6))
-  fig_2, ax_2 = plt.subplots(figsize=(7, 6))
-  max_runs = max(innings_1_partnership['player1_runs'].max(), innings_1_partnership['player2_runs'].max())
-
-  ax_1.set_ylabel('Partnerships')
-  ax_1.set_xlabel('Runs')
-  ax_1.set_title('Partnerships Runs - Innings 1')
-  ax_1.set_yticks(range(len(innings_1_partnership)))
-  ax_1.set_yticklabels(innings_1_partnership['player2'] + ' & ' + innings_1_partnership['player1'])
-  # ax_1.legend()
-
-  ax_1.barh(range(len(innings_1_partnership)), innings_1_partnership['player1_runs'], color='tab:blue', label='Player 1 Runs')
-  ax_1.barh(range(len(innings_1_partnership)), -innings_1_partnership['player2_runs'], color='tab:orange', label='Player 2 Runs')
-  ax_1.set_xlim(-max_runs, max_runs)
-
-  xticks = [-max_runs, -max_runs//2, 0, max_runs//2, max_runs]
-  ax_1.set_xticks(xticks)
-  ax_1.set_xticklabels([abs(x) for x in xticks])
-
-  ax_2.set_ylabel('Partnerships')
-  ax_2.set_xlabel('Runs')
-  ax_2.set_title('Partnerships Runs - Innings 2')
-  ax_2.set_yticks(range(len(innings_2_partnership)))
-  ax_2.set_yticklabels(innings_2_partnership['player2'] + ' & ' + innings_2_partnership['player1'])
-  # ax_2.legend()
-
-  ax_2.barh(range(len(innings_2_partnership)), innings_2_partnership['player1_runs'], color='tab:blue', label='Player 1 Runs')
-  ax_2.barh(range(len(innings_2_partnership)), -innings_2_partnership['player2_runs'], color='tab:orange', label='Player 2 Runs')
-  ax_2.set_xlim(-max_runs, max_runs)
-
-  ax_2.set_xticks(xticks)
-  ax_2.set_xticklabels([abs(x) for x in xticks])
-
-  # plt.tight_layout()
-  i1_partnership = pd.DataFrame(columns=['Wicket', 'Player_1', 'Player_2', 'Partnership', 'player_out'])
-  i2_partnership = pd.DataFrame(columns=['Wicket', 'Player_1', 'Player_2', 'Partnership', 'player_out'])
-
-  for index, row in innings_1_partnership.iterrows():
-    wicket = index+1
-    player1 = f'{row["player1"]} {row["player1_runs"]}({row["player1_balls"]})'
-    player2 = f'{row["player2"]} {row["player2_runs"]}({row["player2_balls"]})'
-    partnership = f'{row["partnershipRuns"]}({row["partnershipBalls"]})'
-    player_out = row["player_out"]
-    # Add the formatted data to dff DataFrame
-    i1_partnership.loc[index] = [wicket, player1, player2, partnership, player_out]
-
-  for index, row in innings_2_partnership.iterrows():
-    wicket = index+1
-    player1 = f'{row["player1"]} {row["player1_runs"]}({row["player1_balls"]})'
-    player2 = f'{row["player2"]} {row["player2_runs"]}({row["player2_balls"]})'
-    partnership = f'{row["partnershipRuns"]}({row["partnershipBalls"]})'
-    player_out = row["player_out"]
-    # Add the formatted data to dff DataFrame
-    i2_partnership.loc[index] = [wicket, player1, player2, partnership, player_out]
-
-  buf1 = io.BytesIO()
-  fig_1.savefig(buf1, format='png')
-  buf1.seek(0)
-  figdata1 = base64.b64encode(buf1.getvalue()).decode('utf-8')
-
-  buf2 = io.BytesIO()
-  fig_2.savefig(buf2, format='png')
-  buf2.seek(0)
-  figdata2 = base64.b64encode(buf2.getvalue()).decode('utf-8')
-
-  # Return the DataFrames and the figures
-  return i1_partnership,i2_partnership, figdata1, figdata2
-
-def graph_cricket_innings_progression(series_id, match_id):
-  # Ball By Ball for 1st innings
-  import numpy as np
-  try:
-    req_response = get_innings_data(series_id, match_id, 1)
-    ball_by_ball_json = pd.json_normalize(data=req_response['comments'])
-    inn1_team_color = get_match_data_from_bucket(series_id, match_id)['content']['innings'][0]['team']['primaryColor']
-    nparr_each_ball_score_inn1 = np.array(ball_by_ball_json['totalInningRuns'])
-    nparr_over_no_where_team_score_at_inn1 = np.array(ball_by_ball_json['oversActual'])
-  except:
-    inn1_team_color = "#00FFFFFF"
-    nparr_each_ball_score_inn1 = np.array([])
-    nparr_over_no_where_team_score_at_inn1 = np.array([])
-  
-  # Ball By Ball for 2nd innings
-  try:
-    req_response = get_innings_data(series_id, match_id, 2)
-    ball_by_ball_json = pd.json_normalize(data=req_response['comments'])
-    inn2_team_color = get_match_data_from_bucket(series_id, match_id)['content']['innings'][1]['team']['primaryColor']
-    nparr_each_ball_score_inn2 = np.array(ball_by_ball_json['totalInningRuns'])
-    nparr_over_no_where_team_score_at_inn2 = np.array(ball_by_ball_json['oversActual'])
-  except:
-    inn2_team_color = "#00FFFFFF"
-    nparr_each_ball_score_inn2 = np.array([])
-    nparr_over_no_where_team_score_at_inn2 = np.array([])
-
-  fig = Figure()
-  ax = fig.add_subplot(1, 1, 1)
-  ax.plot(nparr_over_no_where_team_score_at_inn1, nparr_each_ball_score_inn1, color=inn1_team_color)
-  ax.plot(nparr_over_no_where_team_score_at_inn2, nparr_each_ball_score_inn2, color=inn2_team_color)
-  ax.set_xlabel("Overs")
-  ax.set_ylabel("Runs")
-
-  """ Line Graph Description:
-  This is a line graph in one figure for runs of both teams at each over in the game.
-  This graph consists of 2 line graphs by calculating score in that over and plotting points.
-  Then those lines are joined with line plot. """
-
-  line_graph = conv_to_base64(fig)
-  return line_graph
-
 def runs_in_ovs_fig(series_id, match_id):
   content = get_match_data_from_bucket(series_id, match_id)['content']['innings']
   ov_no_1 = []
@@ -685,41 +726,6 @@ def runs_in_ovs_fig(series_id, match_id):
   inn2_ovs_runs = conv_to_base64(fig2)
   
   return inn1_ovs_runs, inn2_ovs_runs
-
-def DNB(series_id: int, match_id: int) -> tuple[list]:
-  """
-  Players who did not bat.
-
-  Returns
-  ---
-    tuple[list]: (DNB1, DNB2)
-      tuple of list of players who did not bat in 1st innings & 2nd innings.
-  """
-  innings = get_match_data_from_bucket(series_id, match_id)['content']['innings']
-  DNB1=[]
-  DNB2=[]
-  for k in range(0, len(innings)):
-    if(k==0):
-      inningBatsmen=innings[k]['inningBatsmen']
-      for i in range(0,len(inningBatsmen)):
-        batsman_id=inningBatsmen[i]['player']['id']
-        batsman_name=inningBatsmen[i]['player']['longName']
-        battedtype=inningBatsmen[i]['battedType']
-        if(battedtype=="DNB"):
-          DNB1.append(batsman_name)
-        else:
-          continue
-    if(k==1):
-      inningBatsmen=innings[k]['inningBatsmen']
-      for i in range(0,len(inningBatsmen)):
-        batsman_id=inningBatsmen[i]['player']['id']
-        batsman_name=inningBatsmen[i]['player']['longName']
-        battedtype=inningBatsmen[i]['battedType']
-        if(battedtype=="DNB"):
-          DNB2.append(batsman_name)
-        else:
-          continue
-  return DNB1, DNB2
 
 def data_query(series_id: int, match_id: int):
   # Your BigQuery SQL query

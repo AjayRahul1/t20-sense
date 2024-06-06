@@ -120,7 +120,7 @@ def latest_match_custom_sort(match: dict):
         It is the JSON data of that particular match.
   """
   stage = {"RUNNING": 0, "SCHEDULED": 1, "FINISHED": 2}
-  state = {"LIVE": 0, "PRE": 1, "POST": 2}
+  state = {"POST": 0, "LIVE": 1, "PRE": 2}
   return (
     stage.get(match['stage'], float('inf')),
     state.get(match['state'], float('inf'))

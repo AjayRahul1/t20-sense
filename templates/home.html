@@ -47,8 +47,14 @@
                 href="/series/{{ match.series.objectId }}/match/{{ match.objectId }}/full-scorecard">
                 <div class="card-body">
                   <p class="mb-1" style="font-size: smaller;">
-                    {% if match.state == "LIVE" %} <span style="color: red;"> {{ match.state }} </span> &bull; {% endif %}
-                    {{ match.series.alternateName }} &bull; {{ match.title }} &bull; {{ match.ground.smallName }}
+                    {% if match.state == "LIVE" %}
+                    <span style="color: red;">
+                      {{ match.state }}
+                    </span>
+                    {% else %}
+                    {{ match.status }}
+                    {% endif %}
+                    &bull; {{ match.series.alternateName }} &bull; {{ match.title }} &bull; {{ match.ground.smallName }}
                   </p>
                   <div class="my-1">
                     {% if match.teams[0].team.imageUrl is not none %}

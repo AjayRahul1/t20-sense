@@ -1,14 +1,20 @@
 <nav class="navbar navbar-expand-lg shadow mb-3" style="background-color: #ffdea6;">
   <div class="container-fluid">
     <a class="navbar-brand" href="/"><img src="/static/t20-sense-logo.svg" alt="T20 Sense Logo"></a>
-    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
+      aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
       <span class="navbar-toggler-icon"></span>
     </button>
     <div class="collapse navbar-collapse" id="navbarNav">
       <ul class="navbar-nav">
         <!-- Just change the latest data in page_indices.json and it will get updated in the navbar -->
         {% for series in page_indices_json.latest %}
-        <li class="nav-item"><a class="nav-link" href="/series/{{series.id}}">{{series.name}} ({{series.season}})</a></li>
+        <li class="nav-item">
+          <a class="nav-link" href="/series/{{series.id}}">
+            {{series.name}}
+            {% if series.season %}({{series.season}}){% endif %}
+          </a>
+        </li>
         {% endfor %}
       </ul>
       <!-- Search Bar -->

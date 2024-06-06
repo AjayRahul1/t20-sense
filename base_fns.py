@@ -108,25 +108,38 @@ def get_innings_data(series_id: int, match_id: int, innings: int) -> dict:
   ld = requests.get(url, headers=headers)
   return ld.json()
 
-# Define a custom sorting key to order the latest matches in the order of RUNNING, SCHEDULED, FINISHED
-def custom_sort(item):
-  order = {"RUNNING": 0, "SCHEDULED": 1, "FINISHED": 2}
-  return order.get(item['stage'], float('inf'))
+def latest_match_custom_sort(match: dict):
+  """
+    A custom sort key to sort the latest matches in the order of 'RUNNING, SCHEDULED, FINISHED'.
+
+    Then the sorted matches are sorted based on 'LIVE, PRE, POST' State.
+
+    Parameters
+    ---
+      match: dict
+        It is the JSON data of that particular match.
+  """
+  stage = {"RUNNING": 0, "SCHEDULED": 1, "FINISHED": 2}
+  state = {"LIVE": 0, "PRE": 1, "POST": 2}
+  return (
+    stage.get(match['stage'], float('inf')),
+    state.get(match['state'], float('inf'))
+  )
 
 def get_latest_match_data() -> dict:
   headers = {"User-Agent":	"Mozilla/5.0 (X11; Linux x86_64; rv:121.0) Gecko/20100101 Firefox/121.0"}
   ld: dict = requests.get("https://hs-consumer-api.espncricinfo.com/v1/pages/matches/current?lang=en&latest=true", headers=headers).json()
   ld['matches'] = sorted(ld['matches'], key=lambda x: x['objectId'])
-  ld['matches'] = [it for it in ld['matches'] if it["statusText"] and it["coverage"] != "N"]
-  ld['matches'] = sorted(ld['matches'], key=custom_sort)
+  ld['matches'] = [it for it in ld['matches'] if it["statusText"] and it["coverage"] != "N" and it["status"] != r"{{MATCH_START_TIME}}"]
+  ld['matches'] = sorted(ld['matches'], key=latest_match_custom_sort)
   return ld
 
 def get_latest_domestic_match_data() -> dict:
   headers = {"User-Agent":	"Mozilla/5.0 (X11; Linux x86_64; rv:121.0) Gecko/20100101 Firefox/121.0"}
   ld: dict = requests.get("https://hs-consumer-api.espncricinfo.com/v1/pages/matches/current?lang=en&latest=true", headers=headers).json()
   ld['matches'] = sorted(ld['matches'], key=lambda x: x['objectId'])
-  ld['matches'] = [it for it in ld['matches'] if it['internationalClassId'] is None]
-  ld['matches'] = sorted(ld['matches'], key=custom_sort)
+  ld['matches'] = [it for it in ld['matches'] if it['internationalClassId'] is None and it["statusText"] and it["status"] != r"{{MATCH_START_TIME}}"]
+  ld['matches'] = sorted(ld['matches'], key=latest_match_custom_sort)
   return ld
 
 def get_match_players_dict(series_id: int, match_id: int) -> dict:

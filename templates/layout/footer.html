@@ -97,7 +97,7 @@
         <p class="mb-0 text-dark">Site Map</p>
         <ul class="list-unstyled">
           {% for site in page_indices_json.sitemap %}
-          <li><a class="link-primary link-offset-1-hover link-underline link-underline-opacity-0 link-underline-opacity-100-hover" href="{{site.slug}}">{{site.name}}</a></li>
+          <li><a class="link-primary link-offset-1-hover link-underline link-underline-opacity-0 link-underline-opacity-100-hover" href="/{{site.slug}}">{{site.name}}</a></li>
           {% endfor %}
         </ul>
       </div>

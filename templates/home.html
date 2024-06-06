@@ -8,14 +8,14 @@
   <link rel="stylesheet" href="/static/styles_index.css">
   <link rel="icon" type="image/png" href="/static/favicon-t20-sense.png">
   <!-- Google tag (gtag.js) -->
-  <script async src="https://www.googletagmanager.com/gtag/js?id=G-LWDCC125HK"></script>
+  <!-- <script async src="https://www.googletagmanager.com/gtag/js?id=G-LWDCC125HK"></script>
   <script>
     window.dataLayer = window.dataLayer || [];
     function gtag() { dataLayer.push(arguments); }
     gtag('js', new Date());
 
     gtag('config', 'G-LWDCC125HK');
-  </script>
+  </script> -->
 
   <script type="text/javascript" src="/static/script.js"></script>
 
@@ -47,6 +47,7 @@
                 href="/series/{{ match.series.objectId }}/match/{{ match.objectId }}/full-scorecard">
                 <div class="card-body">
                   <p class="mb-1" style="font-size: smaller;">
+                    {% if match.state == "LIVE" %} <span style="color: red;"> {{ match.state }} </span> &bull; {% endif %}
                     {{ match.series.alternateName }} &bull; {{ match.title }} &bull; {{ match.ground.smallName }}
                   </p>
                   <div class="my-1">

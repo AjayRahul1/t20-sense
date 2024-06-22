@@ -76,8 +76,8 @@ cd t20-sense/
 
 - This is an optional step that improves performance.
 - If you have a Google Cloud Platform Key, you have to set two Environment Variables.
-- `setx API_KEY="your_gcp_key_name.json"`
-- `setx BUCKET_NAME="gcp_bucket_name"`
+- `$env:API_KEY="your_gcp_key_name.json"`
+- `$env:BUCKET_NAME="gcp_bucket_name"`
 - run setup_bucket_functions.py with your key to set up required files onto your `Google Cloud Storage` Buckets.
   - This takes 30 mins to 1 hour of time to setup all the required files.
 
@@ -90,7 +90,7 @@ cd t20-sense/
 
 ### For Linux (CLI Commands)
 
-- First go to the folder where you want to clone using `cd your-directory-path/`
+- After cloning in your preferred location, first go to the folder where you have cloned the source code using `cd t20-sense`.
 - Then copy below commands in your terminal in Linux. All done.
 
 Ubuntu

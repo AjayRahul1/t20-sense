@@ -52,9 +52,12 @@ async def scoreacard(request: Request, series_id: int, match_id: int):
       bat_imp_pts, ptnrshp_df = bat_impact_pts(series_id, match_id)  # Batting impact points
       bat_df, bow_imp_pts = bowl_impact_pts(series_id, match_id)  # Bowlers impact points
       bat_imp_pts, bow_imp_pts = bat_imp_pts.to_dict(orient='records'), bow_imp_pts.to_dict(orient='records')
+    except IndexError as e:
+      print("\n\nException in 'Bat and Bowl Impact Pts':\nFew innings missing. Solve it if possible.")
+      bat_imp_pts, bow_imp_pts = {}, {}
     except Exception as e:
-      print("Exception:\n", e)
-      bat_imp_pts, bow_imp_pts= {}, {}
+      print(f"\n\nException in Batting and Bowling Impact Points:\n{e}")
+      bat_imp_pts, bow_imp_pts = {}, {}
 
     # Base64 Image encoded in a string for Line Plot for each innings runs progression
     lineplot_inn_runs_progress: str = cricket_data.graph_cricket_innings_progression()
@@ -84,6 +87,6 @@ async def scoreacard(request: Request, series_id: int, match_id: int):
     }
     print(f"Time Taken is: {time.perf_counter() - start} seconds")
     return templates.TemplateResponse("scorecard.html", context = context)
-  except:
-    traceback.print_exc()
+  except Exception as e:
+    print("Exception that occured:\n", e)
     return templates.TemplateResponse('error_pages/no_scorecard.html', {"request": request}, status_code=500)

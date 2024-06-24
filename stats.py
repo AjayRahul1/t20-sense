@@ -6,7 +6,7 @@ import plotly.express as px
 import plotly.graph_objects as go
 import plotly.offline as pyo
 
-from base_fns import get_match_data_from_bucket, get_innings_data, conv_to_base64
+from base_fns import conv_to_base64
 try:
   # Set the path to your service account key file
   os.environ['GOOGLE_APPLICATION_CREDENTIALS'] = os.getenv('API_KEY') # 't20-sense-main.json'
@@ -25,6 +25,19 @@ class CricketData:
     self.all_innings_data: list[dict] = [
       base_fns.get_innings_data(series_id, match_id, innings_no) for innings_no in range(1, innings_count + 2)
     ]
+
+  def get_innings_data(self, innings_no: int):
+    """
+    Returns data of certain innings.
+    
+    This is a getter function made which is an abstraction by making them unable to access through variable directly.
+    """
+    try:
+      # It has to be (inning number - 1) because index starts from 0.
+      return self.all_innings_data[innings_no - 1]
+    except Exception as e:
+      print("Ran into an exception:\n", e, "\n\nDue to exception, fetching it from the API on the internet.")
+      return base_fns.get_innings_data(innings_no)
   
   def runs_in_ovs_fig(self):
     matchInningsContent = self.match_data['content']['innings']
@@ -32,19 +45,16 @@ class CricketData:
       inningovers = matchInningsContent[k]['inningOvers']
       if k==0:
         try:
-          # for i in range(0, len(inningovers)):
-          #   ov_no_1.append(inningovers[i]['overNumber'])
-          #   ov_runs_1.append(inningovers[i]['overRuns'])
-          #   ov_wkts_1.append(inningovers[i]['overWickets'])
-          ov_no_1, ov_runs_1, ov_wkts_1 = zip(*[(inningovers[i]['overNumber'], inningovers[i]['overRuns'], inningovers[i]['overWickets']) for i in range(0, len(inningovers))])
+          ov_no_1, ov_runs_1, ov_wkts_1 = zip(*[(
+            inningovers[i]['overNumber'],
+            inningovers[i]['overRuns'],
+            inningovers[i]['overWickets'])
+            for i in range(0, len(inningovers))
+          ])
         except:
           ov_no_1, ov_runs_1, ov_wkts_1 = [0] * len(inningovers), [0] * len(inningovers), [0] * len(inningovers)
       elif k==1:
         try:
-          # for i in range(0,len(inningovers)):
-          #   ov_no_2.append(inningovers[i]['overNumber'])
-          #   ov_runs_2.append(inningovers[i]['overRuns'])
-          #   ov_wkts_2.append(inningovers[i]['overWickets'])
           ov_no_2, ov_runs_2, ov_wkts_2 = zip(*[(inningovers[i]['overNumber'], inningovers[i]['overRuns'], inningovers[i]['overWickets']) for i in range(0, len(inningovers))])
         except:
           ov_no_2, ov_runs_2, ov_wkts_2 = [0] * len(inningovers), [0] * len(inningovers), [0] * len(inningovers)
@@ -79,7 +89,7 @@ class CricketData:
 
     for innings in [1, 2]:
       try:
-        comments = self.all_innings_data[(innings - 1)]['comments']
+        comments = self.get_innings_data(innings)['comments']
         for i in range(0, len(comments)):
           runs, wides, four, six = comments[i]['batsmanRuns'], comments[i]['wides'], comments[i]['isFour'], comments[i]['isSix']
           if runs == 1:
@@ -118,7 +128,7 @@ class CricketData:
     """
     # Ball By Ball for 1st innings
     try:
-      inn_data = self.all_innings_data[0]
+      inn_data = self.get_innings_data(1)
       ball_by_ball_json = pd.json_normalize(data = inn_data['comments'])
       inn1_team_color = self.match_data['content']['innings'][0]['team']['primaryColor']
       nparr_each_ball_score_inn1 = np.array(ball_by_ball_json['totalInningRuns'])
@@ -129,7 +139,7 @@ class CricketData:
     
     # Ball By Ball for 2nd innings
     try:
-      inn_data = self.all_innings_data[1]
+      inn_data = self.get_innings_data(2)
       ball_by_ball_json = pd.json_normalize(data = inn_data['comments'])
       inn2_team_color = self.match_data['content']['innings'][1]['team']['primaryColor']
       nparr_each_ball_score_inn2 = np.array(ball_by_ball_json['totalInningRuns'])
@@ -156,7 +166,7 @@ class CricketData:
     ax.set_xlabel("Overs")
     ax.set_ylabel("Runs")
     ax.legend()
-    line_graph = conv_to_base64(fig)
+    line_graph = base_fns.conv_to_base64(fig)
     return line_graph
 
   # def DNB(self) -> list[list]:
@@ -176,8 +186,9 @@ class CricketData:
   #   return DNB
   
   DNB = lambda self: [
-      [{"id": batsman['player']['id'], "longName": batsman['player']['longName']} for batsman in inning['inningBatsmen'] if batsman['battedType'] == "DNB"]
-      for inning in self.match_data['content']['innings']
+    [{"id": batsman['player']['id'], "longName": batsman['player']['longName']}
+     for batsman in inning['inningBatsmen'] if batsman['battedType'] == "DNB"]
+     for inning in self.match_data['content']['innings']
     ]
   """
   Returns list of Players who did not bat in each innings.
@@ -314,17 +325,18 @@ class CricketData:
 def bat_impact_pts(series_id: int, match_id: int):
   # players_dictionary = get_match_players_dict(content=content)
   player_dict={}
-  output1 = get_match_data_from_bucket(series_id, match_id)
+  output1 = base_fns.get_match_data_from_bucket(series_id, match_id)
   content = output1['content']
-  for i in range(0,2):
+  for i in range(0, 2):
     try:
       matches1 = output1['content']['matchPlayers']['teamPlayers'][i]['players']
-      for j in range(0,len(matches1)):
+      for j in range(0, len(matches1)):
         player_id=matches1[j]['player']['id']
         player_name=matches1[j]['player']['longName']
         player_dict[player_id] = player_name
     except:
       continue
+
   partnership_df = pd.DataFrame(columns=['innings', 'player1ID', 'player1', 'player2ID', 'player2','player_out_id', 'player1_runs', 'player1_balls','player2_runs', 'player2_balls', 'partnershipRuns', 'partnershipBalls'])
   f = 0
   for k in range(0, 2):
@@ -356,53 +368,44 @@ def bat_impact_pts(series_id: int, match_id: int):
 
   df = pd.DataFrame(list(player_dict.items()), columns=['player id', 'player name'])
   df['runs'], df['balls'], df['impact_points'], df['runs_imp'], df['fours_imp'], df['sixes_imp'] = [0] * 6
-  df['team']=None
+  df['team'] = None
   team_1_total, team_2_total, team1_balls, team2_balls, wkts1, wkts2 = [0] * 6
 
   for innings in range(1,3):
     try:
-      matches=get_innings_data(series_id, match_id, innings)['comments']
-      impact_points=0
-      # Performance_score=0
+      matches = base_fns.get_innings_data(series_id, match_id, innings)['comments']
+      impact_points = 0
       for i in range(0,len(matches)):
-        over=matches[i]['overNumber']
-        oversActual=matches[i]['oversActual']
-        totalruns=matches[i]['totalRuns']
-        bowler_id=matches[i]['bowlerPlayerId']
-        batsman_id=matches[i]['batsmanPlayerId']
-        batsman1_id=batsman_id
-        batsman_runs=matches[i]['batsmanRuns']
-        wides=matches[i]['wides']
-        noballs=matches[i]['noballs']
-        byes=matches[i]['byes']
-        legbyes=matches[i]['legbyes']
-        penalties=matches[i]['penalties']
-        wicket=matches[i]['isWicket']
+        over          = matches[i]['overNumber']
+        oversActual   = matches[i]['oversActual']
+        totalruns     = matches[i]['totalRuns']
+        bowler_id     = matches[i]['bowlerPlayerId']
+        batsman_id    = matches[i]['batsmanPlayerId']
+        batsman_runs  = matches[i]['batsmanRuns']
+        wides         = matches[i]['wides']
+        noballs       = matches[i]['noballs']
+        byes          = matches[i]['byes']
+        legbyes       = matches[i]['legbyes']
+        penalties     = matches[i]['penalties']
+        wicket        = matches[i]['isWicket']
 
-        if(batsman_runs==0 and wides==0):
-          dot = 1
-        else:
-          dot = 0
+        dot = 1 if batsman_runs==0 and wides==0 else 0
+        
         impact_points=0
-        runs_imp=0
-        four_imp=0
-        sixes_imp=0
-        if(wides>0):
-          ball=0
-        else:
-          ball=1
+        runs_imp, four_imp, sixes_imp = 0, 0, 0
+        ball = 0 if wides>0 else 1
 
         ##Runrate
         if(innings==1):
-          team_1_total=team_1_total + totalruns
-          team1_balls=team1_balls+ball
-          CRR1=team_1_total*6/team1_balls
+          team_1_total = team_1_total + totalruns
+          team1_balls = team1_balls+ball
+          CRR1 = (team_1_total * 6)/team1_balls
         else:
-          target=team_1_total
-          team_2_total=team_2_total + totalruns
-          team2_balls=team2_balls+ball
-          required_runs=target-team_2_total
-          required_rr=required_runs*6/(120-team2_balls)
+          target = team_1_total
+          team_2_total = team_2_total + totalruns
+          team2_balls = team2_balls+ball
+          required_runs = target-team_2_total
+          required_rr = (required_runs * 6) / (120-team2_balls)
           CRR2=team_2_total*6/team2_balls
 
         ##Impact points
@@ -571,9 +574,9 @@ def bat_impact_pts(series_id: int, match_id: int):
   return df1, partnership_df
 
 def bowl_impact_pts(series_id: int,match_id: int):
-  player_dict={}
-  output1 = get_match_data_from_bucket(series_id, match_id)
-  for i in range(0,2):
+  player_dict = {}
+  output1 = base_fns.get_match_data_from_bucket(series_id, match_id)
+  for i in range(0, 2):
     matches1 = output1['content']['matchPlayers']['teamPlayers'][i]
     if(i==0):
       team1_name=matches1['team']['longName']
@@ -581,62 +584,63 @@ def bowl_impact_pts(series_id: int,match_id: int):
       team2_name=matches1['team']['longName']
     players=matches1['players']
     for j in range(0,len(players)):
-      player_id=players[j]['player']['id']
-      player_name=players[j]['player']['longName']
+      player_id = players[j]['player']['id']
+      player_name = players[j]['player']['longName']
       player_dict[player_id] = player_name
   df = pd.DataFrame(list(player_dict.items()), columns=['player id', 'player name'])
   b_df = pd.DataFrame(list(player_dict.items()), columns=['player id', 'player name'])
   b_df['team']=None
-  b_df['innings']=0
-  b_df['impact_points']=0
-  b_df['balls']=0
-  b_df['wickets']=0
-  df['runs']=0
-  df['balls']=0
-  
+
+  # [0] * 6 assigns 0 to each of 6 variables.
+  b_df['innings'], b_df['impact_points'], b_df['balls'], b_df['wickets'], df['runs'], df['balls'] = [0] * 6
+
   # bat_runs=0
-  for innings in range(1,3):
+  for innings in range(1, 3):
     try:
-      matches = get_innings_data(series_id, match_id, innings)['comments']
-      for i in range(0,len(matches)):
+      matches = base_fns.get_innings_data(series_id, match_id, innings)['comments']
+      for i in range(0, len(matches)):
         try:
-          over=matches[i]['overNumber']
-          oversActual=matches[i]['oversActual']
-          totalruns=matches[i]['totalRuns']
-          bowler_id=matches[i]['bowlerPlayerId']
-          batsman_id=matches[i]['batsmanPlayerId']
-          batsman_runs=matches[i]['batsmanRuns']
-          wides=matches[i]['wides']
-          noballs=matches[i]['noballs']
-          byes=matches[i]['byes']
-          legbyes=matches[i]['legbyes']
-          penalties=matches[i]['penalties']
-          wicket=matches[i]['isWicket']
-          impact_points=0
-          if(wides>0):
-            ball=0
-          else:
-            ball=1
-          if(batsman_runs==0 and wides==0):
-            dot=1
-          else:
-            dot=0
+          over          = matches[i]['overNumber']
+          oversActual   = matches[i]['oversActual']
+          totalruns     = matches[i]['totalRuns']
+          bowler_id     = matches[i]['bowlerPlayerId']
+          batsman_id    = matches[i]['batsmanPlayerId']
+          batsman_runs  = matches[i]['batsmanRuns']
+          wides         = matches[i]['wides']
+          noballs       = matches[i]['noballs']
+          byes          = matches[i]['byes']
+          legbyes       = matches[i]['legbyes']
+          penalties     = matches[i]['penalties']
+          wicket        = matches[i]['isWicket']
+          impact_points = 0
+
+          ball = 0 if wides > 0 else 1
+          dot = 1 if batsman_runs == 0 and wides==0 else 0
+
           df.loc[df['player id'] == batsman_id, 'runs'] = df.loc[df['player id'] == batsman_id,'runs'] + batsman_runs
           df.loc[df['player id'] == batsman_id, 'balls'] = df.loc[df['player id'] == batsman_id,'balls'] + ball
 
           b_df.loc[b_df['player id'] == bowler_id, 'innings'] = innings
           b_df.loc[b_df['player id'] == bowler_id, 'balls'] = b_df.loc[b_df['player id'] == bowler_id,'balls'] + ball
 
+          # match batsman_runs:
+          #   case 0:
+          #     impact_points += 2
+          #   case 4:
+          #     impact_points -= 2
+          #   case 6:
+          #     impact_points -= 3
+
           if(batsman_runs==0):
             impact_points+=2
           if(batsman_runs==4):
-            impact_points+=-2
+            impact_points-=2
           if(batsman_runs==6):
-            impact_points+=-3
-          if(wides>0):
-            impact_points=-(wides)
+            impact_points-=3
+
+          impact_points -= wides
           if(noballs==1):
-            impact_points +=-2
+            impact_points -= 2
 
           if(wicket == True):
             dismissal_type=matches[i]['dismissalType']
@@ -674,58 +678,7 @@ def bowl_impact_pts(series_id: int,match_id: int):
   b_df = b_df[b_df['balls'] != 0]
   b_df['innings']=b_df['innings'].astype(int)
   b_df=b_df.sort_values(by='impact_points', ascending=False)
-  return df,b_df
-
-def runs_in_ovs_fig(series_id, match_id):
-  content = get_match_data_from_bucket(series_id, match_id)['content']['innings']
-  ov_no_1 = []
-  ov_runs_1 = []
-  ov_wkts_1 = []
-  ov_no_2 = []
-  ov_runs_2 = []
-  ov_wkts_2 = []
-  for k in range(0,len(content)):
-    inningovers=content[k]['inningOvers']
-    if k==0:
-      try:
-        for i in range(0,len(inningovers)):
-          ov_no_1.append(inningovers[i]['overNumber'])
-          ov_runs_1.append(inningovers[i]['overRuns'])
-          ov_wkts_1.append(inningovers[i]['overWickets'])
-      except:
-        ov_no_1 = [0] * len(inningovers)
-        ov_runs_1 =  [0] * len(inningovers)
-        ov_wkts_1 = [0] * len(inningovers)
-    if k==1:
-      try:
-        for i in range(0,len(inningovers)):
-          ov_no_2.append(inningovers[i]['overNumber'])
-          ov_runs_2.append(inningovers[i]['overRuns'])
-          ov_wkts_2.append(inningovers[i]['overWickets'])
-      except:
-        ov_no_2 = [0] * len(inningovers)
-        ov_runs_2 =  [0] * len(inningovers)
-        ov_wkts_2 = [0] * len(inningovers)
-  
-  fig1 = Figure(figsize=(8, 6))
-  fig2 = Figure(figsize=(8, 6))
-  
-
-  ax = fig1.add_subplot(1, 1, 1)
-  ax.set_ylabel('Runs')
-  ax.set_xlabel('Overs')
-  ax.set_title('Runs Per Over - Innings 1')
-  ax.bar(ov_no_1, ov_runs_1)
-  inn1_ovs_runs = conv_to_base64(fig1)
-  
-  ax = fig2.add_subplot(1, 1, 1)
-  ax.set_ylabel('Runs')
-  ax.set_xlabel('Overs')
-  ax.set_title('Runs Per Over - Innings 2')
-  ax.bar(ov_no_2, ov_runs_2)
-  inn2_ovs_runs = conv_to_base64(fig2)
-  
-  return inn1_ovs_runs, inn2_ovs_runs
+  return df, b_df
 
 def data_query(series_id: int, match_id: int):
   # Your BigQuery SQL query

@@ -13,7 +13,7 @@ except:
 # Base Functions
 def conv_to_base64(fig: Figure) -> str:
   img_stream = io.BytesIO()
-  fig.savefig(img_stream, format="png")
+  fig.savefig(img_stream, format="webp")
   img_stream.seek(0)
   img_data = base64.b64encode(img_stream.read()).decode("utf-8")
   return img_data
@@ -102,7 +102,7 @@ def get_innings_data(series_id: int, match_id: int, innings: int) -> dict:
   dict
     JSON Data of ball by ball in each innings
   """
-  print("Turning to ESPN Cricinfo API to get Match Data")
+  print("Turning to ESPN Cricinfo API to get Innings Data")
   url = f"https://hs-consumer-api.espncricinfo.com/v1/pages/match/comments?lang=en&seriesId={series_id}&matchId={match_id}&inningNumber={innings}&commentType=ALL&sortDirection=DESC&fromInningOver=-1"
   headers={"User-Agent":	"Mozilla/5.0 (X11; Linux x86_64; rv:121.0) Gecko/20100101 Firefox/121.0"}
   ld = requests.get(url, headers=headers)

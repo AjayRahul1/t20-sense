@@ -6,7 +6,6 @@ import plotly.express as px
 import plotly.graph_objects as go
 import plotly.offline as pyo
 
-from base_fns import conv_to_base64
 try:
   # Set the path to your service account key file
   os.environ['GOOGLE_APPLICATION_CREDENTIALS'] = os.getenv('API_KEY') # 't20-sense-main.json'
@@ -26,6 +25,11 @@ class CricketData:
       base_fns.get_innings_data(series_id, match_id, innings_no) for innings_no in range(1, innings_count + 2)
     ]
 
+    # access this variable if to know how many innings are there in the match including the current running over
+    self.current_no_of_inns = len(self.match_data["content"]["innings"])
+
+  """Getter Functions"""
+
   def get_innings_data(self, innings_no: int):
     """
     Returns data of certain innings.
@@ -36,87 +40,85 @@ class CricketData:
       # It has to be (inning number - 1) because index starts from 0.
       return self.all_innings_data[innings_no - 1]
     except Exception as e:
-      print("Ran into an exception:\n", e, "\n\nDue to exception, fetching it from the API on the internet.")
+      print("Ran into an exception in get_innings_data function:\n", e, "\n\nDue to exception, fetching it from the API on the internet.")
       return base_fns.get_innings_data(innings_no)
   
-  def runs_in_ovs_fig(self):
-    matchInningsContent = self.match_data['content']['innings']
-    for k in range(0, len(matchInningsContent)):
-      inningovers = matchInningsContent[k]['inningOvers']
-      if k==0:
-        try:
-          ov_no_1, ov_runs_1, ov_wkts_1 = zip(*[(
-            inningovers[i]['overNumber'],
-            inningovers[i]['overRuns'],
-            inningovers[i]['overWickets'])
-            for i in range(0, len(inningovers))
-          ])
-        except:
-          ov_no_1, ov_runs_1, ov_wkts_1 = [0] * len(inningovers), [0] * len(inningovers), [0] * len(inningovers)
-      elif k==1:
-        try:
-          ov_no_2, ov_runs_2, ov_wkts_2 = zip(*[(inningovers[i]['overNumber'], inningovers[i]['overRuns'], inningovers[i]['overWickets']) for i in range(0, len(inningovers))])
-        except:
-          ov_no_2, ov_runs_2, ov_wkts_2 = [0] * len(inningovers), [0] * len(inningovers), [0] * len(inningovers)
-    
-    fig1 = Figure(figsize=(8, 6))
-    fig2 = Figure(figsize=(8, 6))
+  """Other Implemented Functions"""
 
-    ax = fig1.add_subplot(1, 1, 1)
-    ax.set_ylabel('Runs')
-    ax.set_xlabel('Overs')
-    ax.set_title('Runs Per Over - Innings 1')
-    try:
-      ax.bar(ov_no_1, ov_runs_1)
-    except UnboundLocalError:
-      return (None, None)
-    inn1_ovs_runs = base_fns.conv_to_base64(fig1)
-    
-    ax = fig2.add_subplot(1, 1, 1)
-    ax.set_ylabel('Runs')
-    ax.set_xlabel('Overs')
-    ax.set_title('Runs Per Over - Innings 2')
-    try:
-      ax.bar(ov_no_2, ov_runs_2)
-    except UnboundLocalError:
-      return inn1_ovs_runs, None
-    inn2_ovs_runs = base_fns.conv_to_base64(fig2)
-    
-    return inn1_ovs_runs, inn2_ovs_runs
+  def runs_in_ovs_fig(self):
+    each_inns_ovs_runs_wkts = []
+    matchInningsContent = self.match_data['content']['innings']
+
+    for inning_index in range(0, len(matchInningsContent)):
+      inningovers = matchInningsContent[inning_index]['inningOvers']
+      inningovers_len = len(matchInningsContent[inning_index]['inningOvers'])
+      try:
+        each_inns_ovs_runs_wkts.append(
+          list(
+            zip(*[
+            [inningovers[i]['overNumber'],
+             inningovers[i]['overRuns'],
+             inningovers[i]['overWickets']]
+             for i in range(len(inningovers))])
+          )
+        )
+      except:
+        each_inns_ovs_runs_wkts.append([[0] * inningovers_len, [0] * inningovers_len, [0] * inningovers_len])
+
+    figures = [Figure(figsize=(8, 6), tight_layout=True) for _ in range(self.current_no_of_inns)]
+    each_inns_graphs = []
+    for inning_index in range(len(figures)):
+      ax = figures[inning_index].add_subplot(1, 1, 1)
+      ax.set_ylabel("Runs")
+      ax.set_xlabel("Overs")
+      ax.set_title(f"Runs Per Over - Innings {inning_index + 1} - {matchInningsContent[inning_index]["team"]["abbreviation"]}")
+      try:
+        ax.bar(each_inns_ovs_runs_wkts[inning_index][0], each_inns_ovs_runs_wkts[inning_index][1])
+        ax.set_xticks(each_inns_ovs_runs_wkts[inning_index][0])
+      except UnboundLocalError:
+        return each_inns_graphs
+      each_inns_graphs.append(base_fns.conv_to_base64(figures[inning_index]))
+
+    return each_inns_graphs
   
   def division_of_runs(self) -> tuple[str]:
-    inn1_runs, inn2_runs = [0] * 6, [0] * 6
-
-    for innings in [1, 2]:
+    inn_runs = [[0] * 6 for _ in range(self.current_no_of_inns)]
+    for index, inning_no in enumerate(range(1, self.current_no_of_inns + 1)):
+      # index starts from 0 till 1, inning_no starts from 1 till 2 (for 2 innings) & till 3, 4 respectively for 4 innings (tests)
       try:
-        comments = self.get_innings_data(innings)['comments']
+        comments = self.get_innings_data(inning_no)['comments']
         for i in range(0, len(comments)):
           runs, wides, four, six = comments[i]['batsmanRuns'], comments[i]['wides'], comments[i]['isFour'], comments[i]['isSix']
           if runs == 1:
-            inn_runs = inn1_runs if innings == 1 else inn2_runs
-            inn_runs[1] += 1
+            inn_runs[index][1] += 1
           elif runs == 2:
-            inn_runs = inn1_runs if innings == 1 else inn2_runs
-            inn_runs[2] += 1
+            inn_runs[index][2] += 1
           elif runs == 3:
-            inn_runs = inn1_runs if innings == 1 else inn2_runs
-            inn_runs[3] += 1
+            inn_runs[index][3] += 1
           if runs == 0 and wides == 0:
-            inn_runs = inn1_runs if innings == 1 else inn2_runs
-            inn_runs[0] += 1
+            inn_runs[index][0] += 1
           if four:
-            inn_runs = inn1_runs if innings == 1 else inn2_runs
-            inn_runs[4] += 1
+            inn_runs[index][4] += 1
           if six:
-            inn_runs = inn1_runs if innings == 1 else inn2_runs
-            inn_runs[5] += 1
+            inn_runs[index][5] += 1
       except Exception as e:
-        print(f"Exception in Division of Runs for s{self.series_id}, m{self.match_id}, i{innings}\nException is:\n{e}")
+        print(f"Exception in Division of Runs for s{self.series_id}, m{self.match_id}, i{index}\nException is:\n{e}")
         continue
     fig_labels=["Dots", "1s", "2s", "3s", "4s", "6s"]
-    fig1, fig2 = go.Figure(data=[go.Pie(labels=fig_labels, values=inn1_runs, textinfo='value')]), go.Figure(data=[go.Pie(labels=fig_labels, values=inn2_runs, textinfo='value')])
-    i1_runs, i2_runs = base_fns.conv_to_html(fig1), base_fns.conv_to_html(fig2)
-    return (i1_runs, i2_runs)
+
+    figures = [
+      go.Figure(
+      data=[go.Pie(labels = fig_labels, values = inn_runs[i], textinfo = 'value')],
+      layout = dict(margin = dict(t = 0))) # t stands for top margin
+      for i in range(self.current_no_of_inns)
+    ]
+
+    inn_graph_figs = [
+      base_fns.conv_to_html(figures[i])
+      for i in range(self.current_no_of_inns)
+    ]
+
+    return inn_graph_figs
   
   def graph_cricket_innings_progression(self) -> str:
     """
@@ -126,64 +128,44 @@ class CricketData:
     This graph consists of 2 line graphs by calculating score in that over and plotting points.
     Then those lines are joined with line plot.
     """
-    # Ball By Ball for 1st innings
-    try:
-      inn_data = self.get_innings_data(1)
-      ball_by_ball_json = pd.json_normalize(data = inn_data['comments'])
-      inn1_team_color = self.match_data['content']['innings'][0]['team']['primaryColor']
-      nparr_each_ball_score_inn1 = np.array(ball_by_ball_json['totalInningRuns'])
-      nparr_over_no_where_team_score_at_inn1 = np.array(ball_by_ball_json['oversActual'])
-    except:
-      inn1_team_color = "#00FFFFFF"
-      nparr_each_ball_score_inn1, nparr_over_no_where_team_score_at_inn1 = np.array([]), np.array([])
-    
-    # Ball By Ball for 2nd innings
-    try:
-      inn_data = self.get_innings_data(2)
-      ball_by_ball_json = pd.json_normalize(data = inn_data['comments'])
-      inn2_team_color = self.match_data['content']['innings'][1]['team']['primaryColor']
-      nparr_each_ball_score_inn2 = np.array(ball_by_ball_json['totalInningRuns'])
-      nparr_over_no_where_team_score_at_inn2 = np.array(ball_by_ball_json['oversActual'])
-    except:
-      inn2_team_color = "#00FFFFFF"
-      nparr_each_ball_score_inn2 = np.array([])
-      nparr_over_no_where_team_score_at_inn2 = np.array([])
 
-    fig = Figure()
+    # each_innings_scores_and_overs is a list containings lists for each innings inside
+    # inside lists consists for 2 elements.
+    # 0th index has nparr_each_ball_score, 1st index has np_arr_actual_overs_of_score
+    each_innings_scores_and_overs: list[list] = [[] for _ in range(self.current_no_of_inns)]
+    inn_team_colors: list[str] = []
+    
+    for index, inning_no in enumerate(range(1, self.current_no_of_inns + 1)):
+      try:
+        inn_data = self.get_innings_data(inning_no)
+        ball_by_ball_json = pd.json_normalize(data = inn_data['comments'])
+        inn_team_colors.append(self.match_data['content']['innings'][index]['team']['primaryColor'])
+        each_innings_scores_and_overs[index].append(np.array(ball_by_ball_json['totalInningRuns']))
+        each_innings_scores_and_overs[index].append(np.array(ball_by_ball_json['oversActual']))
+      except:
+        inn_team_colors.append("#00FFFFF")
+        each_innings_scores_and_overs[index].append(np.array([]))
+        each_innings_scores_and_overs[index].append(np.array([]))
+
+    fig = Figure(tight_layout=True)
     ax = fig.add_subplot(1, 1, 1)
-    ax.plot(
-      nparr_over_no_where_team_score_at_inn1,
-      nparr_each_ball_score_inn1,
-      color=inn1_team_color,
-      label=self.match_data["match"]["teams"][0]["team"]["name"]
-    )
-    ax.plot(
-      nparr_over_no_where_team_score_at_inn2,
-      nparr_each_ball_score_inn2,
-      color=inn2_team_color,
-      label=self.match_data["match"]["teams"][1]["team"]["name"]
-    )
+    
+    # set_xticks is to set x-axis label follow a pattern.
+    # for example, for t20 it will be (0, 21, 2) which makes the x-axes labels as 0,2,4,...20
+    ax.set_xticks(np.arange(0, len(self.match_data["content"]["innings"][0]["inningOvers"]) + 1, 2))
+    for index in range(self.current_no_of_inns):
+      ax.plot(
+        each_innings_scores_and_overs[index][1],
+        each_innings_scores_and_overs[index][0],
+        color=inn_team_colors[index],
+        label=self.match_data["match"]["teams"][index]["team"]["name"]
+      )
+
     ax.set_xlabel("Overs")
     ax.set_ylabel("Runs")
     ax.legend()
     line_graph = base_fns.conv_to_base64(fig)
     return line_graph
-
-  # def DNB(self) -> list[list]:
-  #   """
-  #   List of Players who did not bat.
-
-  #   Returns
-  #   ---
-  #     list[list]: (DNB1, DNB2)
-  #       tuple of list of players who did not bat in 1st innings & 2nd innings.
-  #   """
-  #   DNB: list[list] = [
-  #     [batsman['player']['longName'] for batsman in inning['inningBatsmen'] if batsman['battedType'] == "DNB"]
-  #     for inning in self.match_data['content']['innings']
-  #   ]
-
-  #   return DNB
   
   DNB = lambda self: [
     [{"id": batsman['player']['id'], "longName": batsman['player']['longName']}

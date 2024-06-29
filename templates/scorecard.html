@@ -35,6 +35,7 @@ match_data_json["match"]["teams"][1]["team"]["abbreviation"] + " " + match_data_
 <body>
   <!-- Navigation Bar -->
   {% include "layout/navbar.html" %}
+
   <div class="container-fluid">
     <div class="row">
       <!-- 1st Frame -->
@@ -98,7 +99,7 @@ match_data_json["match"]["teams"][1]["team"]["abbreviation"] + " " + match_data_
           </div>
         </div>
 
-        <div class="my-1 p-1 border rounded bg-light">
+        <div class="my-1 p-2 border rounded bg-light">
           <p class="fw-bold my-1">Best Performances in Batting</p>
           {% if match_data_json.content.bestPerformance %}
           {% for batsman in match_data_json.content.bestPerformance.batsmen %}
@@ -490,35 +491,25 @@ match_data_json["match"]["teams"][1]["team"]["abbreviation"] + " " + match_data_
             style="width: 100%; max-height: min-content;">
         </div>
         {% endif %}
-        {% if match_data_json.match.teams[0].score is not none %}
-        <div class="border rounded mb-2 overflow-hidden">
-          <img src="data:image/png;base64,{{ i1_ov_runs }}" alt="Innings 1 Overs-Runs"
-            style="width: 100%; max-height: min-content;">
-        </div>
-        {% endif %}
-        {% if match_data_json.match.teams[1].score is not none %}
-        <div class="border rounded mb-2 overflow-hidden">
-          <img src="data:image/png;base64,{{ i2_ov_runs }}" alt="Innings 2 Overs-Runs"
-            style="width: 100%; max-height: min-content;">
-        </div>
-        {% endif %}
-        {% if match_data_json.match.teams[0].score is not none %}
-        <p class="fs-5 fw-bold text-center border-top">Distribution of Runs</p>
-        <iframe class="rounded" srcdoc="{{ i1_runs }}" width="100%" height="380px" frameborder="0"
-          scrolling="no"></iframe>
-        <p class="fs-6 mb-0 text-center">{{ match_data_json.match.teams[0].team.longName }}</p>
-        {% if match_data_json.match.teams[1].score is not none %}
-        <iframe class="rounded" srcdoc="{{ i2_runs }}" width="100%" height="380px" frameborder="0"
-          scrolling="no"></iframe>
-        <p class="fs-6 mb-0 text-center">{{ match_data_json.match.teams[1].team.longName }}</p>
-        {% endif %}
-        {% endif %}
-        <!-- <div class="border rounded mb-2 overflow-hidden">
-            <img src="data:image/png;base64,{{ i1_runs }}" alt="Innings 1 Runs distribution" style="width: 100%; max-height: min-content;">
-          </div>
+        
+
+        {% for index in range(each_inns_graphs | length) %}
           <div class="border rounded mb-2 overflow-hidden">
-            <img src="data:image/png;base64,{{ i2_runs }}" alt="Innings 2 Runs distribution" style="width: 100%; max-height: min-content;">
-          </div> -->
+            <img src="data:image/png;base64,{{ each_inns_graphs[index] }}" alt="Innings {{ index + 1 }} Overs-Runs"
+              style="width: 100%; max-height: min-content;">
+          </div>
+        {% endfor %}
+
+        <!-- Distribution of Runs Graph (Dots, 1s, 2s, 3s, 4s, 6s) -->
+        <h5 class="fs-5 fw-bold text-center border-top">Distribution of Runs</h5>
+        {% for index in range(runs_div_graphs | length) %}
+          {% if match_data_json.match.teams[index].score is not none %}
+          <iframe class="rounded" srcdoc="{{ runs_div_graphs[index] }}" width="100%" height="380px" frameborder="0"
+            scrolling="no"></iframe>
+          <p class="fs-6 mb-0 text-center">{{ match_data_json.match.teams[0].team.longName }}</p>
+          {% endif %}
+        {% endfor %}
+
         <!-- <div class="border rounded p-2 mb-2" style="width: 100%; height: 300px; background-color: white;">
             <p class="text-center" style="font-size: small;">Advertisement is going to displayed here</p>
           </div> -->

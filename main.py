@@ -1,12 +1,11 @@
-from fastapi import FastAPI, Request, Form
+from fastapi import FastAPI, Request
 from fastapi.responses import HTMLResponse
 from fastapi.templating import Jinja2Templates
 from fastapi.staticfiles import StaticFiles
 import traceback, dotenv, json, time
 
-from ipl_func import get_particular_match_whole_score
-from base_fns import get_series_data_from_bucket, get_latest_match_data
-from stats import CricketData, bat_impact_pts, bowl_impact_pts
+import ipl_func, base_fns, stats
+from stats import CricketData
 
 app = FastAPI()
 templates = Jinja2Templates(directory="templates")
@@ -28,12 +27,12 @@ mlc_years = {1357742 : 2023}
 @app.get("/")
 async def home(request: Request):
   global page_indices
-  latest_data = get_latest_match_data()
+  latest_data = base_fns.get_latest_match_data()
   return templates.TemplateResponse("home.html", {"request": request, "latest_data": latest_data, "page_indices_json": page_indices})
 
 @app.get("/series/{series_id}")
 async def seriesPage(request: Request, series_id: int):
-  ser_data = get_series_data_from_bucket(series_id=series_id)
+  ser_data = base_fns.get_series_data_from_bucket(series_id=series_id)
   return templates.TemplateResponse("series.html", {"request": request, "series_id": series_id, "ser_data": ser_data, "page_indices_json": page_indices})
 
 @app.get("/series/{series_id}/match/{match_id}/full-scorecard", response_class=HTMLResponse)
@@ -45,18 +44,18 @@ async def scoreacard(request: Request, series_id: int, match_id: int):
     cricket_data = CricketData(series_id, match_id)
     match_data: dict = cricket_data.match_data
 
-    batting1, bowling1, batting2, bowling2 = get_particular_match_whole_score(series_id, match_id)
+    batting1, bowling1, batting2, bowling2 = ipl_func.get_particular_match_whole_score(series_id, match_id)
     
     bat_imp_pts, bow_imp_pts = {}, {}
     try:
-      bat_imp_pts, ptnrshp_df = bat_impact_pts(series_id, match_id)  # Batting impact points
-      bat_df, bow_imp_pts = bowl_impact_pts(series_id, match_id)  # Bowlers impact points
+      bat_imp_pts, ptnrshp_df = stats.bat_impact_pts(series_id, match_id)  # Batting impact points
+      bat_df, bow_imp_pts = stats.bowl_impact_pts(series_id, match_id)  # Bowlers impact points
       bat_imp_pts, bow_imp_pts = bat_imp_pts.to_dict(orient='records'), bow_imp_pts.to_dict(orient='records')
     except IndexError as e:
       print("\n\nException in 'Bat and Bowl Impact Pts':\nFew innings missing. Solve it if possible.")
       bat_imp_pts, bow_imp_pts = {}, {}
-    except Exception as e:
-      print(f"\n\nException in Batting and Bowling Impact Points:\n{e}")
+    except Exception:
+      print(f"\n\nException in Batting and Bowling Impact Points:\n{traceback.print_exc}")
       bat_imp_pts, bow_imp_pts = {}, {}
 
     # Base64 Image encoded in a string for Line Plot for each innings runs progression
@@ -70,8 +69,8 @@ async def scoreacard(request: Request, series_id: int, match_id: int):
     except:
       i1_ptnr_df, i2_ptnr_df, ptnr_fig1, ptnr_fig2 = {}, {}, "", ""
 
-    i1_ovs_runs, i2_ovs_runs = cricket_data.runs_in_ovs_fig()
-    i1_runs, i2_runs = cricket_data.division_of_runs()
+    each_inns_graphs = cricket_data.runs_in_ovs_fig()
+    runs_div_graphs = cricket_data.division_of_runs()
 
     dnb = cricket_data.DNB()
 
@@ -80,13 +79,13 @@ async def scoreacard(request: Request, series_id: int, match_id: int):
       "batting1": batting1, "bowling1": bowling1, "batting2": batting2, "bowling2": bowling2,
       "imp_pts": bat_imp_pts, "bow_imp_pts": bow_imp_pts,
       "ptnr_df1": i1_ptnr_df, "ptnr_df2": i2_ptnr_df, "ptnr_f1" : ptnr_fig1, "ptnr_f2" : ptnr_fig2,
-      "i1_runs": i1_runs, "i2_runs": i2_runs, "dnb" : dnb,
-      "i1_ov_runs": i1_ovs_runs,  "i2_ov_runs": i2_ovs_runs,
+      "runs_div_graphs": runs_div_graphs, "dnb" : dnb,
+      "each_inns_graphs": each_inns_graphs,
       "each_team_cumulative_score_per_over": lineplot_inn_runs_progress,
       "page_indices_json": page_indices
     }
     print(f"Time Taken is: {time.perf_counter() - start} seconds")
     return templates.TemplateResponse("scorecard.html", context = context)
   except Exception as e:
-    print("Exception that occured:\n", e)
+    traceback.print_exc()
     return templates.TemplateResponse('error_pages/no_scorecard.html', {"request": request}, status_code=500)

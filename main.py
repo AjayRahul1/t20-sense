@@ -2,8 +2,7 @@ from fastapi import FastAPI, Request
 from fastapi.responses import HTMLResponse
 from fastapi.templating import Jinja2Templates
 from fastapi.staticfiles import StaticFiles
-import traceback, dotenv, json, time
-
+import traceback, dotenv, json, time, uvicorn
 import ipl_func, base_fns, stats
 from stats import CricketData
 
@@ -38,7 +37,7 @@ async def seriesPage(request: Request, series_id: int):
 @app.get("/series/{series_id}/match/{match_id}/full-scorecard", response_class=HTMLResponse)
 async def scoreacard(request: Request, series_id: int, match_id: int):
   try:
-    print("Match ID: ", match_id, "\nSeries ID: ", series_id)
+    print(f"{match_id=}\n{series_id=}")
     start = time.perf_counter()
 
     cricket_data = CricketData(series_id, match_id)
@@ -64,14 +63,12 @@ async def scoreacard(request: Request, series_id: int, match_id: int):
     i1_ptnr_df, i2_ptnr_df, ptnr_fig1, ptnr_fig2 = {}, {}, "", ""
     try:
       i1_ptnr_df, i2_ptnr_df, ptnr_fig1, ptnr_fig2 = cricket_data.get_ptnship()
-      i1_ptnr_df = i1_ptnr_df.to_dict(orient='records')
-      i2_ptnr_df = i2_ptnr_df.to_dict(orient='records')
+      i1_ptnr_df, i2_ptnr_df = i1_ptnr_df.to_dict(orient='records'), i2_ptnr_df.to_dict(orient='records')
     except:
       i1_ptnr_df, i2_ptnr_df, ptnr_fig1, ptnr_fig2 = {}, {}, "", ""
 
     each_inns_graphs = cricket_data.runs_in_ovs_fig()
     runs_div_graphs = cricket_data.division_of_runs()
-
     dnb = cricket_data.DNB()
 
     context = {
@@ -86,6 +83,9 @@ async def scoreacard(request: Request, series_id: int, match_id: int):
     }
     print(f"Time Taken is: {time.perf_counter() - start} seconds")
     return templates.TemplateResponse("scorecard.html", context = context)
-  except Exception as e:
+  except Exception:
     traceback.print_exc()
     return templates.TemplateResponse('error_pages/no_scorecard.html', {"request": request}, status_code=500)
+
+if __name__ == "__main__":
+  uvicorn.run(app=app, host="0.0.0.0", port=8000)

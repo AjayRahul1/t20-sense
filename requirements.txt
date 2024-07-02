@@ -5,6 +5,5 @@ numpy
 pandas
 matplotlib
 requests
-ipython
 python-dotenv
 plotly

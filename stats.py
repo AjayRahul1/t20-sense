@@ -1,4 +1,4 @@
-import os, io, base64, pandas as pd, numpy as np, base_fns
+import os, io, base64, pandas as pd, numpy as np, base_fns, traceback
 from google.cloud import storage  # Google Cloud Storage Imports
 import matplotlib.pyplot as plt
 from matplotlib.figure import Figure
@@ -16,21 +16,22 @@ except:
 
 class CricketData:
   def __init__(self, series_id: int, match_id: int):
+    from math import ceil
     self.series_id: int = series_id
     self.match_id: int = match_id
     self.series_data: dict = base_fns.get_series_data_from_bucket(series_id)
     self.match_data: dict = base_fns.get_match_data_from_bucket(series_id, match_id)
-    innings_count = self.match_data["match"]["scheduledInnings"]
+    self.current_no_of_inns: int = len(self.match_data["content"]["innings"])
+    self.max_overs_played_in_an_inns: int = ceil(max([self.match_data["content"]["innings"][i]["overs"] for i in range(self.current_no_of_inns)]))
     self.all_innings_data: list[dict] = [
-      base_fns.get_innings_data(series_id, match_id, innings_no) for innings_no in range(1, innings_count + 2)
+      base_fns.get_innings_data(series_id, match_id, inning_no) for inning_no in range(1, self.current_no_of_inns + 1)
     ]
 
     # access this variable if to know how many innings are there in the match including the current running over
-    self.current_no_of_inns = len(self.match_data["content"]["innings"])
 
   """Getter Functions"""
 
-  def get_innings_data(self, innings_no: int):
+  def get_innings_data(self, inning_no: int):
     """
     Returns data of certain innings.
     
@@ -38,10 +39,10 @@ class CricketData:
     """
     try:
       # It has to be (inning number - 1) because index starts from 0.
-      return self.all_innings_data[innings_no - 1]
+      return self.all_innings_data[inning_no - 1]
     except Exception as e:
       print("Ran into an exception in get_innings_data function:\n", e, "\n\nDue to exception, fetching it from the API on the internet.")
-      return base_fns.get_innings_data(innings_no)
+      return base_fns.get_innings_data(inning_no)
   
   """Other Implemented Functions"""
 
@@ -49,7 +50,7 @@ class CricketData:
     each_inns_ovs_runs_wkts = []
     matchInningsContent = self.match_data['content']['innings']
 
-    for inning_index in range(0, len(matchInningsContent)):
+    for inning_index in range(len(matchInningsContent)):
       inningovers = matchInningsContent[inning_index]['inningOvers']
       inningovers_len = len(matchInningsContent[inning_index]['inningOvers'])
       try:
@@ -59,7 +60,7 @@ class CricketData:
             [inningovers[i]['overNumber'],
              inningovers[i]['overRuns'],
              inningovers[i]['overWickets']]
-             for i in range(len(inningovers))])
+             for i in range(inningovers_len)])
           )
         )
       except:
@@ -73,15 +74,21 @@ class CricketData:
       ax.set_xlabel("Overs")
       ax.set_title(f"Runs Per Over - Innings {inning_index + 1} - {matchInningsContent[inning_index]["team"]["abbreviation"]}")
       try:
-        ax.bar(each_inns_ovs_runs_wkts[inning_index][0], each_inns_ovs_runs_wkts[inning_index][1])
-        ax.set_xticks(each_inns_ovs_runs_wkts[inning_index][0])
+        ax.bar(
+          each_inns_ovs_runs_wkts[inning_index][0],
+          each_inns_ovs_runs_wkts[inning_index][1]
+        )
+        ax.set_xticks(each_inns_ovs_runs_wkts[inning_index][0][::2])
       except UnboundLocalError:
-        return each_inns_graphs
+        traceback.print_exc()
+      except Exception:
+        traceback.print_exc()
+        return []
       each_inns_graphs.append(base_fns.conv_to_base64(figures[inning_index]))
 
     return each_inns_graphs
   
-  def division_of_runs(self) -> tuple[str]:
+  def division_of_runs(self) -> list[str]:
     inn_runs = [[0] * 6 for _ in range(self.current_no_of_inns)]
     for index, inning_no in enumerate(range(1, self.current_no_of_inns + 1)):
       # index starts from 0 till 1, inning_no starts from 1 till 2 (for 2 innings) & till 3, 4 respectively for 4 innings (tests)
@@ -108,8 +115,8 @@ class CricketData:
 
     figures = [
       go.Figure(
-      data=[go.Pie(labels = fig_labels, values = inn_runs[i], textinfo = 'value')],
-      layout = dict(margin = dict(t = 0))) # t stands for top margin
+      data=[go.Pie(labels = fig_labels, values = inn_runs[i], textinfo = 'value+label')],
+      layout = dict(margin = dict(t = 0), showlegend=False)) # t stands for top margin
       for i in range(self.current_no_of_inns)
     ]
 
@@ -143,7 +150,7 @@ class CricketData:
         each_innings_scores_and_overs[index].append(np.array(ball_by_ball_json['totalInningRuns']))
         each_innings_scores_and_overs[index].append(np.array(ball_by_ball_json['oversActual']))
       except:
-        inn_team_colors.append("#00FFFFF")
+        inn_team_colors.append("#FFFFFF00")
         each_innings_scores_and_overs[index].append(np.array([]))
         each_innings_scores_and_overs[index].append(np.array([]))
 
@@ -152,13 +159,13 @@ class CricketData:
     
     # set_xticks is to set x-axis label follow a pattern.
     # for example, for t20 it will be (0, 21, 2) which makes the x-axes labels as 0,2,4,...20
-    ax.set_xticks(np.arange(0, len(self.match_data["content"]["innings"][0]["inningOvers"]) + 1, 2))
+    ax.set_xticks(np.arange(0, self.max_overs_played_in_an_inns + 1, 2 if self.max_overs_played_in_an_inns < 100 else 10))
     for index in range(self.current_no_of_inns):
       ax.plot(
         each_innings_scores_and_overs[index][1],
         each_innings_scores_and_overs[index][0],
         color=inn_team_colors[index],
-        label=self.match_data["match"]["teams"][index]["team"]["name"]
+        label=self.match_data["content"]["innings"][index]["team"]["name"]
       )
 
     ax.set_xlabel("Overs")

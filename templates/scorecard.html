@@ -30,6 +30,14 @@ match_data_json["match"]["teams"][1]["team"]["abbreviation"] + " " + match_data_
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
     integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz"
     crossorigin="anonymous"></script>
+  <style>
+    .carousel-control-prev:hover {
+      background: linear-gradient(to right, rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.3), rgba(0, 0, 0, 0));
+    }
+    .carousel-control-next:hover {
+      background: linear-gradient(to left, rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.3), rgba(0, 0, 0, 0));
+    }
+  </style>
 </head>
 
 <body>
@@ -280,10 +288,9 @@ match_data_json["match"]["teams"][1]["team"]["abbreviation"] + " " + match_data_
               <div>
                 <p class="my-0 p-1"><strong>Did not bat - </strong> {% for p in dnb[1] %} {{ p.longName }}, {% endfor %}</p>
                 <div class="my-0 d-flex justify-content-around">
-                  {% set Team2ScoreTrgt = match_data_json.match.teams[1].scoreInfo.split(', T:') %}
                   {% set team2_score = match_data_json.match.teams[1].score %}
-                  {% set inn2_ovs = Team2ScoreTrgt[0] %}
-                  {% set target = Team2ScoreTrgt[1] %}
+                  {% set inn2_ovs = match_data_json.content.innings[1].overs %}
+                  {% set target = match_data_json.content.innings[1].target %}
                   <p class="mb-0"><strong>Total</strong> - {{ team2_score }} ({{ inn2_ovs }})</p>
                   <p class="mb-0"><strong>Target</strong> - {{ target }}</p>
                 </div>
@@ -491,24 +498,54 @@ match_data_json["match"]["teams"][1]["team"]["abbreviation"] + " " + match_data_
             style="width: 100%; max-height: min-content;">
         </div>
         {% endif %}
-        
-
-        {% for index in range(each_inns_graphs | length) %}
-          <div class="border rounded mb-2 overflow-hidden">
-            <img src="data:image/png;base64,{{ each_inns_graphs[index] }}" alt="Innings {{ index + 1 }} Overs-Runs"
-              style="width: 100%; max-height: min-content;">
+        {% set len_runs_each_over_graphs = each_inns_graphs | length %}
+        {% if len_runs_each_over_graphs > 0 %}
+        <div id="runsEachOverGraphsCarousel" class="carousel slide border rounded mb-2 overflow-hidden">
+          <h6 class="fs-6 fw-bold px-2 py-1 my-0">Runs Each Over (Slide for another graph)</h6>
+          <div class="carousel-inner">
+            {% for index in range(len_runs_each_over_graphs) %}
+            <div class="carousel-item {% if index == 0 %} active {% endif %}">
+              <div>
+                <img src="data:image/png;base64,{{ each_inns_graphs[index] }}" alt="Innings {{ index + 1 }} Overs-Runs"
+                style="width: 100%; max-height: min-content;">
+              </div>
+            </div>
+            {% endfor %}
           </div>
-        {% endfor %}
+          <button class="carousel-control-prev border-dark" type="button" data-bs-target="#runsEachOverGraphsCarousel" data-bs-slide="prev">
+            <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+            <span class="visually-hidden">Previous</span>
+          </button>
+          <button class="carousel-control-next" type="button" data-bs-target="#runsEachOverGraphsCarousel" data-bs-slide="next">
+            <span class="carousel-control-next-icon" aria-hidden="true"></span>
+            <span class="visually-hidden">Next</span>
+          </button>
+        </div>
+        {% endif %}
 
-        <!-- Distribution of Runs Graph (Dots, 1s, 2s, 3s, 4s, 6s) -->
-        <h5 class="fs-5 fw-bold text-center border-top">Distribution of Runs</h5>
-        {% for index in range(runs_div_graphs | length) %}
-          {% if match_data_json.match.teams[index].score is not none %}
-          <iframe class="rounded" srcdoc="{{ runs_div_graphs[index] }}" width="100%" height="380px" frameborder="0"
-            scrolling="no"></iframe>
-          <p class="fs-6 mb-0 text-center">{{ match_data_json.match.teams[0].team.longName }}</p>
-          {% endif %}
-        {% endfor %}
+        <!-- Distribution of Runs Graph (Dots, 1s, 2s, 3s, 4s, 6s) with Carousel -->
+        <div id="runsDistroGraphsCarousel" class="carousel slide rounded mb-2 overflow-hidden border">
+          <h6 class="fs-6 fw-bold px-2 py-1 my-0">Distribution of Runs (Slide for another graph)</h6>
+          <div class="carousel-inner">
+            {% for index in range(runs_div_graphs | length) %}
+              {% if match_data_json.content.innings[index].runs is not none %}
+              <div class="carousel-item {% if index == 0 %} active {% endif %}">
+                <iframe srcdoc="{{ runs_div_graphs[index] }}" width="100%" height="380px" frameborder="0"
+                  scrolling="no"></iframe>
+                <p class="fs-6 mb-0 text-center">{{ match_data_json.content.innings[index].team.longName }} (Innings {{ index + 1 }})</p>
+              </div>
+              {% endif %}
+            {% endfor %}
+          </div>
+          <button class="carousel-control-prev" type="button" data-bs-target="#runsDistroGraphsCarousel" data-bs-slide="prev">
+            <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+            <span class="visually-hidden">Previous</span>
+          </button>
+          <button class="carousel-control-next" type="button" data-bs-target="#runsDistroGraphsCarousel" data-bs-slide="next">
+            <span class="carousel-control-next-icon" aria-hidden="true"></span>
+            <span class="visually-hidden">Next</span>
+          </button>
+        </div>        
 
         <!-- <div class="border rounded p-2 mb-2" style="width: 100%; height: 300px; background-color: white;">
             <p class="text-center" style="font-size: small;">Advertisement is going to displayed here</p>

@@ -21,13 +21,15 @@ class CricketData:
     self.match_id: int = match_id
     self.series_data: dict = base_fns.get_series_data_from_bucket(series_id)
     self.match_data: dict = base_fns.get_match_data_from_bucket(series_id, match_id)
+    
+    # access this variable if to know how many innings are there in the match including the current running over
     self.current_no_of_inns: int = len(self.match_data["content"]["innings"])
+
     self.max_overs_played_in_an_inns: int = ceil(max([self.match_data["content"]["innings"][i]["overs"] for i in range(self.current_no_of_inns)]))
+    
     self.all_innings_data: list[dict] = [
       base_fns.get_innings_data(series_id, match_id, inning_no) for inning_no in range(1, self.current_no_of_inns + 1)
     ]
-
-    # access this variable if to know how many innings are there in the match including the current running over
 
   """Getter Functions"""
 
@@ -312,146 +314,122 @@ class CricketData:
     return i1_partnership, i2_partnership, figdata1, figdata2
 
 def bat_impact_pts(series_id: int, match_id: int):
-  # players_dictionary = get_match_players_dict(content=content)
-  player_dict={}
-  output1 = base_fns.get_match_data_from_bucket(series_id, match_id)
-  content = output1['content']
-  for i in range(0, 2):
-    try:
-      matches1 = output1['content']['matchPlayers']['teamPlayers'][i]['players']
-      for j in range(0, len(matches1)):
-        player_id=matches1[j]['player']['id']
-        player_name=matches1[j]['player']['longName']
-        player_dict[player_id] = player_name
-    except:
-      continue
+  try:
+    # players_dictionary = get_match_players_dict(content=content)
+    player_dict={}
+    output1 = base_fns.get_match_data_from_bucket(series_id, match_id)
+    content = output1['content']
+    for i in range(0, 2):
+      try:
+        matches1 = output1['content']['matchPlayers']['teamPlayers'][i]['players']
+        for j in range(0, len(matches1)):
+          player_id=matches1[j]['player']['id']
+          player_name=matches1[j]['player']['longName']
+          player_dict[player_id] = player_name
+      except:
+        continue
 
-  partnership_df = pd.DataFrame(columns=['innings', 'player1ID', 'player1', 'player2ID', 'player2','player_out_id', 'player1_runs', 'player1_balls','player2_runs', 'player2_balls', 'partnershipRuns', 'partnershipBalls'])
-  f = 0
-  for k in range(0, 2):
-    if(k==0):
-      team1_name=content['matchPlayers']['teamPlayers'][k]['team']['longName']
-    else:
-      team2_name=content['matchPlayers']['teamPlayers'][k]['team']['longName']
-    partnerships = content['innings'][k]['inningPartnerships']
-    for p in range(0, len(partnerships)):
-        partnership_df.loc[f, 'innings'] = k + 1
-        partnership_df.loc[f, 'player1ID'] = partnerships[p]['player1']['id']
-        partnership_df.loc[f, 'player1'] = partnerships[p]['player1']['longName']
-        partnership_df.loc[f, 'player2ID'] = partnerships[p]['player2']['id']
-        partnership_df.loc[f, 'player2'] = partnerships[p]['player2']['longName']
-        partnership_df.loc[f, 'player_out_id'] = partnerships[p]['outPlayerId']
-        partnership_df.loc[f, 'player1_runs'] = partnerships[p]['player1Runs']
-        partnership_df.loc[f, 'player1_balls'] = partnerships[p]['player1Balls']
-        partnership_df.loc[f, 'player2_runs'] = partnerships[p]['player2Runs']
-        partnership_df.loc[f, 'player2_balls'] = partnerships[p]['player2Balls']
-        partnership_df.loc[f, 'partnershipRuns'] = partnerships[p]['runs']
-        partnership_df.loc[f, 'partnershipBalls'] = partnerships[p]['balls']
-        f += 1
-  partnership_df['player_out'] = partnership_df['player_out_id'].map(player_dict).fillna("not out")
-  for index, row in partnership_df.iterrows():
-    partnership_df.at[index, 'p1_contrib'] = (row['player1_runs'] * 100 / row['partnershipRuns']) if row['partnershipRuns'] != 0 else 0
-    partnership_df.at[index, 'p2_contrib'] = (row['player2_runs'] * 100 / row['partnershipRuns']) if row['partnershipRuns'] != 0 else 0
-    partnership_df.at[index, 'player1_SR'] = (row['player1_runs'] * 100 / row['player1_balls']) if row['player1_balls'] != 0 else 0
-    partnership_df.at[index, 'player2_SR'] = (row['player2_runs'] * 100 / row['player2_balls']) if row['player2_balls'] != 0 else 0
+    partnership_df = pd.DataFrame(columns=['innings', 'player1ID', 'player1', 'player2ID', 'player2','player_out_id', 'player1_runs', 'player1_balls','player2_runs', 'player2_balls', 'partnershipRuns', 'partnershipBalls'])
+    f = 0
+    for k in range(0, 2):
+      if(k==0):
+        team1_name=content['matchPlayers']['teamPlayers'][k]['team']['longName']
+      else:
+        team2_name=content['matchPlayers']['teamPlayers'][k]['team']['longName']
+      partnerships = content['innings'][k]['inningPartnerships']
+      for p in range(0, len(partnerships)):
+          partnership_df.loc[f, 'innings'] = k + 1
+          partnership_df.loc[f, 'player1ID'] = partnerships[p]['player1']['id']
+          partnership_df.loc[f, 'player1'] = partnerships[p]['player1']['longName']
+          partnership_df.loc[f, 'player2ID'] = partnerships[p]['player2']['id']
+          partnership_df.loc[f, 'player2'] = partnerships[p]['player2']['longName']
+          partnership_df.loc[f, 'player_out_id'] = partnerships[p]['outPlayerId']
+          partnership_df.loc[f, 'player1_runs'] = partnerships[p]['player1Runs']
+          partnership_df.loc[f, 'player1_balls'] = partnerships[p]['player1Balls']
+          partnership_df.loc[f, 'player2_runs'] = partnerships[p]['player2Runs']
+          partnership_df.loc[f, 'player2_balls'] = partnerships[p]['player2Balls']
+          partnership_df.loc[f, 'partnershipRuns'] = partnerships[p]['runs']
+          partnership_df.loc[f, 'partnershipBalls'] = partnerships[p]['balls']
+          f += 1
+    partnership_df['player_out'] = partnership_df['player_out_id'].map(player_dict).fillna("not out")
+    for index, row in partnership_df.iterrows():
+      partnership_df.at[index, 'p1_contrib'] = (row['player1_runs'] * 100 / row['partnershipRuns']) if row['partnershipRuns'] != 0 else 0
+      partnership_df.at[index, 'p2_contrib'] = (row['player2_runs'] * 100 / row['partnershipRuns']) if row['partnershipRuns'] != 0 else 0
+      partnership_df.at[index, 'player1_SR'] = (row['player1_runs'] * 100 / row['player1_balls']) if row['player1_balls'] != 0 else 0
+      partnership_df.at[index, 'player2_SR'] = (row['player2_runs'] * 100 / row['player2_balls']) if row['player2_balls'] != 0 else 0
 
-  df = pd.DataFrame(list(player_dict.items()), columns=['player id', 'player name'])
-  df['runs'], df['balls'], df['impact_points'], df['runs_imp'], df['fours_imp'], df['sixes_imp'] = [0] * 6
-  df['team'] = None
-  team_1_total, team_2_total, team1_balls, team2_balls, wkts1, wkts2 = [0] * 6
+    df = pd.DataFrame(list(player_dict.items()), columns=['player id', 'player name'])
+    df['runs'], df['balls'], df['impact_points'], df['runs_imp'], df['fours_imp'], df['sixes_imp'] = [0] * 6
+    df['team'] = None
+    team_1_total, team_2_total, team1_balls, team2_balls, wkts1, wkts2 = [0] * 6
 
-  for innings in range(1,3):
-    try:
-      matches = base_fns.get_innings_data(series_id, match_id, innings)['comments']
-      impact_points = 0
-      for i in range(0,len(matches)):
-        over          = matches[i]['overNumber']
-        oversActual   = matches[i]['oversActual']
-        totalruns     = matches[i]['totalRuns']
-        bowler_id     = matches[i]['bowlerPlayerId']
-        batsman_id    = matches[i]['batsmanPlayerId']
-        batsman_runs  = matches[i]['batsmanRuns']
-        wides         = matches[i]['wides']
-        noballs       = matches[i]['noballs']
-        byes          = matches[i]['byes']
-        legbyes       = matches[i]['legbyes']
-        penalties     = matches[i]['penalties']
-        wicket        = matches[i]['isWicket']
+    for innings in range(1,3):
+      try:
+        matches = base_fns.get_innings_data(series_id, match_id, innings)['comments']
+        impact_points = 0
+        for i in range(0,len(matches)):
+          over          = matches[i]['overNumber']
+          oversActual   = matches[i]['oversActual']
+          totalruns     = matches[i]['totalRuns']
+          bowler_id     = matches[i]['bowlerPlayerId']
+          batsman_id    = matches[i]['batsmanPlayerId']
+          batsman_runs  = matches[i]['batsmanRuns']
+          wides         = matches[i]['wides']
+          noballs       = matches[i]['noballs']
+          byes          = matches[i]['byes']
+          legbyes       = matches[i]['legbyes']
+          penalties     = matches[i]['penalties']
+          wicket        = matches[i]['isWicket']
 
-        dot = 1 if batsman_runs==0 and wides==0 else 0
-        
-        impact_points=0
-        runs_imp, four_imp, sixes_imp = 0, 0, 0
-        ball = 0 if wides>0 else 1
+          dot = 1 if batsman_runs==0 and wides==0 else 0
+          
+          impact_points=0
+          runs_imp, four_imp, sixes_imp = 0, 0, 0
+          ball = 0 if wides>0 else 1
 
-        ##Runrate
-        if(innings==1):
-          team_1_total = team_1_total + totalruns
-          team1_balls = team1_balls+ball
-          CRR1 = (team_1_total * 6)/team1_balls
-        else:
-          target = team_1_total
-          team_2_total = team_2_total + totalruns
-          team2_balls = team2_balls+ball
-          required_runs = target-team_2_total
-          required_rr = (required_runs * 6) / (120-team2_balls)
-          CRR2=team_2_total*6/team2_balls
-
-        ##Impact points
-        match (batsman_runs):
-          case 0:
-            impact_points, runs_imp, four_imp, sixes_imp = [0] * 4
-          case 1:
-            impact_points, runs_imp = [1] * 2
-          case 2:
-            impact_points, runs_imp= [2] * 2
-          case 3:
-            impact_points, runs_imp = [3] * 2
-          case 4:
-            impact_points, four_imp = [4.5] * 2
-          case 6:
-            impact_points, sixes_imp = [7] * 2
-
-        # k = i + 1
-        batsman2_id = None
-        check=0
-        p=k
-        while(check):
-          b_id = matches[p]['batsmanPlayerId']
-          if b_id != batsman_id:
-            batsman2_id = b_id
-            check=1
-            break
-          p += 1
-
-        ##Wicket
-        if(wicket==True):
-          outplayer_id=matches[i]['outPlayerId']
-          next_batsman_id=matches[i+1]['batsmanPlayerId']
-          if(next_batsman_id == batsman2_id or batsman_id):
-            check=0
-            while(check):
-              p = k
-              b_id = matches[p]['batsmanPlayerId']
-              if(b_id != batsman2_id or batsman_id):
-                next_batsman_id = b_id
-                check = 1
-                break
-              p += 1
+          ##Runrate
           if(innings==1):
-            wkts1 += 1
-            if(wkts1==1):
-              df.loc[df['player id'] == outplayer_id, 'CRR_when_came'] = 0
-              df.loc[df['player id'] == batsman2_id, 'CRR_when_came'] = 0
-            else:
-              df.loc[df['player id'] == outplayer_id, 'CRR_when_out'] = CRR1
-              df.loc[df['player id'] == outplayer_id, 'team_score'] = team_1_total
-              df.loc[df['player id'] == outplayer_id, 'team_balls'] = team1_balls
-              df.loc[df['player id'] == next_batsman_id, 'CRR_when_came'] = CRR1
-            CRR1_arrived = CRR1
+            team_1_total = team_1_total + totalruns
+            team1_balls = team1_balls+ball
+            CRR1 = (team_1_total * 6)/team1_balls
+          else:
+            target = team_1_total
+            team_2_total = team_2_total + totalruns
+            team2_balls = team2_balls+ball
+            required_runs = target-team_2_total
+            required_rr = (required_runs * 6) / (120-team2_balls)
+            CRR2=team_2_total*6/team2_balls
 
-          if(innings==2):
-            wkts2 += 1
+          ##Impact points
+          match (batsman_runs):
+            case 0:
+              impact_points, runs_imp, four_imp, sixes_imp = [0] * 4
+            case 1:
+              impact_points, runs_imp = [1] * 2
+            case 2:
+              impact_points, runs_imp= [2] * 2
+            case 3:
+              impact_points, runs_imp = [3] * 2
+            case 4:
+              impact_points, four_imp = [4.5] * 2
+            case 6:
+              impact_points, sixes_imp = [7] * 2
+
+          # k = i + 1
+          batsman2_id = None
+          check=0
+          p=k
+          while(check):
+            b_id = matches[p]['batsmanPlayerId']
+            if b_id != batsman_id:
+              batsman2_id = b_id
+              check=1
+              break
+            p += 1
+
+          ##Wicket
+          if(wicket==True):
+            outplayer_id=matches[i]['outPlayerId']
             next_batsman_id=matches[i+1]['batsmanPlayerId']
             if(next_batsman_id == batsman2_id or batsman_id):
               check=0
@@ -460,107 +438,134 @@ def bat_impact_pts(series_id: int, match_id: int):
                 b_id = matches[p]['batsmanPlayerId']
                 if(b_id != batsman2_id or batsman_id):
                   next_batsman_id = b_id
-                  check=1
+                  check = 1
                   break
                 p += 1
-            df.loc[df['player id'] == outplayer_id, 'team_score'] = team_2_total
-            df.loc[df['player id'] == outplayer_id, 'team_balls'] = team2_balls
-            if(wkts2 != 1):
-              df.loc[df['player id'] == outplayer_id, 'RRR_when_came'] = req_rr
-            if(wkts2 == 1):
-              df.loc[df['player id'] == outplayer_id, 'RRR_when_came'] = CRR1
-              df.loc[df['player id'] == batsman2_id, 'RRR_when_came'] = CRR1
-              df.loc[df['player id'] == outplayer_id, 'CRR_when_came'] = 0
-              df.loc[df['player id'] == batsman2_id, 'CRR_when_came'] = 0
-            df.loc[df['player id'] == outplayer_id, 'CRR_when_out'] = CRR2
-            df.loc[df['player id'] == next_batsman_id, 'CRR_when_came'] = CRR2
-            df.loc[df['player id'] == outplayer_id, 'RRR_when_out'] = required_rr
-            req_rr=required_rr
+            if(innings==1):
+              wkts1 += 1
+              if(wkts1==1):
+                df.loc[df['player id'] == outplayer_id, 'CRR_when_came'] = 0
+                df.loc[df['player id'] == batsman2_id, 'CRR_when_came'] = 0
+              else:
+                df.loc[df['player id'] == outplayer_id, 'CRR_when_out'] = CRR1
+                df.loc[df['player id'] == outplayer_id, 'team_score'] = team_1_total
+                df.loc[df['player id'] == outplayer_id, 'team_balls'] = team1_balls
+                df.loc[df['player id'] == next_batsman_id, 'CRR_when_came'] = CRR1
+              CRR1_arrived = CRR1
 
-        if(innings == 2):
-          if(oversActual == 0.1):
-            df.loc[df['player id'] == batsman_id, 'RRR_when_came'] = CRR1
-            # df.loc[df['player id'] == batsman2_id, 'RRR_when_came']=CRR1
+            if(innings==2):
+              wkts2 += 1
+              next_batsman_id=matches[i+1]['batsmanPlayerId']
+              if(next_batsman_id == batsman2_id or batsman_id):
+                check=0
+                while(check):
+                  p = k
+                  b_id = matches[p]['batsmanPlayerId']
+                  if(b_id != batsman2_id or batsman_id):
+                    next_batsman_id = b_id
+                    check=1
+                    break
+                  p += 1
+              df.loc[df['player id'] == outplayer_id, 'team_score'] = team_2_total
+              df.loc[df['player id'] == outplayer_id, 'team_balls'] = team2_balls
+              if(wkts2 != 1):
+                df.loc[df['player id'] == outplayer_id, 'RRR_when_came'] = req_rr
+              if(wkts2 == 1):
+                df.loc[df['player id'] == outplayer_id, 'RRR_when_came'] = CRR1
+                df.loc[df['player id'] == batsman2_id, 'RRR_when_came'] = CRR1
+                df.loc[df['player id'] == outplayer_id, 'CRR_when_came'] = 0
+                df.loc[df['player id'] == batsman2_id, 'CRR_when_came'] = 0
+              df.loc[df['player id'] == outplayer_id, 'CRR_when_out'] = CRR2
+              df.loc[df['player id'] == next_batsman_id, 'CRR_when_came'] = CRR2
+              df.loc[df['player id'] == outplayer_id, 'RRR_when_out'] = required_rr
+              req_rr=required_rr
+
+          if(innings == 2):
+            if(oversActual == 0.1):
+              df.loc[df['player id'] == batsman_id, 'RRR_when_came'] = CRR1
+              # df.loc[df['player id'] == batsman2_id, 'RRR_when_came']=CRR1
 
 
-        df.loc[df['player id'] == batsman_id,'innings'] = innings
-        if(innings==1):
-          df.loc[df['player id'] == batsman_id,'team'] = team1_name
-        else:
-          df.loc[df['player id'] == batsman_id,'team'] = team2_name
-        df.loc[df['player id'] == batsman_id, 'runs'] = df.loc[df['player id'] == batsman_id,'runs'] + batsman_runs
-        df.loc[df['player id'] == batsman_id, 'balls'] = df.loc[df['player id'] == batsman_id,'balls'] + ball
-        r, dp = [0] * 2
-        if(over<7):
-          r = 0.5
-        elif(over > 16 and over < 19):
-          r=1
-          if(dot == 1):
-            dp =- 0.5
-        elif(over > 18):
-          r = 2
-          if(dot == 1):
-            dp =- 1
-        else:
-          r=0
-        df.loc[df['player id'] == batsman_id, 'runs_imp'] += runs_imp
-        # if(totalruns!=0):
-        #   df.loc[df['player id'] == batsman_id, 'impact_points']+= impact_points + r
-        # elif (batsman_runs==0 and wides==0):
-        #   df.loc[df['player id'] == batsman_id, 'impact_points']+= impact_points + dp
-        if(four_imp != 0):
-          df.loc[df['player id'] == batsman_id, 'fours_imp'] += four_imp + r
-        else:
-          df.loc[df['player id'] == batsman_id, 'fours_imp'] += four_imp
-        if(sixes_imp!=0):
-          df.loc[df['player id'] == batsman_id, 'sixes_imp'] += sixes_imp + r
-        else:
-          df.loc[df['player id'] == batsman_id, 'sixes_imp'] += sixes_imp
-      df['impact_points'] = df['runs_imp'] + df['fours_imp'] + df['sixes_imp']
-      df['SR'] = (df['runs']*100/df['balls']).round(2)
+          df.loc[df['player id'] == batsman_id,'innings'] = innings
+          if(innings==1):
+            df.loc[df['player id'] == batsman_id,'team'] = team1_name
+          else:
+            df.loc[df['player id'] == batsman_id,'team'] = team2_name
+          df.loc[df['player id'] == batsman_id, 'runs'] = df.loc[df['player id'] == batsman_id,'runs'] + batsman_runs
+          df.loc[df['player id'] == batsman_id, 'balls'] = df.loc[df['player id'] == batsman_id,'balls'] + ball
+          r, dp = [0] * 2
+          if(over<7):
+            r = 0.5
+          elif(over > 16 and over < 19):
+            r=1
+            if(dot == 1):
+              dp =- 0.5
+          elif(over > 18):
+            r = 2
+            if(dot == 1):
+              dp =- 1
+          else:
+            r=0
+          df.loc[df['player id'] == batsman_id, 'runs_imp'] += runs_imp
+          # if(totalruns!=0):
+          #   df.loc[df['player id'] == batsman_id, 'impact_points']+= impact_points + r
+          # elif (batsman_runs==0 and wides==0):
+          #   df.loc[df['player id'] == batsman_id, 'impact_points']+= impact_points + dp
+          if(four_imp != 0):
+            df.loc[df['player id'] == batsman_id, 'fours_imp'] += four_imp + r
+          else:
+            df.loc[df['player id'] == batsman_id, 'fours_imp'] += four_imp
+          if(sixes_imp!=0):
+            df.loc[df['player id'] == batsman_id, 'sixes_imp'] += sixes_imp + r
+          else:
+            df.loc[df['player id'] == batsman_id, 'sixes_imp'] += sixes_imp
+        df['impact_points'] = df['runs_imp'] + df['fours_imp'] + df['sixes_imp']
+        df['SR'] = (df['runs']*100/df['balls']).round(2)
 
-      for i in range(len(df)):
-        p = df['runs'][i] / 10
-        df['impact_points'][i] += p * 2
-      target=df.loc[df['innings'] == 1, 'runs'].sum()
-      target_sr=target / 1.2
-    except:
-      continue
+        for i in range(len(df)):
+          p = df['runs'][i] / 10
+          df['impact_points'][i] += p * 2
+        target=df.loc[df['innings'] == 1, 'runs'].sum()
+        target_sr=target / 1.2
+      except:
+        continue
 
-  # for j in range(0,len(partnership_df)):
+    # for j in range(0,len(partnership_df)):
 
-  for j in range(len(df)):
-    if(df['innings'][j]==1):
-      first_total=df['runs'].sum()
-      first_balls=df['balls'].sum()
-      first_SR=first_total*6/first_balls
-      if(df['SR'][j]<(first_SR)/2):
-        df['impact_points'][j]-=5
-      elif(df['SR'][j]<first_SR):
-        df['impact_points'][j]-=2
-      elif(df['SR'][j]>=1.5*(first_SR)):
-        df['impact_points'][j]+=2
-      elif(df['SR'][j]>2*(first_SR)):
-        df['impact_points'][j]+=5
-    else:
-      if(df['SR'][j]<(target_sr)/2):
-        df['impact_points'][j]-=5
-      elif(df['SR'][j]<target_sr):
-        df['impact_points'][j]-=2
-      elif(df['SR'][j]>=1.5*(target_sr)):
-        df['impact_points'][j]+=2
-      elif(df['SR'][j]>2*(target_sr)):
-        df['impact_points'][j]+=5
-    df1 = df[df['impact_points'] != 0]
-    df1['CRR_when_out']=df1['CRR_when_out'].fillna(" - ")
-    df1['RRR_when_came']=df1['RRR_when_came'].fillna(" - ")
-    df1['CRR_when_out']=(df1['CRR_when_out']).apply(lambda x: format(x, ".2f") if isinstance(x, (int, float)) else x)
-    # df1['RRR_when_came']=(df1['RRR_when_came']).apply(lambda x: format(x, ".2f") if isinstance(x, (int, float)) else x)
-    # df1['RRR_when_out']=(df1['RRR_when_out']).apply(lambda x: format(x, ".2f") if isinstance(x, (int, float)) else x)
-    # b_df1 = b_df[b_df['Performance_score'] != 0]
-    df1=df1.sort_values(by='impact_points', ascending=False)
-    df1['SR'] = df1['SR'].round(2)
-  return df1, partnership_df
+    for j in range(len(df)):
+      if(df['innings'][j]==1):
+        first_total=df['runs'].sum()
+        first_balls=df['balls'].sum()
+        first_SR=first_total*6/first_balls
+        if(df['SR'][j]<(first_SR)/2):
+          df['impact_points'][j]-=5
+        elif(df['SR'][j]<first_SR):
+          df['impact_points'][j]-=2
+        elif(df['SR'][j]>=1.5*(first_SR)):
+          df['impact_points'][j]+=2
+        elif(df['SR'][j]>2*(first_SR)):
+          df['impact_points'][j]+=5
+      else:
+        if(df['SR'][j]<(target_sr)/2):
+          df['impact_points'][j]-=5
+        elif(df['SR'][j]<target_sr):
+          df['impact_points'][j]-=2
+        elif(df['SR'][j]>=1.5*(target_sr)):
+          df['impact_points'][j]+=2
+        elif(df['SR'][j]>2*(target_sr)):
+          df['impact_points'][j]+=5
+      df1 = df[df['impact_points'] != 0]
+      df1['CRR_when_out']=df1['CRR_when_out'].fillna(" - ")
+      df1['RRR_when_came']=df1['RRR_when_came'].fillna(" - ")
+      df1['CRR_when_out']=(df1['CRR_when_out']).apply(lambda x: format(float(x), ".2f") if isinstance(x, (int, float)) else x)
+      # df1['RRR_when_came']=(df1['RRR_when_came']).apply(lambda x: format(x, ".2f") if isinstance(x, (int, float)) else x)
+      # df1['RRR_when_out']=(df1['RRR_when_out']).apply(lambda x: format(x, ".2f") if isinstance(x, (int, float)) else x)
+      # b_df1 = b_df[b_df['Performance_score'] != 0]
+      df1=df1.sort_values(by='impact_points', ascending=False)
+      df1['SR'] = df1['SR'].round(2)
+    return df1, partnership_df
+  except Exception:
+    traceback.print_exc()
 
 def bowl_impact_pts(series_id: int,match_id: int):
   player_dict = {}

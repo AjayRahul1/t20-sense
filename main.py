@@ -2,7 +2,7 @@ from fastapi import FastAPI, Request
 from fastapi.responses import HTMLResponse
 from fastapi.templating import Jinja2Templates
 from fastapi.staticfiles import StaticFiles
-import traceback, dotenv, json, time, uvicorn
+import traceback, dotenv, json, time, uvicorn, pandas as pd
 import ipl_func, base_fns, stats
 from stats import CricketData
 
@@ -48,14 +48,20 @@ async def scoreacard(request: Request, series_id: int, match_id: int):
     bat_imp_pts, bow_imp_pts = {}, {}
     try:
       bat_imp_pts, ptnrshp_df = stats.bat_impact_pts(series_id, match_id)  # Batting impact points
-      bat_df, bow_imp_pts = stats.bowl_impact_pts(series_id, match_id)  # Bowlers impact points
-      bat_imp_pts, bow_imp_pts = bat_imp_pts.to_dict(orient='records'), bow_imp_pts.to_dict(orient='records')
     except IndexError as e:
       print("\n\nException in 'Bat and Bowl Impact Pts':\nFew innings missing. Solve it if possible.")
-      bat_imp_pts, bow_imp_pts = {}, {}
+      bat_imp_pts = pd.DataFrame()
     except Exception:
-      print(f"\n\nException in Batting and Bowling Impact Points:\n{traceback.print_exc}")
-      bat_imp_pts, bow_imp_pts = {}, {}
+      print(f"\n\nException in Batting and Bowling Impact Points:\n{traceback.print_exc()}")
+      bat_imp_pts =  pd.DataFrame()
+
+    try:    
+      bat_df, bow_imp_pts = stats.bowl_impact_pts(series_id, match_id)  # Bowlers impact points
+    except Exception:
+      bow_imp_pts = pd.DataFrame()
+      traceback.print_exc()
+
+    bat_imp_pts, bow_imp_pts = bat_imp_pts.to_dict(orient='records'), bow_imp_pts.to_dict(orient='records')
 
     # Base64 Image encoded in a string for Line Plot for each innings runs progression
     lineplot_inn_runs_progress: str = cricket_data.graph_cricket_innings_progression()

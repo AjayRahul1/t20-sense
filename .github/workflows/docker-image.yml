@@ -1,5 +1,4 @@
 name: Docker Image CI
-
 on:
   push:
     branches: [ "main" ]
@@ -7,11 +6,8 @@ on:
     branches: [ "main" ]
 
 jobs:
-
   build:
-
     runs-on: ubuntu-latest
-
     steps:
     - uses: actions/checkout@v3
     - name: Build the Docker image
@@ -19,6 +15,6 @@ jobs:
 
     - name: Login to Docker
       run: echo "${{ secrets.DOCKER_PWD_TOKEN }}" | docker login --username "${{ secrets.DOCKER_USERNAME }}" --password-stdin
-      
+
     - name: Push Docker Image
-      run: docker push ${{ secrets.DOCKER_USERNAME }}/music-composition:${{ github.sha }}
+      run: docker push ${{ secrets.DOCKER_USERNAME }}/t20-sense:${{ github.sha }}
